@@ -236,8 +236,3 @@ dataset/
 ```
 
 ---
-
-## License
-
-NASA Mars Trek data: Public domain (US Government work).  
-Code: MIT License.
