@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mars Trek Level 5 Explorer - MGS MOLA & HRSC Hillshade Blend (16K Master)</title>
+  <link rel="stylesheet" href="lib/leaflet.css">
+  <style>
+    :root {
+      --bg-dark: #0b0d13;
+      --card-bg: rgba(18, 22, 34, 0.92);
+      --card-border: #252e42;
+      --text-main: #f0f3f8;
+      --text-dim: #9aa5b8;
+      --accent-orange: #ff5e36;
+      --accent-cyan: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-yellow: #facc15;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: rgba(11, 13, 19, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-mars {
+      background: linear-gradient(135deg, #e11d48, #ff5e36);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .title-group h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .title-group p {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button.btn {
+      background: #1e2538;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button.btn:hover {
+      background: #2a344d;
+      border-color: var(--accent-cyan);
+    }
+
+    button.btn-accent {
+      background: linear-gradient(135deg, #ff5e36, #ea580c);
+      border-color: #ea580c;
+      color: white;
+      font-weight: 600;
+    }
+
+    button.btn-accent:hover {
+      filter: brightness(1.1);
+    }
+
+    /* Main Container */
+    #workspace {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #050608;
+    }
+
+    /* Overlay HUD Panels */
+    .hud-panel {
+      position: absolute;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 500;
+      font-size: 12px;
+    }
+
+    .hud-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: var(--accent-cyan);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Top-Left: Quick Landmarks */
+    #hud-landmarks {
+      top: 16px;
+      left: 16px;
+      max-width: 440px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 4px 10px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: var(--accent-orange);
+      border-color: var(--accent-orange);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* Top-Right: Layers & Toggles */
+    #hud-controls {
+      top: 16px;
+      right: 16px;
+      width: 250px;
+    }
+
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toggle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    .toggle-item input[type="checkbox"] {
+      accent-color: var(--accent-orange);
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Bottom-Left: Realtime Coordinate Inspector */
+    #hud-coords {
+      bottom: 24px;
+      left: 16px;
+      width: 340px;
+    }
+
+    .coord-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      row-gap: 4px;
+      column-gap: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .coord-label {
+      color: var(--text-dim);
+    }
+
+    .coord-val {
+      color: #e2e8f0;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .badge-tile {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+    }
+
+    /* Bottom-Right: Elevation Legend */
+    #hud-elevation {
+      bottom: 24px;
+      right: 16px;
+      width: 260px;
+    }
+
+    .elevation-bar {
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(to right,
+        #2a0845, /* -8 km Deep basin */
+        #1b3b87, /* -5 km */
+        #00a8cc, /* -2 km */
+        #2ecc71, /* 0 km Datum */
+        #f1c40f, /* +4 km */
+        #e67e22, /* +8 km */
+        #e74c3c, /* +14 km */
+        #ffffff  /* +21 km Olympus peak */
+      );
+      margin-bottom: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .elevation-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: ui-monospace, monospace;
+    }
+
+    /* Custom Landmark Marker & Tile Grid CSS */
+    .landmark-popup h3 {
+      font-size: 14px;
+      color: var(--accent-orange);
+      margin-bottom: 4px;
+    }
+
+    .landmark-popup p {
+      font-size: 11px;
+      color: #334155;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+
+    .landmark-popup .landmark-coords {
+      font-family: monospace;
+      font-size: 10px;
+      background: #f1f5f9;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: #0f172a;
+    }
+
+    .tile-grid-label {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      font-size: 9px;
+      font-family: monospace;
+      padding: 1px 3px;
+      border-radius: 2px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Client-Side Canvas Assembly Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(5, 7, 12, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-card {
+      background: #111520;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      width: 850px;
+      max-width: 95vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .canvas-preview-container {
+      width: 100%;
+      height: 340px;
+      background: #07090e;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    canvas#stitch-canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: #1a2234;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff5e36, #38bdf8);
+      transition: width 0.1s linear;
+    }
+
+    .status-text {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header>
+    <div class="brand">
+      <span class="badge-mars">NASA Trek</span>
+      <div class="title-group">
+        <h1>Mars MOLA & HRSC Color Hillshade Blend (Level 5 - 16K Master)</h1>
+        <p>2,048 Fragments Stitched (64 cols &times; 32 rows) &bull; Equirectangular (EPSG:104905) &bull; BBox: [-180, -90, 180, 90]</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-accent" id="btn-open-canvas-tool">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        Browser Canvas Stitcher
+      </button>
+      <button class="btn" id="btn-reset-view">Reset View</button>
+    </div>
+  </header>
+
+  <!-- Workspace Container with Leaflet Map -->
+  <div id="workspace">
+    <div id="map"></div>
+
+    <!-- Quick Landmarks Bar -->
+    <div class="hud-panel" id="hud-landmarks">
+      <span class="chip" data-lat="18.65" data-lon="-133.8" data-zoom="6">Olympus Mons</span>
+      <span class="chip" data-lat="-13.9" data-lon="-59.2" data-zoom="6">Valles Marineris</span>
+      <span class="chip" data-lat="-5.37" data-lon="137.44" data-zoom="7">Gale Crater</span>
+      <span class="chip" data-lat="18.38" data-lon="77.58" data-zoom="7">Jezero Crater</span>
+      <span class="chip" data-lat="-42.7" data-lon="70.0" data-zoom="6">Hellas Planitia</span>
+      <span class="chip" data-lat="84.0" data-lon="0.0" data-zoom="5">North Pole</span>
+      <span class="chip" data-lat="-85.0" data-lon="0.0" data-zoom="5">South Pole</span>
+    </div>
+
+    <!-- Layer & Grid Controls HUD -->
+    <div class="hud-panel" id="hud-controls">
+      <div class="hud-title">
+        <span>Map Layers & Overlays</span>
+      </div>
+      <div class="toggle-group">
+        <label class="toggle-item">
+          <span>Stitched 16K Mosaic</span>
+          <input type="checkbox" id="toggle-mosaic" checked>
+        </label>
+        <label class="toggle-item">
+          <span>Individual Tile Grid</span>
+          <input type="checkbox" id="toggle-tiles">
+        </label>
+        <label class="toggle-item">
+          <span>Tile Seam & Matrix Bounds</span>
+          <input type="checkbox" id="toggle-bounds" checked>
+        </label>
+        <label class="toggle-item">
+          <span>Graticule (Lat/Lon Grid)</span>
+          <input type="checkbox" id="toggle-graticule" checked>
+        </label>
+        <label class="toggle-item">
+          <span>Landmark Annotations</span>
+          <input type="checkbox" id="toggle-landmarks" checked>
+        </label>
+      </div>
+    </div>
+
+    <!-- Realtime Coordinates & Tile Inspection HUD -->
+    <div class="hud-panel" id="hud-coords">
+      <div class="hud-title">
+        <span>Planetary Inspector (Level 5)</span>
+        <span class="badge-tile" id="hud-tile-name">5_x_y.jpg</span>
+      </div>
+      <div class="coord-grid">
+        <span class="coord-label">Mars Latitude:</span>
+        <span class="coord-val" id="val-lat">0.0000°</span>
+
+        <span class="coord-label">Mars Longitude:</span>
+        <span class="coord-val" id="val-lon">0.0000°</span>
+
+        <span class="coord-label">Longitude (0-360°E):</span>
+        <span class="coord-val" id="val-lon360">0.0000°E</span>
+
+        <span class="coord-label">Tile Grid Matrix:</span>
+        <span class="coord-val" id="val-matrix">Row: -, Col: -</span>
+
+        <span class="coord-label">Tile Local Pixel:</span>
+        <span class="coord-val" id="val-local-pixel">(x: -, y: -)</span>
+
+        <span class="coord-label">Global 16K Pixel:</span>
+        <span class="coord-val" id="val-global-pixel">(X: -, Y: -)</span>
+      </div>
+    </div>
+
+    <!-- Elevation Legend HUD -->
+    <div class="hud-panel" id="hud-elevation">
+      <div class="hud-title">
+        <span>Elevation Ramp (MOLA)</span>
+      </div>
+      <div class="elevation-bar"></div>
+      <div class="elevation-ticks">
+        <span>-8 km</span>
+        <span>-4 km</span>
+        <span>0 km</span>
+        <span>+8 km</span>
+        <span>+21 km</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client-Side Canvas Assembly Modal -->
+  <div class="modal-overlay" id="modal-canvas-tool">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Client-Side HTML5 Canvas Tile Stitcher (Level 5)</h2>
+        <button class="btn" id="btn-close-modal">&times; Close</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-dim);">
+          This tool demonstrates browser-side stitching: it loads all 2,048 Level 5 tiles (<code>5_0_0.jpg</code> to <code>5_31_63.jpg</code>) directly from the local tiles folder into an HTML5 16384&times;8192 Canvas, verifying pixel positioning and enabling a full-resolution composite export.
+        </p>
+        
+        <div class="canvas-preview-container">
+          <canvas id="stitch-canvas" width="16384" height="8192"></canvas>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="stitch-progress"></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="status-text" id="stitch-status">Status: Ready to assemble (2,048 tiles)</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-accent" id="btn-run-stitch">Start Assembling Canvas</button>
+            <button class="btn" id="btn-download-canvas" disabled>Download 16K PNG</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="lib/leaflet.js"></script>
+  <script>
+    /*
+     * Planetary Coordinate System Setup
+     * Projection: Mars Equirectangular / Plate Carrée
+     * Bounds: [-90, -180] to [90, 180]
+     */
+    const bounds = [[-90, -180], [90, 180]];
+
+    const map = L.map('map', {
+      crs: L.CRS.EPSG4326,
+      maxBounds: [[-100, -190], [100, 190]],
+      minZoom: 1,
+      maxZoom: 8,
+      zoomSnap: 0.25,
+      zoomDelta: 0.5,
+      attributionControl: false
+    }).setView([0, 0], 2);
+
+    // 1. Layer 1: Stitched 16384x8192 Mosaic Image Overlay
+    const mosaicOverlay = L.imageOverlay('mars_mola_level5_mosaic.jpg', bounds, {
+      opacity: 1.0,
+      interactive: true
+    }).addTo(map);
+
+    // 2. Layer 2: Custom Leaflet Tile Layer fetching local 5_{r}_{c}.jpg files directly
+    const Level5LocalTiles = L.GridLayer.extend({
+      createTile: function(coords, done) {
+        const tile = document.createElement('img');
+        tile.alt = '';
+        tile.setAttribute('role', 'presentation');
+
+        // At zoom level 5, row is 0..31 and col is 0..63
+        const col = (coords.x % 64 + 64) % 64;
+        const row = coords.y;
+
+        if (row >= 0 && row < 32) {
+          tile.src = `tiles/5_${row}_${col}.jpg`;
+        } else {
+          tile.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        }
+
+        L.DomEvent.on(tile, 'load', L.Util.bind(done, null, null, tile));
+        L.DomEvent.on(tile, 'error', L.Util.bind(done, null, null, tile));
+        return tile;
+      }
+    });
+    const localTileLayer = new Level5LocalTiles({
+      tileSize: 256,
+      minZoom: 1,
+      maxZoom: 8,
+      bounds: bounds
+    });
+
+    // 3. Layer 3: Tile Seams & Matrix Bounds Overlay (64 cols x 32 rows)
+    const boundsGroup = L.layerGroup().addTo(map);
+    const ROWS = 32;
+    const COLS = 64;
+    const LAT_STEP = 180 / ROWS; // 5.625 deg
+    const LON_STEP = 360 / COLS; // 5.625 deg
+
+    for (let r = 0; r < ROWS; r++) {
+      const topLat = 90 - r * LAT_STEP;
+      const bottomLat = 90 - (r + 1) * LAT_STEP;
+
+      for (let c = 0; c < COLS; c++) {
+        const leftLon = -180 + c * LON_STEP;
+        const rightLon = -180 + (c + 1) * LON_STEP;
+
+        // Rectangle for tile
+        const rect = L.rectangle([[bottomLat, leftLon], [topLat, rightLon]], {
+          color: '#38bdf8',
+          weight: 1,
+          opacity: 0.35,
+          dashArray: '3, 3',
+          fillOpacity: 0.02
+        });
+
+        // Center label marker
+        const centerLat = (topLat + bottomLat) / 2;
+        const centerLon = (leftLon + rightLon) / 2;
+        const label = L.marker([centerLat, centerLon], {
+          icon: L.divIcon({
+            className: 'tile-grid-label',
+            html: `<span>5_${r}_${c}</span>`,
+            iconSize: [52, 18],
+            iconAnchor: [26, 9]
+          }),
+          interactive: false
+        });
+
+        boundsGroup.addLayer(rect);
+        boundsGroup.addLayer(label);
+      }
+    }
+
+    // 4. Layer 4: Graticule Grid (Equator, Prime Meridian, 30 deg parallels)
+    const graticuleGroup = L.layerGroup().addTo(map);
+    // Equator (Red line)
+    graticuleGroup.addLayer(L.polyline([[0, -180], [0, 180]], {
+      color: '#ff5e36',
+      weight: 2,
+      opacity: 0.8
+    }));
+    // Prime Meridian (Yellow line)
+    graticuleGroup.addLayer(L.polyline([[-90, 0], [90, 0]], {
+      color: '#facc15',
+      weight: 2,
+      opacity: 0.8
+    }));
+    // Major parallels
+    [-60, -30, 30, 60].forEach(lat => {
+      graticuleGroup.addLayer(L.polyline([[lat, -180], [lat, 180]], {
+        color: '#64748b',
+        weight: 1,
+        opacity: 0.4,
+        dashArray: '2, 6'
+      }));
+    });
+    // Major meridians
+    [-120, -60, 60, 120].forEach(lon => {
+      graticuleGroup.addLayer(L.polyline([[-90, lon], [90, lon]], {
+        color: '#64748b',
+        weight: 1,
+        opacity: 0.4,
+        dashArray: '2, 6'
+      }));
+    });
+
+    // 5. Layer 5: Mars Iconic Landmarks
+    const landmarksGroup = L.layerGroup().addTo(map);
+    const landmarks = [
+      {
+        name: "Olympus Mons",
+        lat: 18.65,
+        lon: -133.8,
+        desc: "The largest shield volcano and tallest planetary mountain in the Solar System (elevation: 21.9 km above datum).",
+        tile: "Row 12, Col 8 (5_12_8.jpg)"
+      },
+      {
+        name: "Valles Marineris",
+        lat: -13.9,
+        lon: -59.2,
+        desc: "Sprawling tectonic canyon system spanning over 4,000 km in length and up to 7 km deep.",
+        tile: "Row 18, Col 21 (5_18_21.jpg)"
+      },
+      {
+        name: "Gale Crater",
+        lat: -5.37,
+        lon: 137.44,
+        desc: "Ancient impact crater containing Aeolis Mons (Mount Sharp); landing site of NASA's Curiosity rover.",
+        tile: "Row 16, Col 56 (5_16_56.jpg)"
+      },
+      {
+        name: "Jezero Crater",
+        lat: 18.38,
+        lon: 77.58,
+        desc: "Paleolake basin with preserved river delta; landing site of NASA's Perseverance rover and Ingenuity helicopter.",
+        tile: "Row 12, Col 45 (5_12_45.jpg)"
+      },
+      {
+        name: "Hellas Planitia",
+        lat: -42.7,
+        lon: 70.0,
+        desc: "Enormous impact basin (~2,300 km diameter) reaching depths of 7,152 m below Martian datum.",
+        tile: "Row 23, Col 44 (5_23_44.jpg)"
+      },
+      {
+        name: "Planum Boreum (North Polar Cap)",
+        lat: 84.0,
+        lon: 0.0,
+        desc: "Northern permanent polar ice cap composed of water ice and seasonal carbon dioxide frost.",
+        tile: "Row 1, Col 32 (5_1_32.jpg)"
+      },
+      {
+        name: "Planum Australe (South Polar Cap)",
+        lat: -85.0,
+        lon: 0.0,
+        desc: "Southern polar ice plateau capped with permanent dry ice (CO2) and underlying water ice.",
+        tile: "Row 31, Col 32 (5_31_32.jpg)"
+      }
+    ];
+
+    landmarks.forEach(lm => {
+      const marker = L.circleMarker([lm.lat, lm.lon], {
+        radius: 6,
+        color: '#ff5e36',
+        fillColor: '#ff5e36',
+        fillOpacity: 0.9,
+        weight: 2
+      });
+
+      marker.bindPopup(`
+        <div class="landmark-popup">
+          <h3>${lm.name}</h3>
+          <p>${lm.desc}</p>
+          <div class="landmark-coords">
+            Lat: ${lm.lat}° | Lon: ${lm.lon}°<br>
+            Grid: ${lm.tile}
+          </div>
+        </div>
+      `);
+      landmarksGroup.addLayer(marker);
+    });
+
+    // Layer Toggle Controls
+    document.getElementById('toggle-mosaic').addEventListener('change', e => {
+      if (e.target.checked) map.addLayer(mosaicOverlay);
+      else map.removeLayer(mosaicOverlay);
+    });
+    document.getElementById('toggle-tiles').addEventListener('change', e => {
+      if (e.target.checked) map.addLayer(localTileLayer);
+      else map.removeLayer(localTileLayer);
+    });
+    document.getElementById('toggle-bounds').addEventListener('change', e => {
+      if (e.target.checked) map.addLayer(boundsGroup);
+      else map.removeLayer(boundsGroup);
+    });
+    document.getElementById('toggle-graticule').addEventListener('change', e => {
+      if (e.target.checked) map.addLayer(graticuleGroup);
+      else map.removeLayer(graticuleGroup);
+    });
+    document.getElementById('toggle-landmarks').addEventListener('change', e => {
+      if (e.target.checked) map.addLayer(landmarksGroup);
+      else map.removeLayer(landmarksGroup);
+    });
+
+    // Reset View Button
+    document.getElementById('btn-reset-view').addEventListener('click', () => {
+      map.setView([0, 0], 2);
+    });
+
+    // Landmark Chips click
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const lat = parseFloat(chip.dataset.lat);
+        const lon = parseFloat(chip.dataset.lon);
+        const zoom = parseFloat(chip.dataset.zoom);
+        map.flyTo([lat, lon], zoom, { duration: 1.2 });
+      });
+    });
+
+    // Planetary Coordinate Inspector on Mousemove
+    map.on('mousemove', e => {
+      const lat = e.latlng.lat;
+      let lon = e.latlng.lng;
+
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+
+      const clampedLat = Math.max(-90, Math.min(90, lat));
+
+      // Calculate Tile Row (0 to 31) and Col (0 to 63) for Level 5 (5.625 deg/tile)
+      const row = Math.min(31, Math.max(0, Math.floor((90 - clampedLat) / 5.625)));
+      const col = Math.min(63, Math.max(0, Math.floor((lon + 180) / 5.625)));
+
+      // Local pixel inside 256x256 tile
+      const latRemainder = (90 - clampedLat) % 5.625;
+      const lonRemainder = (lon + 180) % 5.625;
+      const localY = Math.min(255, Math.floor((latRemainder / 5.625) * 256));
+      const localX = Math.min(255, Math.floor((lonRemainder / 5.625) * 256));
+
+      // Global pixel in 16384x8192 mosaic
+      const globalX = col * 256 + localX;
+      const globalY = row * 256 + localY;
+
+      // Update DOM
+      document.getElementById('val-lat').textContent = `${clampedLat.toFixed(4)}° ${clampedLat >= 0 ? 'N' : 'S'}`;
+      document.getElementById('val-lon').textContent = `${lon.toFixed(4)}° ${lon >= 0 ? 'E' : 'W'}`;
+      const lon360 = (lon + 360) % 360;
+      document.getElementById('val-lon360').textContent = `${lon360.toFixed(4)}° E`;
+
+      document.getElementById('val-matrix').textContent = `Row: ${row}, Col: ${col}`;
+      document.getElementById('val-local-pixel').textContent = `(x: ${localX}, y: ${localY})`;
+      document.getElementById('val-global-pixel').textContent = `(X: ${globalX}, Y: ${globalY})`;
+      document.getElementById('hud-tile-name').textContent = `5_${row}_${col}.jpg`;
+    });
+
+    // --- Browser Canvas Tile Stitcher Implementation ---
+    const modal = document.getElementById('modal-canvas-tool');
+    const canvas = document.getElementById('stitch-canvas');
+    const ctx = canvas.getContext('2d');
+    const progressFill = document.getElementById('stitch-progress');
+    const statusText = document.getElementById('stitch-status');
+    const btnRunStitch = document.getElementById('btn-run-stitch');
+    const btnDownloadCanvas = document.getElementById('btn-download-canvas');
+
+    document.getElementById('btn-open-canvas-tool').addEventListener('click', () => {
+      modal.style.display = 'flex';
+    });
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    btnRunStitch.addEventListener('click', async () => {
+      btnRunStitch.disabled = true;
+      btnDownloadCanvas.disabled = true;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const totalTiles = ROWS * COLS; // 2048
+      let loaded = 0;
+
+      statusText.textContent = `Assembling 2,048 tiles in canvas...`;
+
+      // Batch load in chunks for optimal browser performance
+      const batchSize = 32;
+      const tileTasks = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          tileTasks.push({ r, c, url: `tiles/5_${r}_${c}.jpg` });
+        }
+      }
+
+      for (let i = 0; i < tileTasks.length; i += batchSize) {
+        const batch = tileTasks.slice(i, i + batchSize);
+        await Promise.all(batch.map(item => {
+          return new Promise(resolve => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+              ctx.drawImage(img, item.c * 256, item.r * 256, 256, 256);
+              loaded++;
+              resolve();
+            };
+            img.onerror = () => {
+              console.warn(`Could not load: ${item.url}`);
+              loaded++;
+              resolve();
+            };
+            img.src = item.url;
+          });
+        }));
+
+        const pct = ((loaded / totalTiles) * 100).toFixed(1);
+        progressFill.style.width = `${pct}%`;
+        statusText.textContent = `Assembled ${loaded}/${totalTiles} tiles (${pct}%)...`;
+      }
+
+      statusText.textContent = `Completed! 2,048 tiles assembled accurately into 16384x8192 Canvas.`;
+      btnRunStitch.disabled = false;
+      btnDownloadCanvas.disabled = false;
+    });
+
+    btnDownloadCanvas.addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.download = 'mars_mola_level5_canvas_stitched.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    });
+  </script>
+</body>
+</html>
