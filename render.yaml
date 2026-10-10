@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: mars-gpu-viewer
+    runtime: python3
+    buildCommand: ""
+    startCommand: "cd dataset/web_app_gpu && python3 serve.py $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+    healthCheckPath: /
+    autoDeploy: true
