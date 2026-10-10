@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mars Trek Level 5 - Hardware GPU Accelerated Viewer (16K Master)</title>
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --card-bg: rgba(13, 17, 27, 0.92);
+      --card-border: #1e283d;
+      --text-main: #f1f5f9;
+      --text-dim: #94a3b8;
+      --accent-orange: #ff5e36;
+      --accent-cyan: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-yellow: #facc15;
+      --accent-purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: rgba(11, 15, 25, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-gpu {
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      color: #032014;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .title-group h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-group p {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    button.btn {
+      background: #192233;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button.btn:hover {
+      background: #25334d;
+      border-color: var(--accent-cyan);
+    }
+
+    /* Main Viewport Container */
+    #viewport-container {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    canvas#gpu-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    canvas#gpu-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* Overlay HUD Panels */
+    .hud-panel {
+      position: absolute;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+      z-index: 500;
+      font-size: 12px;
+      pointer-events: auto;
+    }
+
+    .hud-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: var(--accent-cyan);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Top-Left: Quick Landmarks */
+    #hud-landmarks {
+      top: 16px;
+      left: 16px;
+      max-width: 480px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 5px 11px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: var(--accent-orange);
+      border-color: var(--accent-orange);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* Top-Right: GPU Telemetry & Hardware Info */
+    #hud-telemetry {
+      top: 16px;
+      right: 16px;
+      width: 290px;
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      row-gap: 5px;
+      column-gap: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .telemetry-label {
+      color: var(--text-dim);
+    }
+
+    .telemetry-val {
+      color: #38bdf8;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .telemetry-val.fps-good {
+      color: #22c55e;
+    }
+
+    /* Bottom-Left: Realtime Planetary Inspector */
+    #hud-coords {
+      bottom: 24px;
+      left: 16px;
+      width: 340px;
+    }
+
+    .coord-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      row-gap: 4px;
+      column-gap: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .coord-label {
+      color: var(--text-dim);
+    }
+
+    .coord-val {
+      color: #e2e8f0;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .badge-tile {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, monospace;
+      font-size: 10px;
+    }
+
+    /* Bottom-Right: Shader Filters & Controls */
+    #hud-shaders {
+      bottom: 24px;
+      right: 16px;
+      width: 280px;
+    }
+
+    .shader-control {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .shader-control-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-dim);
+      font-size: 11px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: #1e283d;
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(255, 94, 54, 0.5);
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 11px;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      accent-color: var(--accent-orange);
+      cursor: pointer;
+    }
+
+    /* Elevation Legend Bar */
+    .elevation-container {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .elevation-bar {
+      height: 10px;
+      border-radius: 5px;
+      background: linear-gradient(to right,
+        #2a0845, #1b3b87, #00a8cc, #2ecc71, #f1c40f, #e67e22, #e74c3c, #ffffff
+      );
+      margin-bottom: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .elevation-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--text-dim);
+      font-family: ui-monospace, monospace;
+    }
+
+    /* Help Overlay */
+    .help-tooltip {
+      position: absolute;
+      bottom: 24px;
+      left: 375px;
+      background: rgba(13, 17, 27, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: var(--text-dim);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header>
+    <div class="brand">
+      <span class="badge-gpu">GPU Accelerated</span>
+      <div class="title-group">
+        <h1>Mars MOLA & HRSC Explorer (Hardware GPU Pipeline)</h1>
+        <p>Level 5 Master (2,048 Tiles &bull; 16K Master) &bull; Asynchronous Texture Streaming &bull; WebGL2 / GLSL Shaders</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn" id="btn-reset-view">Reset Camera</button>
+    </div>
+  </header>
+
+  <!-- Viewport Area -->
+  <div id="viewport-container">
+    <canvas id="gpu-canvas"></canvas>
+
+    <!-- Quick Landmarks Bar -->
+    <div class="hud-panel" id="hud-landmarks">
+      <span class="chip" data-lat="18.65" data-lon="-133.8" data-zoom="8">Olympus Mons</span>
+      <span class="chip" data-lat="-13.9" data-lon="-59.2" data-zoom="8">Valles Marineris</span>
+      <span class="chip" data-lat="-5.37" data-lon="137.44" data-zoom="10">Gale Crater</span>
+      <span class="chip" data-lat="18.38" data-lon="77.58" data-zoom="10">Jezero Crater</span>
+      <span class="chip" data-lat="-42.7" data-lon="70.0" data-zoom="8">Hellas Planitia</span>
+      <span class="chip" data-lat="84.0" data-lon="0.0" data-zoom="6">North Pole</span>
+      <span class="chip" data-lat="-85.0" data-lon="0.0" data-zoom="6">South Pole</span>
+    </div>
+
+    <!-- GPU Telemetry HUD -->
+    <div class="hud-panel" id="hud-telemetry">
+      <div class="hud-title">
+        <span>Hardware GPU Telemetry</span>
+        <span style="font-size: 10px; color: var(--accent-green);" id="val-api">WebGL 2.0</span>
+      </div>
+      <div class="telemetry-grid">
+        <span class="telemetry-label">Frame Rate:</span>
+        <span class="telemetry-val fps-good" id="val-fps">60.0 FPS</span>
+
+        <span class="telemetry-label">Render Time:</span>
+        <span class="telemetry-val" id="val-frame-time">16.6 ms</span>
+
+        <span class="telemetry-label">GPU Adapter:</span>
+        <span class="telemetry-val" style="font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="val-renderer">Hardware GPU</span>
+
+        <span class="telemetry-label">Active Textures:</span>
+        <span class="telemetry-val" id="val-gpu-textures">0 cached</span>
+
+        <span class="telemetry-label">Visible Quads:</span>
+        <span class="telemetry-val" id="val-visible-tiles">0 tiles</span>
+
+        <span class="telemetry-label">Async Streams:</span>
+        <span class="telemetry-val" id="val-pending-loads">0 in flight</span>
+      </div>
+    </div>
+
+    <!-- Planetary Inspector HUD -->
+    <div class="hud-panel" id="hud-coords">
+      <div class="hud-title">
+        <span>Planetary Inspector (Level 5)</span>
+        <span class="badge-tile" id="hud-tile-name">5_x_y.jpg</span>
+      </div>
+      <div class="coord-grid">
+        <span class="coord-label">Mars Latitude:</span>
+        <span class="coord-val" id="val-lat">0.0000°</span>
+
+        <span class="coord-label">Mars Longitude:</span>
+        <span class="coord-val" id="val-lon">0.0000°</span>
+
+        <span class="coord-label">Longitude (0-360°E):</span>
+        <span class="coord-val" id="val-lon360">0.0000°E</span>
+
+        <span class="coord-label">Tile Matrix Index:</span>
+        <span class="coord-val" id="val-matrix">Row: -, Col: -</span>
+
+        <span class="coord-label">Tile Local Pixel:</span>
+        <span class="coord-val" id="val-local-pixel">(x: -, y: -)</span>
+
+        <span class="coord-label">Global 16K Pixel:</span>
+        <span class="coord-val" id="val-global-pixel">(X: -, Y: -)</span>
+      </div>
+    </div>
+
+    <!-- Shader Controls HUD -->
+    <div class="hud-panel" id="hud-shaders">
+      <div class="hud-title">
+        <span>GPU Post-Processing Shaders</span>
+      </div>
+      <div class="shader-control">
+        <div class="shader-control-header">
+          <span>Brightness / Exposure</span>
+          <span id="label-brightness">0.00</span>
+        </div>
+        <input type="range" id="slider-brightness" min="-0.4" max="0.4" step="0.02" value="0.0">
+      </div>
+      <div class="shader-control">
+        <div class="shader-control-header">
+          <span>Contrast</span>
+          <span id="label-contrast">1.00</span>
+        </div>
+        <input type="range" id="slider-contrast" min="0.5" max="2.0" step="0.05" value="1.0">
+      </div>
+      <div class="shader-control">
+        <div class="shader-control-header">
+          <span>Terrain Ridge Sharpening</span>
+          <span id="label-sharpness">0.00</span>
+        </div>
+        <input type="range" id="slider-sharpness" min="0.0" max="1.5" step="0.05" value="0.0">
+      </div>
+      <div class="toggle-row">
+        <span>Tile Matrix Seam Overlay</span>
+        <input type="checkbox" id="toggle-grid">
+      </div>
+
+      <!-- Elevation Ramp -->
+      <div class="elevation-container">
+        <div class="elevation-bar"></div>
+        <div class="elevation-ticks">
+          <span>-8 km</span>
+          <span>-4 km</span>
+          <span>0 km</span>
+          <span>+8 km</span>
+          <span>+21 km</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-tooltip" id="help-tooltip">
+      Pan: Left Drag &bull; Zoom: Mouse Wheel &bull; GPU Viewport: 2D Hardware Accelerated
+    </div>
+  </div>
+
+  <script>
+    /**
+     * GPU Hardware Accelerated Planetary Map Engine
+     * Uses WebGL2 / WebGL with custom GLSL shaders and off-thread createImageBitmap() texture streaming.
+     */
+
+    const canvas = document.getElementById('gpu-canvas');
+    let gl = canvas.getContext('webgl2', { alpha: false, antialias: true, powerPreference: 'high-performance' });
+    let isWebGL2 = true;
+    if (!gl) {
+      gl = canvas.getContext('webgl', { alpha: false, antialias: true, powerPreference: 'high-performance' });
+      isWebGL2 = false;
+    }
+
+    if (!gl) {
+      alert("WebGL initialization failed. Please ensure hardware acceleration is enabled in your browser.");
+    }
+
+    // Query GPU Hardware Vendor & Renderer
+    const extDebug = gl.getExtension('WEBGL_debug_renderer_info');
+    const gpuRenderer = extDebug ? gl.getParameter(extDebug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+    document.getElementById('val-renderer').textContent = gpuRenderer || 'Hardware GPU';
+    document.getElementById('val-api').textContent = isWebGL2 ? 'WebGL 2.0' : 'WebGL 1.0';
+
+    // Matrix & Level 5 Specs
+    const ROWS = 32;
+    const COLS = 64;
+    const TILE_DEG = 5.625; // 360 / 64 = 180 / 32 = 5.625 deg
+    const MAX_GPU_TEXTURES = 512; // Texture pool budget
+
+    // Application State (2D Hardware-Accelerated Viewport)
+    let camera2D = {
+      centerLon: 0.0,
+      centerLat: 0.0,
+      zoom: 1.0, // 1.0 = entire globe fits screen
+      minZoom: 0.8,
+      maxZoom: 32.0
+    };
+
+    // GPU Post-Processing Shader Parameters
+    let shaderParams = {
+      brightness: 0.0,
+      contrast: 1.0,
+      sharpness: 0.0,
+      showGrid: false
+    };
+
+    // Telemetry
+    let frameTimes = [];
+    let lastTime = performance.now();
+    let pendingLoads = 0;
+
+    // --- Shaders Definition ---
+
+    // 2D Vertex Shader
+    const vs2D = `
+      attribute vec2 a_pos;
+      attribute vec2 a_uv;
+      uniform vec2 u_offset;
+      uniform vec2 u_scale;
+      uniform float u_aspect;
+      varying vec2 v_uv;
+
+      void main() {
+        v_uv = a_uv;
+        // Transform planetary Lon/Lat [-180..180, -90..90] to normalized screen coordinates
+        vec2 screenPos = (a_pos - u_offset) * u_scale;
+        screenPos.x /= u_aspect;
+        gl_Position = vec4(screenPos, 0.0, 1.0);
+      }
+    `;
+
+    // 2D Fragment Shader with Post-Processing & Convolution Ridge Filtering
+    const fs2D = `
+      precision highp float;
+      varying vec2 v_uv;
+      uniform sampler2D u_texture;
+      uniform float u_brightness;
+      uniform float u_contrast;
+      uniform float u_sharpness;
+      uniform float u_grid;
+      uniform vec2 u_grid_scale;
+
+      void main() {
+        vec4 color = texture2D(u_texture, v_uv);
+
+        // Hardware Ridge Sharpening / Convolution Filter
+        if (u_sharpness > 0.0) {
+          float step = 1.0 / 256.0;
+          vec4 cU = texture2D(u_texture, v_uv + vec2(0.0, step));
+          vec4 cD = texture2D(u_texture, v_uv - vec2(0.0, step));
+          vec4 cL = texture2D(u_texture, v_uv - vec2(step, 0.0));
+          vec4 cR = texture2D(u_texture, v_uv + vec2(step, 0.0));
+          vec4 laplacian = 4.0 * color - (cU + cD + cL + cR);
+          color += laplacian * u_sharpness * 0.4;
+        }
+
+        // Brightness & Contrast adjustment
+        vec3 rgb = color.rgb + vec3(u_brightness);
+        rgb = (rgb - 0.5) * u_contrast + 0.5;
+
+        // Seam boundary line indicator
+        if (u_grid > 0.5) {
+          vec2 edge = abs(v_uv - 0.5) * 2.0;
+          if (edge.x > 0.985 || edge.y > 0.985) {
+            rgb = mix(rgb, vec3(0.22, 0.74, 0.97), 0.4);
+          }
+        }
+
+        gl_FragColor = vec4(clamp(rgb, 0.0, 1.0), 1.0);
+      }
+    `;
+
+    function compileShader(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error("Shader compile error:", gl.getShaderInfoLog(s));
+      }
+      return s;
+    }
+
+    function createProgram(vsSrc, fsSrc) {
+      const p = gl.createProgram();
+      gl.attachShader(p, compileShader(gl.VERTEX_SHADER, vsSrc));
+      gl.attachShader(p, compileShader(gl.FRAGMENT_SHADER, fsSrc));
+      gl.linkProgram(p);
+      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+        console.error("Program link error:", gl.getProgramInfoLog(p));
+      }
+      return p;
+    }
+
+    const prog2D = createProgram(vs2D, fs2D);
+
+    // Buffers for 2D Quads
+    const quadPosBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadPosBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      0, 0,  1, 0,  0, 1,
+      0, 1,  1, 0,  1, 1
+    ]), gl.STATIC_DRAW);
+
+    const quadUvBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadUvBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      0, 0,  1, 0,  0, 1,
+      0, 1,  1, 0,  1, 1
+    ]), gl.STATIC_DRAW);
+
+    // --- GPU Texture Cache & Asynchronous ImageBitmap Streaming ---
+    const textureCache = new Map(); // key "5_r_c" -> { tex, lastUsed }
+    const inFlightRequests = new Set();
+    let baseTexture = null;
+    let currentMinRow = 0, currentMaxRow = 31, currentMinCol = 0, currentMaxCol = 63;
+
+    function uploadTexture(imgBitmap) {
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgBitmap);
+
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.generateMipmap(gl.TEXTURE_2D);
+
+      return tex;
+    }
+
+    // Load Low-Res Base Composite Mosaic for Instant Fallback
+    async function loadBaseComposite() {
+      const candidates = ['mars_mola_base_2k.jpg', 'mars_mola_level5_mosaic.jpg'];
+      for (const url of candidates) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) continue;
+          const blob = await resp.blob();
+          let bmp;
+          try {
+            bmp = await createImageBitmap(blob, { resizeWidth: 2048, resizeHeight: 1024 });
+          } catch (_) {
+            bmp = await createImageBitmap(blob);
+          }
+          baseTexture = uploadTexture(bmp);
+          requestRender();
+          break;
+        } catch (err) {
+          console.warn("Could not load base composite texture from", url, err);
+        }
+      }
+    }
+    loadBaseComposite();
+
+    // Stream Level 5 Tile Asynchronously
+    async function requestTileAsync(r, c) {
+      const key = `5_${r}_${c}`;
+      if (textureCache.has(key) || inFlightRequests.has(key)) return;
+
+      inFlightRequests.add(key);
+      pendingLoads++;
+
+      try {
+        const resp = await fetch(`tiles/${key}.jpg`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const blob = await resp.blob();
+        const bmp = await createImageBitmap(blob);
+
+        // Evict LRU texture prioritizing off-screen tiles if cache limit reached
+        if (textureCache.size >= MAX_GPU_TEXTURES) {
+          let oldestKey = null;
+          let oldestScore = Infinity;
+          for (const [k, v] of textureCache.entries()) {
+            const parts = k.split('_');
+            const tr = parseInt(parts[1], 10);
+            const tc = parseInt(parts[2], 10);
+            const isVis = (tr >= currentMinRow && tr <= currentMaxRow && tc >= currentMinCol && tc <= currentMaxCol);
+            const score = isVis ? (v.lastUsed + 1e12) : v.lastUsed;
+            if (score < oldestScore) {
+              oldestScore = score;
+              oldestKey = k;
+            }
+          }
+          if (oldestKey) {
+            gl.deleteTexture(textureCache.get(oldestKey).tex);
+            textureCache.delete(oldestKey);
+          }
+        }
+
+        const tex = uploadTexture(bmp);
+        textureCache.set(key, { tex, lastUsed: performance.now() });
+        requestRender();
+      } catch (e) {
+        // Ignored or network error
+      } finally {
+        inFlightRequests.delete(key);
+        pendingLoads--;
+      }
+    }
+
+    // --- Render Loop ---
+    let animFrame = null;
+    function requestRender() {
+      if (!animFrame) {
+        animFrame = requestAnimationFrame(render);
+      }
+    }
+
+    function render(now) {
+      animFrame = null;
+
+      // FPS Calculation
+      const dt = now - lastTime;
+      lastTime = now;
+      frameTimes.push(dt);
+      if (frameTimes.length > 20) frameTimes.shift();
+      const avgDt = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
+      const fps = 1000 / avgDt;
+
+      document.getElementById('val-fps').textContent = `${fps.toFixed(1)} FPS`;
+      document.getElementById('val-frame-time').textContent = `${avgDt.toFixed(1)} ms`;
+      document.getElementById('val-gpu-textures').textContent = `${textureCache.size} in VRAM`;
+      document.getElementById('val-pending-loads').textContent = `${pendingLoads} in flight`;
+
+      // Resize canvas buffer to device display size
+      const width = canvas.clientWidth * window.devicePixelRatio;
+      const height = canvas.clientHeight * window.devicePixelRatio;
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      const aspect = canvas.width / canvas.height;
+
+      gl.clearColor(0.02, 0.03, 0.05, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      render2D(aspect);
+    }
+
+    function render2D(aspect) {
+      gl.disable(gl.DEPTH_TEST);
+      gl.useProgram(prog2D);
+
+      const locOffset = gl.getUniformLocation(prog2D, "u_offset");
+      const locScale = gl.getUniformLocation(prog2D, "u_scale");
+      const locAspect = gl.getUniformLocation(prog2D, "u_aspect");
+      const locBrightness = gl.getUniformLocation(prog2D, "u_brightness");
+      const locContrast = gl.getUniformLocation(prog2D, "u_contrast");
+      const locSharpness = gl.getUniformLocation(prog2D, "u_sharpness");
+      const locGrid = gl.getUniformLocation(prog2D, "u_grid");
+
+      gl.uniform1f(locAspect, aspect);
+      gl.uniform1f(locBrightness, shaderParams.brightness);
+      gl.uniform1f(locContrast, shaderParams.contrast);
+      gl.uniform1f(locSharpness, shaderParams.sharpness);
+
+      // Camera view box: scale factor maps 360 deg Lon to view width
+      const scaleX = (camera2D.zoom / 180.0) * aspect;
+      const scaleY = (camera2D.zoom / 90.0);
+
+      gl.uniform2f(locOffset, camera2D.centerLon, camera2D.centerLat);
+      gl.uniform2f(locScale, scaleX, scaleY);
+
+      // Bind quad buffers
+      const aPos = gl.getAttribLocation(prog2D, "a_pos");
+      const aUv = gl.getAttribLocation(prog2D, "a_uv");
+
+      // Calculate Visible Viewport Bounding Box in Planetary Lon/Lat
+      const halfWidthDeg = (1.0 / scaleX) * aspect;
+      const halfHeightDeg = (1.0 / scaleY);
+
+      const visMinLon = camera2D.centerLon - halfWidthDeg;
+      const visMaxLon = camera2D.centerLon + halfWidthDeg;
+      const visMinLat = camera2D.centerLat - halfHeightDeg;
+      const visMaxLat = camera2D.centerLat + halfHeightDeg;
+
+      // Draw Base Texture across full planetary quad [-180..180, -90..90]
+      if (baseTexture) {
+        gl.uniform1f(locGrid, 0.0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, baseTexture);
+
+        const baseQuad = new Float32Array([
+          -180, -90,   180, -90,  -180,  90,
+          -180,  90,   180, -90,   180,  90
+        ]);
+        const baseUv = new Float32Array([
+          0, 1,  1, 1,  0, 0,
+          0, 0,  1, 1,  1, 0
+        ]);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, quadPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, baseQuad, gl.DYNAMIC_DRAW);
+        gl.enableVertexAttribArray(aPos);
+        gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, quadUvBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, baseUv, gl.DYNAMIC_DRAW);
+        gl.enableVertexAttribArray(aUv);
+        gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      }
+
+      // Calculate Tile Row / Col Range Visible in Viewport Frustum
+      const minCol = Math.max(0, Math.floor((visMinLon + 180.0) / TILE_DEG));
+      const maxCol = Math.min(COLS - 1, Math.floor((visMaxLon + 180.0) / TILE_DEG));
+      const minRow = Math.max(0, Math.floor((90.0 - visMaxLat) / TILE_DEG));
+      const maxRow = Math.min(ROWS - 1, Math.floor((90.0 - visMinLat) / TILE_DEG));
+
+      currentMinRow = minRow;
+      currentMaxRow = maxRow;
+      currentMinCol = minCol;
+      currentMaxCol = maxCol;
+
+      const totalFrustumTiles = (maxCol - minCol + 1) * (maxRow - minRow + 1);
+      const shouldStreamTiles = (camera2D.zoom >= 1.6 || totalFrustumTiles <= MAX_GPU_TEXTURES || !baseTexture);
+
+      let visibleCount = 0;
+
+      // Stream & Render Visible Tiles as GPU Quads
+      for (let r = minRow; r <= maxRow; r++) {
+        const topLat = 90.0 - r * TILE_DEG;
+        const bottomLat = 90.0 - (r + 1) * TILE_DEG;
+
+        for (let c = minCol; c <= maxCol; c++) {
+          const leftLon = -180.0 + c * TILE_DEG;
+          const rightLon = -180.0 + (c + 1) * TILE_DEG;
+
+          const key = `5_${r}_${c}`;
+          if (!textureCache.has(key)) {
+            if (shouldStreamTiles) {
+              requestTileAsync(r, c);
+            }
+            continue;
+          }
+
+          visibleCount++;
+          // Render Tile Quad
+          const tileItem = textureCache.get(key);
+          tileItem.lastUsed = performance.now();
+
+          gl.uniform1f(locGrid, shaderParams.showGrid ? 1.0 : 0.0);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, tileItem.tex);
+
+          const tileQuad = new Float32Array([
+            leftLon, bottomLat,   rightLon, bottomLat,  leftLon,  topLat,
+            leftLon,  topLat,     rightLon, bottomLat,  rightLon, topLat
+          ]);
+          const tileUv = new Float32Array([
+            0, 1,  1, 1,  0, 0,
+            0, 0,  1, 1,  1, 0
+          ]);
+
+          gl.bindBuffer(gl.ARRAY_BUFFER, quadPosBuffer);
+          gl.bufferData(gl.ARRAY_BUFFER, tileQuad, gl.DYNAMIC_DRAW);
+          gl.enableVertexAttribArray(aPos);
+          gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+          gl.bindBuffer(gl.ARRAY_BUFFER, quadUvBuffer);
+          gl.bufferData(gl.ARRAY_BUFFER, tileUv, gl.DYNAMIC_DRAW);
+          gl.enableVertexAttribArray(aUv);
+          gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 0, 0);
+
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
+      }
+
+      document.getElementById('val-visible-tiles').textContent = baseTexture && !shouldStreamTiles ? 'Global 16K LOD' : `${visibleCount} quads`;
+    }
+
+    // --- Interactive Mouse & Touch Controls ---
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    canvas.addEventListener('mousedown', e => {
+      isDragging = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    window.addEventListener('mousemove', e => {
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+
+      if (isDragging) {
+        const degPerPixelX = 360.0 / (camera2D.zoom * canvas.clientWidth);
+        const degPerPixelY = 180.0 / (camera2D.zoom * canvas.clientHeight);
+
+        camera2D.centerLon -= dx * degPerPixelX;
+        camera2D.centerLat += dy * degPerPixelY;
+
+        // Clamp Lon and Lat strictly within physical planetary boundaries without looping
+        camera2D.centerLon = Math.max(-180.0, Math.min(180.0, camera2D.centerLon));
+        camera2D.centerLat = Math.max(-89.9, Math.min(89.9, camera2D.centerLat));
+        requestRender();
+      }
+
+      // Planetary Inspector Mouse Position
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const aspect = canvas.width / canvas.height;
+      const normX = (mouseX / rect.width) * 2.0 - 1.0;
+      const normY = 1.0 - (mouseY / rect.height) * 2.0;
+
+      const lon = camera2D.centerLon + (normX * aspect) / ((camera2D.zoom / 180.0) * aspect);
+      const lat = camera2D.centerLat + normY / (camera2D.zoom / 90.0);
+
+      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+        updateInspector(lat, lon);
+      }
+    });
+
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+      camera2D.zoom = Math.max(camera2D.minZoom, Math.min(camera2D.maxZoom, camera2D.zoom * zoomFactor));
+      requestRender();
+    }, { passive: false });
+
+    // Planetary Coordinate Inspector Logic
+    function updateInspector(lat, lon) {
+      const clampedLat = Math.max(-90, Math.min(90, lat));
+      const clampedLon = Math.max(-180, Math.min(180, lon));
+
+      // Row 0..31, Col 0..63
+      const row = Math.min(31, Math.max(0, Math.floor((90 - clampedLat) / TILE_DEG)));
+      const col = Math.min(63, Math.max(0, Math.floor((clampedLon + 180) / TILE_DEG)));
+
+      // Local Pixel
+      const latRem = (90 - clampedLat) % TILE_DEG;
+      const lonRem = (clampedLon + 180) % TILE_DEG;
+      const localY = Math.min(255, Math.floor((latRem / TILE_DEG) * 256));
+      const localX = Math.min(255, Math.floor((lonRem / TILE_DEG) * 256));
+
+      // Global 16K Pixel
+      const globalX = col * 256 + localX;
+      const globalY = row * 256 + localY;
+
+      document.getElementById('val-lat').textContent = `${clampedLat.toFixed(4)}° ${clampedLat >= 0 ? 'N' : 'S'}`;
+      document.getElementById('val-lon').textContent = `${clampedLon.toFixed(4)}° ${clampedLon >= 0 ? 'E' : 'W'}`;
+      const lon360 = (clampedLon + 360) % 360;
+      document.getElementById('val-lon360').textContent = `${lon360.toFixed(4)}° E`;
+
+      document.getElementById('val-matrix').textContent = `Row: ${row}, Col: ${col}`;
+      document.getElementById('val-local-pixel').textContent = `(x: ${localX}, y: ${localY})`;
+      document.getElementById('val-global-pixel').textContent = `(X: ${globalX}, Y: ${globalY})`;
+      document.getElementById('hud-tile-name').textContent = `5_${row}_${col}.jpg`;
+    }
+
+    // Reset View Button
+    document.getElementById('btn-reset-view').addEventListener('click', () => {
+      camera2D.centerLon = 0.0;
+      camera2D.centerLat = 0.0;
+      camera2D.zoom = 1.0;
+      requestRender();
+    });
+
+    // Landmark Fly-To Buttons
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const lat = parseFloat(chip.dataset.lat);
+        const lon = parseFloat(chip.dataset.lon);
+        const zoom = parseFloat(chip.dataset.zoom);
+
+        const startLon = camera2D.centerLon;
+        const startLat = camera2D.centerLat;
+        const startZoom = camera2D.zoom;
+        const targetZoom = zoom * 0.7;
+        const startTime = performance.now();
+        const duration = 800;
+
+        function animateFly(now) {
+          const t = Math.min(1.0, (now - startTime) / duration);
+          const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+          camera2D.centerLon = startLon + (lon - startLon) * ease;
+          camera2D.centerLat = startLat + (lat - startLat) * ease;
+          camera2D.zoom = startZoom + (targetZoom - startZoom) * ease;
+
+          requestRender();
+          if (t < 1.0) requestAnimationFrame(animateFly);
+        }
+        requestAnimationFrame(animateFly);
+
+        updateInspector(lat, lon);
+      });
+    });
+
+    // Shader Controls Event Listeners
+    document.getElementById('slider-brightness').addEventListener('input', e => {
+      shaderParams.brightness = parseFloat(e.target.value);
+      document.getElementById('label-brightness').textContent = shaderParams.brightness.toFixed(2);
+      requestRender();
+    });
+
+    document.getElementById('slider-contrast').addEventListener('input', e => {
+      shaderParams.contrast = parseFloat(e.target.value);
+      document.getElementById('label-contrast').textContent = shaderParams.contrast.toFixed(2);
+      requestRender();
+    });
+
+    document.getElementById('slider-sharpness').addEventListener('input', e => {
+      shaderParams.sharpness = parseFloat(e.target.value);
+      document.getElementById('label-sharpness').textContent = shaderParams.sharpness.toFixed(2);
+      requestRender();
+    });
+
+    document.getElementById('toggle-grid').addEventListener('change', e => {
+      shaderParams.showGrid = e.target.checked;
+      requestRender();
+    });
+
+    window.addEventListener('resize', () => {
+      requestRender();
+    });
+
+    // Initial render
+    requestRender();
+  </script>
+</body>
+</html>

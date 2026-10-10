@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mars Trek Level 5 - Hardware GPU Accelerated Viewer (16K Master)</title>
+  <title>Mars 3D - Google Earth Planetary Explorer (NASA PDS / ODE / GDS)</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <style>
     :root {
-      --bg-dark: #07090e;
-      --card-bg: rgba(13, 17, 27, 0.92);
-      --card-border: #1e283d;
-      --text-main: #f1f5f9;
+      --bg-dark: #000206;
+      --card-bg: rgba(10, 14, 24, 0.88);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --text-main: #f8fafc;
       --text-dim: #94a3b8;
       --accent-orange: #ff5e36;
       --accent-cyan: #38bdf8;
       --accent-green: #22c55e;
       --accent-yellow: #facc15;
-      --accent-purple: #a855f7;
+      --hazard-red: #ef4444;
     }
 
     * {
@@ -35,1016 +36,1655 @@
       user-select: none;
     }
 
-    /* Top Navigation Header */
+    /* Minimalist Google Earth Style Header */
     header {
-      background: rgba(11, 15, 25, 0.96);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border);
-      padding: 10px 20px;
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 1000;
+      pointer-events: none;
     }
 
-    .brand {
+    .ge-search-bar {
+      pointer-events: auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 8px 18px;
       display: flex;
       align-items: center;
       gap: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
     }
 
-    .badge-gpu {
-      background: linear-gradient(135deg, #10b981, #06b6d4);
-      color: #032014;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
-    }
-
-    .title-group h1 {
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+    .brand-logo {
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .title-group p {
-      font-size: 11px;
-      color: var(--text-dim);
+    .mars-glyph {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff7a50, #9f2a08);
+      box-shadow: 0 0 10px rgba(255, 94, 54, 0.6);
     }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    button.btn {
-      background: #192233;
-      color: var(--text-main);
-      border: 1px solid var(--card-border);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    button.btn:hover {
-      background: #25334d;
-      border-color: var(--accent-cyan);
-    }
-
-    /* Main Viewport Container */
-    #viewport-container {
-      flex: 1;
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    canvas#gpu-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      cursor: grab;
-    }
-
-    canvas#gpu-canvas:active {
-      cursor: grabbing;
-    }
-
-    /* Overlay HUD Panels */
-    .hud-panel {
-      position: absolute;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
-      z-index: 500;
-      font-size: 12px;
-      pointer-events: auto;
-    }
-
-    .hud-title {
-      font-size: 11px;
+    .ge-title {
+      font-size: 14px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.75px;
-      color: var(--accent-cyan);
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      letter-spacing: 0.4px;
+      color: #fff;
     }
 
-    /* Top-Left: Quick Landmarks */
-    #hud-landmarks {
-      top: 16px;
-      left: 16px;
-      max-width: 480px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .chip {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--card-border);
-      color: var(--text-main);
-      padding: 5px 11px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-size: 11px;
-      transition: all 0.2s;
-    }
-
-    .chip:hover {
-      background: var(--accent-orange);
-      border-color: var(--accent-orange);
-      color: white;
-      transform: translateY(-1px);
-    }
-
-    /* Top-Right: GPU Telemetry & Hardware Info */
-    #hud-telemetry {
-      top: 16px;
-      right: 16px;
-      width: 290px;
-    }
-
-    .telemetry-grid {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      row-gap: 5px;
-      column-gap: 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 11px;
-    }
-
-    .telemetry-label {
-      color: var(--text-dim);
-    }
-
-    .telemetry-val {
-      color: #38bdf8;
-      font-weight: 600;
-      text-align: right;
-    }
-
-    .telemetry-val.fps-good {
-      color: #22c55e;
-    }
-
-    /* Bottom-Left: Realtime Planetary Inspector */
-    #hud-coords {
-      bottom: 24px;
-      left: 16px;
-      width: 340px;
-    }
-
-    .coord-grid {
-      display: grid;
-      grid-template-columns: 140px 1fr;
-      row-gap: 4px;
-      column-gap: 8px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 11px;
-    }
-
-    .coord-label {
-      color: var(--text-dim);
-    }
-
-    .coord-val {
-      color: #e2e8f0;
-      font-weight: 600;
-      text-align: right;
-    }
-
-    .badge-tile {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: ui-monospace, monospace;
-      font-size: 10px;
-    }
-
-    /* Bottom-Right: Shader Filters & Controls */
-    #hud-shaders {
-      bottom: 24px;
-      right: 16px;
-      width: 280px;
-    }
-
-    .shader-control {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-bottom: 8px;
-    }
-
-    .shader-control-header {
-      display: flex;
-      justify-content: space-between;
-      color: var(--text-dim);
-      font-size: 11px;
-    }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 4px;
-      background: #1e283d;
-      border-radius: 2px;
+    .ge-search-input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 13px;
+      width: 220px;
       outline: none;
     }
 
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      cursor: pointer;
-      box-shadow: 0 0 6px rgba(255, 94, 54, 0.5);
+    .ge-search-input::placeholder {
+      color: #64748b;
     }
 
-    .toggle-row {
+    .mars-clock-widget {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s;
+    }
+
+    .mars-clock-widget:hover {
+      border-color: var(--accent-yellow);
+      background: rgba(30, 41, 59, 0.95);
+    }
+
+    .clock-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .clock-time {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .clock-sol {
+      font-size: 11px;
+      color: #cbd5e1;
+      padding-left: 6px;
+      border-left: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    #ephemeris-panel {
+      position: absolute;
+      top: 76px;
+      right: 16px;
+      width: 320px;
+      background: var(--card-bg);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      border-radius: 14px;
+      padding: 14px;
+      z-index: 1000;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .ephemeris-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      row-gap: 6px;
+      font-size: 11px;
+    }
+
+    .eph-label {
+      color: var(--text-dim);
+    }
+
+    .eph-val {
+      font-family: monospace;
+      font-weight: 600;
+      color: #fff;
+      text-align: right;
+    }
+
+    .header-pills {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .pill-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: var(--accent-cyan);
+    }
+
+    .pill-btn.active {
+      background: var(--accent-orange);
+      border-color: var(--accent-orange);
+      color: white;
+    }
+
+    /* Fullscreen Viewport */
+    #viewport-container {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      cursor: grab;
+    }
+
+    #viewport-container:active {
+      cursor: grabbing;
+    }
+
+    #three-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 10;
+    }
+
+    #flat-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      z-index: 10;
+    }
+
+    /* Google Earth Floating Landmark Hover Card */
+    #hover-tooltip {
+      position: absolute;
+      display: none;
+      pointer-events: none;
+      z-index: 2000;
+      transform: translate(-50%, -100%) translateY(-10px);
+      background: rgba(13, 17, 28, 0.95);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 10px 14px;
+      width: 270px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
+      transition: opacity 0.12s ease-out;
+    }
+
+    #hover-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid rgba(13, 17, 28, 0.95);
+    }
+
+    .tooltip-tag {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #94a3b8;
+      margin-bottom: 2px;
+    }
+
+    .tooltip-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-bottom: 3px;
+    }
+
+    .tooltip-coords {
+      font-family: monospace;
+      font-size: 10px;
+      color: #38bdf8;
+      margin-bottom: 5px;
+    }
+
+    .tooltip-desc {
+      font-size: 11px;
+      line-height: 1.35;
+      color: #cbd5e1;
+    }
+
+    /* Google Earth Side Destination Drawer (Left) */
+    #left-drawer {
+      position: absolute;
+      top: 76px;
+      left: 16px;
+      width: 310px;
+      max-height: calc(100vh - 160px);
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #left-drawer.collapsed {
+      transform: translateX(-340px);
+    }
+
+    .drawer-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-dim);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 6px;
-      font-size: 11px;
     }
 
-    .toggle-row input[type="checkbox"] {
-      accent-color: var(--accent-orange);
+    .destinations-scroll {
+      overflow-y: auto;
+      max-height: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dest-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 10px;
       cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
     }
 
-    /* Elevation Legend Bar */
-    .elevation-container {
-      margin-top: 10px;
-      padding-top: 8px;
+    .dest-card:hover {
+      background: rgba(255, 94, 54, 0.15);
+      border-color: var(--accent-orange);
+      transform: translateX(3px);
+    }
+
+    .dest-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .dest-sub {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    /* Bottom Dock: Astronaut EVA Traverse & Topography Cross-Section */
+    #bottom-dock {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 780px;
+      max-width: calc(100vw - 120px);
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+    }
+
+    .dock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dock-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-yellow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .route-select-input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      outline: none;
+    }
+
+    .dock-metrics {
+      display: flex;
+      gap: 16px;
+    }
+
+    .metric-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .metric-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .metric-val {
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .chart-box {
+      width: 100%;
+      height: 72px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      position: relative;
+    }
+
+    #eva-canvas-chart {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Google Earth Floating Navigation Toolbar (Bottom-Right) */
+    #ge-controls-dock {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .ge-btn-group {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .ge-ctrl-btn {
+      width: 42px;
+      height: 42px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .ge-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--accent-cyan);
+    }
+
+    .ge-ctrl-btn + .ge-ctrl-btn {
       border-top: 1px solid var(--card-border);
     }
 
-    .elevation-bar {
-      height: 10px;
-      border-radius: 5px;
-      background: linear-gradient(to right,
-        #2a0845, #1b3b87, #00a8cc, #2ecc71, #f1c40f, #e67e22, #e74c3c, #ffffff
-      );
-      margin-bottom: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .elevation-ticks {
-      display: flex;
-      justify-content: space-between;
-      font-size: 9px;
-      color: var(--text-dim);
-      font-family: ui-monospace, monospace;
-    }
-
-    /* Help Overlay */
-    .help-tooltip {
+    /* Floating Telemetry Coordinates Bar (Bottom-Left) */
+    #status-pill {
       position: absolute;
       bottom: 24px;
-      left: 375px;
-      background: rgba(13, 17, 27, 0.85);
+      left: 20px;
+      background: rgba(5, 8, 15, 0.85);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 6px 12px;
+      border-radius: 18px;
+      padding: 6px 14px;
       font-size: 11px;
+      font-family: monospace;
+      color: var(--accent-cyan);
+      z-index: 100;
+      display: flex;
+      gap: 12px;
+    }
+
+    /* NASA Modal */
+    #product-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 14, 25, 0.98);
+      border: 1px solid var(--accent-cyan);
+      border-radius: 14px;
+      padding: 20px;
+      width: 520px;
+      max-width: 90vw;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+      z-index: 3000;
+    }
+
+    #product-modal img {
+      width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin: 12px 0;
+      background: #000;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      cursor: pointer;
       color: var(--text-dim);
-      backdrop-filter: blur(8px);
-      pointer-events: none;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .modal-close:hover {
+      color: #fff;
     }
   </style>
+  <script src="/lib/three.min.js"></script>
+  <script src="/lib/OrbitControls.js"></script>
 </head>
 <body>
 
-  <!-- Top Header Navigation -->
+  <!-- Minimalist Google Earth Navigation Header -->
   <header>
-    <div class="brand">
-      <span class="badge-gpu">GPU Accelerated</span>
-      <div class="title-group">
-        <h1>Mars MOLA & HRSC Explorer (Hardware GPU Pipeline)</h1>
-        <p>Level 5 Master (2,048 Tiles &bull; 16K Master) &bull; Asynchronous Texture Streaming &bull; WebGL2 / GLSL Shaders</p>
+    <div class="ge-search-bar">
+      <div class="brand-logo">
+        <div class="mars-glyph"></div>
+        <span class="ge-title">Google Mars 3D</span>
       </div>
+      <input type="text" class="ge-search-input" id="search-input" placeholder="Search Olympus Mons, Jezero, Poles...">
     </div>
-    <div class="nav-actions">
-      <button class="btn" id="btn-reset-view">Reset Camera</button>
+
+    <div class="header-pills">
+      <div class="mars-clock-widget" id="mars-clock-widget" title="Live Allison & McEwen Mars24 Astronomical Clock">
+        <span class="clock-label">MTC</span>
+        <span class="clock-time" id="val-mtc-time">02:30:00</span>
+        <span class="clock-sol" id="val-sol-num">Sol 54,309</span>
+      </div>
+      <button class="pill-btn active" id="btn-mode-3d">🌐 3D Earth-Style Globe</button>
+      <button class="pill-btn" id="btn-mode-2d">🗺️ 2D Flat Map</button>
+      <button class="pill-btn" id="btn-toggle-decontour" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
+      <button class="pill-btn" id="btn-toggle-drawer">📍 Destinations</button>
+      <button class="pill-btn active" id="btn-toggle-solar" title="Toggle Real-Time Astronomical Sun Position & Surface Shadows">☀️ Live Sun Shadows</button>
+      <button class="pill-btn" id="btn-scan-nasa">🛰️ Scan NASA Orbiters</button>
     </div>
   </header>
 
-  <!-- Viewport Area -->
+  <!-- Ephemeris Solar Intel Floating Panel -->
+  <div id="ephemeris-panel" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--accent-yellow);">☀️ Solar Ephemeris & Day/Night HUD</span>
+      <span style="font-size:16px; cursor:pointer; color:#94a3b8;" id="close-ephemeris">&times;</span>
+    </div>
+    <div class="ephemeris-grid">
+      <span class="eph-label">Earth UTC:</span>
+      <span class="eph-val" id="eph-utc">2026-10-10 15:10 UTC</span>
+
+      <span class="eph-label">Mars Sol Date (MSD):</span>
+      <span class="eph-val" id="eph-msd">54,309.10</span>
+
+      <span class="eph-label">Coordinated Mars Time:</span>
+      <span class="eph-val" id="eph-mtc" style="color:var(--accent-yellow);">02:30:00 MTC</span>
+
+      <span class="eph-label">Solar Longitude (Ls):</span>
+      <span class="eph-val" id="eph-ls">5.09°</span>
+
+      <span class="eph-label">Martian Season:</span>
+      <span class="eph-val" id="eph-season">Northern Spring</span>
+
+      <span class="eph-label">Subsolar Point (Sun Zenith):</span>
+      <span class="eph-val" id="eph-subsolar">2.16° N, 152.89° E</span>
+
+      <span class="eph-label">Solar Irradiance (TSI):</span>
+      <span class="eph-val" id="eph-tsi">590 W/m²</span>
+
+      <span class="eph-label">Solar Lighting & Shadows:</span>
+      <span class="eph-val" id="eph-shadows" style="color:var(--accent-yellow);">REAL-TIME ASTRONOMICAL SUN</span>
+
+      <span class="eph-label">Decontour Filter:</span>
+      <span class="eph-val" id="eph-decontour" style="color:var(--accent-green);">SMOOTH REAL-TIME ACTIVE</span>
+    </div>
+  </div>
+
+  <!-- Main Viewport -->
   <div id="viewport-container">
-    <canvas id="gpu-canvas"></canvas>
+    <canvas id="three-canvas"></canvas>
+    <canvas id="flat-canvas"></canvas>
 
-    <!-- Quick Landmarks Bar -->
-    <div class="hud-panel" id="hud-landmarks">
-      <span class="chip" data-lat="18.65" data-lon="-133.8" data-zoom="8">Olympus Mons</span>
-      <span class="chip" data-lat="-13.9" data-lon="-59.2" data-zoom="8">Valles Marineris</span>
-      <span class="chip" data-lat="-5.37" data-lon="137.44" data-zoom="10">Gale Crater</span>
-      <span class="chip" data-lat="18.38" data-lon="77.58" data-zoom="10">Jezero Crater</span>
-      <span class="chip" data-lat="-42.7" data-lon="70.0" data-zoom="8">Hellas Planitia</span>
-      <span class="chip" data-lat="84.0" data-lon="0.0" data-zoom="6">North Pole</span>
-      <span class="chip" data-lat="-85.0" data-lon="0.0" data-zoom="6">South Pole</span>
+    <!-- Google Earth Landmark Hover Card -->
+    <div id="hover-tooltip">
+      <div class="tooltip-tag" id="tt-category">Volcano</div>
+      <div class="tooltip-name" id="tt-name">Olympus Mons</div>
+      <div class="tooltip-coords" id="tt-coords">18.6500° N, 133.8000° W • +21,287 m</div>
+      <div class="tooltip-desc" id="tt-desc">Description text...</div>
     </div>
 
-    <!-- GPU Telemetry HUD -->
-    <div class="hud-panel" id="hud-telemetry">
-      <div class="hud-title">
-        <span>Hardware GPU Telemetry</span>
-        <span style="font-size: 10px; color: var(--accent-green);" id="val-api">WebGL 2.0</span>
+    <!-- Side Destinations Drawer (Left) -->
+    <div id="left-drawer">
+      <div class="drawer-title">
+        <span>Curated Exploration Sites</span>
+        <span style="font-size:10px; color:var(--accent-orange);">IAU Geodetic</span>
       </div>
-      <div class="telemetry-grid">
-        <span class="telemetry-label">Frame Rate:</span>
-        <span class="telemetry-val fps-good" id="val-fps">60.0 FPS</span>
-
-        <span class="telemetry-label">Render Time:</span>
-        <span class="telemetry-val" id="val-frame-time">16.6 ms</span>
-
-        <span class="telemetry-label">GPU Adapter:</span>
-        <span class="telemetry-val" style="font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="val-renderer">Hardware GPU</span>
-
-        <span class="telemetry-label">Active Textures:</span>
-        <span class="telemetry-val" id="val-gpu-textures">0 cached</span>
-
-        <span class="telemetry-label">Visible Quads:</span>
-        <span class="telemetry-val" id="val-visible-tiles">0 tiles</span>
-
-        <span class="telemetry-label">Async Streams:</span>
-        <span class="telemetry-val" id="val-pending-loads">0 in flight</span>
+      <div class="destinations-scroll" id="dest-list"></div>
+      <div style="border-top: 1px solid var(--card-border); padding-top: 8px;">
+        <div style="font-size:10px; text-transform:uppercase; color:var(--text-dim); margin-bottom:4px;">NASA Active Scans</div>
+        <div id="nasa-scan-summary" style="font-size:11px; color:#cbd5e1;">Click "Scan NASA Orbiters" to stream high-res CTX footprints at camera center.</div>
       </div>
     </div>
 
-    <!-- Planetary Inspector HUD -->
-    <div class="hud-panel" id="hud-coords">
-      <div class="hud-title">
-        <span>Planetary Inspector (Level 5)</span>
-        <span class="badge-tile" id="hud-tile-name">5_x_y.jpg</span>
+    <!-- Bottom Dock: Astronaut EVA Route Planner & Hazard Cross-Section -->
+    <div id="bottom-dock">
+      <div class="dock-header">
+        <div class="dock-title">
+          <span>🚀 Live NASA Rover Traverses & Expedition Corridors</span>
+          <select class="route-select-input" id="select-eva-preset">
+            <optgroup label="NASA Live & Historical Rover Traverses">
+              <option value="m20_perseverance" selected>Perseverance (Jezero Delta • Live Sol 1980+ • 45.1 km)</option>
+              <option value="msl_curiosity">Curiosity (Gale Mt Sharp • Live Sol 5021+ • 38.1 km)</option>
+              <option value="mer_opportunity">Opportunity (Meridiani Planum • Sol 5,111 • 45.2 km)</option>
+              <option value="mer_spirit">Spirit (Gusev Columbia Hills • Sol 2,210 • 7.7 km)</option>
+            </optgroup>
+            <optgroup label="Human EVA Expeditions">
+              <option value="jezero_delta_traverse">Jezero Delta Human Walkback</option>
+              <option value="mount_sharp_ascent">Mount Sharp Ascent Track</option>
+              <option value="valles_marineris_rim_descent">Melas Chasma Canyon Descent</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="dock-metrics">
+          <div class="metric-col">
+            <span class="metric-label">Traverse</span>
+            <span class="metric-val" id="eva-val-dist">8.28 km</span>
+          </div>
+          <div class="metric-col">
+            <span class="metric-label">EVA Duration</span>
+            <span class="metric-val" id="eva-val-time">2.6 hrs</span>
+          </div>
+          <div class="metric-col">
+            <span class="metric-label">Metabolic</span>
+            <span class="metric-val" id="eva-val-energy">348 kcal</span>
+          </div>
+          <div class="metric-col">
+            <span class="metric-label">Max Incline</span>
+            <span class="metric-val" id="eva-val-slope">11.4°</span>
+          </div>
+          <div class="metric-col">
+            <span class="metric-label">Walkback Safety</span>
+            <span class="metric-val" id="eva-val-safety" style="color:var(--accent-green);">SAFE (&lt;12.5km)</span>
+          </div>
+        </div>
       </div>
-      <div class="coord-grid">
-        <span class="coord-label">Mars Latitude:</span>
-        <span class="coord-val" id="val-lat">0.0000°</span>
-
-        <span class="coord-label">Mars Longitude:</span>
-        <span class="coord-val" id="val-lon">0.0000°</span>
-
-        <span class="coord-label">Longitude (0-360°E):</span>
-        <span class="coord-val" id="val-lon360">0.0000°E</span>
-
-        <span class="coord-label">Tile Matrix Index:</span>
-        <span class="coord-val" id="val-matrix">Row: -, Col: -</span>
-
-        <span class="coord-label">Tile Local Pixel:</span>
-        <span class="coord-val" id="val-local-pixel">(x: -, y: -)</span>
-
-        <span class="coord-label">Global 16K Pixel:</span>
-        <span class="coord-val" id="val-global-pixel">(X: -, Y: -)</span>
+      <div class="chart-box">
+        <canvas id="eva-canvas-chart"></canvas>
       </div>
     </div>
 
-    <!-- Shader Controls HUD -->
-    <div class="hud-panel" id="hud-shaders">
-      <div class="hud-title">
-        <span>GPU Post-Processing Shaders</span>
-      </div>
-      <div class="shader-control">
-        <div class="shader-control-header">
-          <span>Brightness / Exposure</span>
-          <span id="label-brightness">0.00</span>
-        </div>
-        <input type="range" id="slider-brightness" min="-0.4" max="0.4" step="0.02" value="0.0">
-      </div>
-      <div class="shader-control">
-        <div class="shader-control-header">
-          <span>Contrast</span>
-          <span id="label-contrast">1.00</span>
-        </div>
-        <input type="range" id="slider-contrast" min="0.5" max="2.0" step="0.05" value="1.0">
-      </div>
-      <div class="shader-control">
-        <div class="shader-control-header">
-          <span>Terrain Ridge Sharpening</span>
-          <span id="label-sharpness">0.00</span>
-        </div>
-        <input type="range" id="slider-sharpness" min="0.0" max="1.5" step="0.05" value="0.0">
-      </div>
-      <div class="toggle-row">
-        <span>Tile Matrix Seam Overlay</span>
-        <input type="checkbox" id="toggle-grid">
-      </div>
-
-      <!-- Elevation Ramp -->
-      <div class="elevation-container">
-        <div class="elevation-bar"></div>
-        <div class="elevation-ticks">
-          <span>-8 km</span>
-          <span>-4 km</span>
-          <span>0 km</span>
-          <span>+8 km</span>
-          <span>+21 km</span>
-        </div>
-      </div>
+    <!-- Floating Coordinates Telemetry (Bottom-Left) -->
+    <div id="status-pill">
+      <span id="st-lat">18.3800° N</span>
+      <span id="st-lon">77.5800° E</span>
+      <span id="st-elev">-2,540 m (MOLA)</span>
+      <span id="st-alt">Alt: 4,200 km</span>
+      <span id="st-fps" style="color:var(--accent-green);">60 FPS</span>
     </div>
 
-    <div class="help-tooltip" id="help-tooltip">
-      Pan: Left Drag &bull; Zoom: Mouse Wheel &bull; GPU Viewport: 2D Hardware Accelerated
+    <!-- Google Earth Floating Controls (Bottom-Right) -->
+    <div id="ge-controls-dock">
+      <div class="ge-btn-group">
+        <button class="ge-ctrl-btn" id="btn-zoom-in" title="Zoom In (+)">➕</button>
+        <button class="ge-ctrl-btn" id="btn-zoom-out" title="Zoom Out (-)">➖</button>
+      </div>
+      <div class="ge-btn-group">
+        <button class="ge-ctrl-btn" id="btn-compass" title="Reset North Up">🧭</button>
+        <button class="ge-ctrl-btn" id="btn-toggle-routes" title="Toggle Traverse Visibility">🛣️</button>
+        <button class="ge-ctrl-btn" id="btn-toggle-atmo" title="Atmospheric Lighting">🌌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for NASA Science Observation Detail -->
+  <div id="product-modal">
+    <span class="modal-close" id="modal-close">&times;</span>
+    <h3 id="modal-title" style="color: var(--accent-cyan); font-size: 14px;">NASA Observation Detail</h3>
+    <div id="modal-meta" style="font-size: 11px; color: var(--text-dim); margin-top: 4px;"></div>
+    <img id="modal-img" src="" alt="Observation Preview">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 10px;">
+      <a id="modal-ode-link" href="#" target="_blank" style="color: var(--accent-orange); font-size: 12px; text-decoration: none;">View in NASA ODE Catalog &rarr;</a>
+      <button class="pill-btn" id="modal-close-btn" style="padding: 4px 12px;">Close</button>
     </div>
   </div>
 
   <script>
     /**
-     * GPU Hardware Accelerated Planetary Map Engine
-     * Uses WebGL2 / WebGL with custom GLSL shaders and off-thread createImageBitmap() texture streaming.
+     * Google Earth Style Mars 3D Explorer
+     * Features:
+     * - Highly visible 3D Tube traverse corridors & beacon markers
+     * - Raycaster Landmark hover detection with Google Earth info cards
+     * - Smooth orbit, zoom, and continuous flight physics
+     * - 8K Progressive texture mapping & NASA ODE / GDS live sync
      */
 
-    const canvas = document.getElementById('gpu-canvas');
-    let gl = canvas.getContext('webgl2', { alpha: false, antialias: true, powerPreference: 'high-performance' });
-    let isWebGL2 = true;
-    if (!gl) {
-      gl = canvas.getContext('webgl', { alpha: false, antialias: true, powerPreference: 'high-performance' });
-      isWebGL2 = false;
+    let appMode = '3D';
+    let currentLat = 18.38;
+    let currentLon = 77.58;
+    let currentElevation = -2540;
+    let landmarksData = [];
+    let currentRouteSamples = [];
+
+    const container = document.getElementById('viewport-container');
+    const threeCanvas = document.getElementById('three-canvas');
+    const flatCanvas = document.getElementById('flat-canvas');
+    const tooltip = document.getElementById('hover-tooltip');
+
+    // --- Scene Setup ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.01, 100);
+    camera.position.set(0, 0, 3.2);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: threeCanvas,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // Smooth Orbit Controls (Google Earth feel)
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.rotateSpeed = 0.65;
+    controls.zoomSpeed = 0.9;
+    controls.minDistance = 1.03;
+    controls.maxDistance = 8.5;
+    controls.enablePan = false;
+
+    // Lighting Architecture: Full Planetary Visibility + Real-Time Astronomical Sun Shadows
+    let solarTerminatorActive = true; // Active with real-time ephemeris Sun positioning
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.48); // Baseline ambient light prevents total pitch-black obscuration
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xffeedd, 1.35); // Astronomical sunlight
+    sunLight.position.set(6, 4, 5);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 16.0;
+    const shadowFrustum = 1.6;
+    sunLight.shadow.camera.left = -shadowFrustum;
+    sunLight.shadow.camera.right = shadowFrustum;
+    sunLight.shadow.camera.top = shadowFrustum;
+    sunLight.shadow.camera.bottom = -shadowFrustum;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+
+    // Viewport-tracking headlight ensuring craters and features remain readable on night hemisphere
+    const cameraHeadlight = new THREE.DirectionalLight(0xffffff, 0.22);
+    camera.add(cameraHeadlight);
+    scene.add(camera);
+
+    // Deep Space Starfield
+    const starsGeo = new THREE.BufferGeometry();
+    const starCount = 2000;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+      starPositions[i] = (Math.random() - 0.5) * 90;
+      starPositions[i + 1] = (Math.random() - 0.5) * 90;
+      starPositions[i + 2] = (Math.random() - 0.5) * 90;
     }
+    starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    scene.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({ color: 0x94a3b8, size: 0.16 })));
 
-    if (!gl) {
-      alert("WebGL initialization failed. Please ensure hardware acceleration is enabled in your browser.");
-    }
+    // Mars 3D Sphere & Real-Time Decontourification Shader Architecture
+    const MARS_RADIUS = 1.0;
+    const sphereGeo = new THREE.SphereGeometry(MARS_RADIUS, 128, 64);
 
-    // Query GPU Hardware Vendor & Renderer
-    const extDebug = gl.getExtension('WEBGL_debug_renderer_info');
-    const gpuRenderer = extDebug ? gl.getParameter(extDebug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
-    document.getElementById('val-renderer').textContent = gpuRenderer || 'Hardware GPU';
-    document.getElementById('val-api').textContent = isWebGL2 ? 'WebGL 2.0' : 'WebGL 1.0';
-
-    // Matrix & Level 5 Specs
-    const ROWS = 32;
-    const COLS = 64;
-    const TILE_DEG = 5.625; // 360 / 64 = 180 / 32 = 5.625 deg
-    const MAX_GPU_TEXTURES = 512; // Texture pool budget
-
-    // Application State (2D Hardware-Accelerated Viewport)
-    let camera2D = {
-      centerLon: 0.0,
-      centerLat: 0.0,
-      zoom: 1.0, // 1.0 = entire globe fits screen
-      minZoom: 0.8,
-      maxZoom: 32.0
+    let decontourActive = true;
+    const decontourUniforms = {
+      u_decontour: { value: 1.0 },
+      u_sharpness: { value: 0.65 },
+      u_contrast: { value: 1.08 },
+      u_texelSize: { value: new THREE.Vector2(1.0 / 8192.0, 1.0 / 4096.0) }
     };
 
-    // GPU Post-Processing Shader Parameters
-    let shaderParams = {
-      brightness: 0.0,
-      contrast: 1.0,
-      sharpness: 0.0,
-      showGrid: false
+    const marsMaterial = new THREE.MeshStandardMaterial({
+      roughness: 0.88,
+      metalness: 0.04
+    });
+
+    // Custom GPU Decontourification Pipeline (removes contour banding artifacts & sharpens MOLA ridges)
+    marsMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.u_decontour = decontourUniforms.u_decontour;
+      shader.uniforms.u_sharpness = decontourUniforms.u_sharpness;
+      shader.uniforms.u_contrast = decontourUniforms.u_contrast;
+      shader.uniforms.u_texelSize = decontourUniforms.u_texelSize;
+
+      shader.fragmentShader = `
+        uniform float u_decontour;
+        uniform float u_sharpness;
+        uniform float u_contrast;
+        uniform vec2 u_texelSize;
+      ` + shader.fragmentShader;
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <map_fragment>',
+        `
+        #ifdef USE_MAP
+          vec4 texColor = texture2D(map, vUv);
+          if (u_decontour > 0.5) {
+            // High-precision 5-tap cross convolution decontour filter
+            vec4 cU = texture2D(map, vUv + vec2(0.0, u_texelSize.y));
+            vec4 cD = texture2D(map, vUv - vec2(0.0, u_texelSize.y));
+            vec4 cL = texture2D(map, vUv - vec2(u_texelSize.x, 0.0));
+            vec4 cR = texture2D(map, vUv + vec2(u_texelSize.x, 0.0));
+
+            // Laplacian second-derivative operator for ridge extraction
+            vec4 laplacian = 4.0 * texColor - (cU + cD + cL + cR);
+            // Continuous bilateral anti-banding blend
+            vec4 smoothed = (cU + cD + cL + cR) * 0.25;
+            texColor = mix(texColor, smoothed, 0.22);
+            texColor += laplacian * (u_sharpness * 0.35);
+
+            // Contrast enhancement for geomorphology
+            texColor.rgb = (texColor.rgb - 0.5) * u_contrast + 0.5;
+            texColor = clamp(texColor, 0.0, 1.0);
+          }
+          diffuseColor *= texColor;
+        #endif
+        `
+      );
     };
 
-    // Telemetry
-    let frameTimes = [];
-    let lastTime = performance.now();
-    let pendingLoads = 0;
-
-    // --- Shaders Definition ---
-
-    // 2D Vertex Shader
-    const vs2D = `
-      attribute vec2 a_pos;
-      attribute vec2 a_uv;
-      uniform vec2 u_offset;
-      uniform vec2 u_scale;
-      uniform float u_aspect;
-      varying vec2 v_uv;
-
-      void main() {
-        v_uv = a_uv;
-        // Transform planetary Lon/Lat [-180..180, -90..90] to normalized screen coordinates
-        vec2 screenPos = (a_pos - u_offset) * u_scale;
-        screenPos.x /= u_aspect;
-        gl_Position = vec4(screenPos, 0.0, 1.0);
-      }
-    `;
-
-    // 2D Fragment Shader with Post-Processing & Convolution Ridge Filtering
-    const fs2D = `
-      precision highp float;
-      varying vec2 v_uv;
-      uniform sampler2D u_texture;
-      uniform float u_brightness;
-      uniform float u_contrast;
-      uniform float u_sharpness;
-      uniform float u_grid;
-      uniform vec2 u_grid_scale;
-
-      void main() {
-        vec4 color = texture2D(u_texture, v_uv);
-
-        // Hardware Ridge Sharpening / Convolution Filter
-        if (u_sharpness > 0.0) {
-          float step = 1.0 / 256.0;
-          vec4 cU = texture2D(u_texture, v_uv + vec2(0.0, step));
-          vec4 cD = texture2D(u_texture, v_uv - vec2(0.0, step));
-          vec4 cL = texture2D(u_texture, v_uv - vec2(step, 0.0));
-          vec4 cR = texture2D(u_texture, v_uv + vec2(step, 0.0));
-          vec4 laplacian = 4.0 * color - (cU + cD + cL + cR);
-          color += laplacian * u_sharpness * 0.4;
-        }
-
-        // Brightness & Contrast adjustment
-        vec3 rgb = color.rgb + vec3(u_brightness);
-        rgb = (rgb - 0.5) * u_contrast + 0.5;
-
-        // Seam boundary line indicator
-        if (u_grid > 0.5) {
-          vec2 edge = abs(v_uv - 0.5) * 2.0;
-          if (edge.x > 0.985 || edge.y > 0.985) {
-            rgb = mix(rgb, vec3(0.22, 0.74, 0.97), 0.4);
-          }
-        }
-
-        gl_FragColor = vec4(clamp(rgb, 0.0, 1.0), 1.0);
-      }
-    `;
-
-    function compileShader(type, src) {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.error("Shader compile error:", gl.getShaderInfoLog(s));
-      }
-      return s;
-    }
-
-    function createProgram(vsSrc, fsSrc) {
-      const p = gl.createProgram();
-      gl.attachShader(p, compileShader(gl.VERTEX_SHADER, vsSrc));
-      gl.attachShader(p, compileShader(gl.FRAGMENT_SHADER, fsSrc));
-      gl.linkProgram(p);
-      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
-        console.error("Program link error:", gl.getProgramInfoLog(p));
-      }
-      return p;
-    }
-
-    const prog2D = createProgram(vs2D, fs2D);
-
-    // Buffers for 2D Quads
-    const quadPosBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, quadPosBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      0, 0,  1, 0,  0, 1,
-      0, 1,  1, 0,  1, 1
-    ]), gl.STATIC_DRAW);
-
-    const quadUvBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, quadUvBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      0, 0,  1, 0,  0, 1,
-      0, 1,  1, 0,  1, 1
-    ]), gl.STATIC_DRAW);
-
-    // --- GPU Texture Cache & Asynchronous ImageBitmap Streaming ---
-    const textureCache = new Map(); // key "5_r_c" -> { tex, lastUsed }
-    const inFlightRequests = new Set();
-    let baseTexture = null;
-    let currentMinRow = 0, currentMaxRow = 31, currentMinCol = 0, currentMaxCol = 63;
-
-    function uploadTexture(imgBitmap) {
-      const tex = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, imgBitmap);
-
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.generateMipmap(gl.TEXTURE_2D);
-
-      return tex;
-    }
-
-    // Load Low-Res Base Composite Mosaic for Instant Fallback
-    async function loadBaseComposite() {
-      const candidates = ['mars_mola_base_2k.jpg', 'mars_mola_level5_mosaic.jpg'];
-      for (const url of candidates) {
-        try {
-          const resp = await fetch(url);
-          if (!resp.ok) continue;
-          const blob = await resp.blob();
-          let bmp;
-          try {
-            bmp = await createImageBitmap(blob, { resizeWidth: 2048, resizeHeight: 1024 });
-          } catch (_) {
-            bmp = await createImageBitmap(blob);
-          }
-          baseTexture = uploadTexture(bmp);
-          requestRender();
-          break;
-        } catch (err) {
-          console.warn("Could not load base composite texture from", url, err);
-        }
-      }
-    }
-    loadBaseComposite();
-
-    // Stream Level 5 Tile Asynchronously
-    async function requestTileAsync(r, c) {
-      const key = `5_${r}_${c}`;
-      if (textureCache.has(key) || inFlightRequests.has(key)) return;
-
-      inFlightRequests.add(key);
-      pendingLoads++;
-
-      try {
-        const resp = await fetch(`tiles/${key}.jpg`);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const blob = await resp.blob();
-        const bmp = await createImageBitmap(blob);
-
-        // Evict LRU texture prioritizing off-screen tiles if cache limit reached
-        if (textureCache.size >= MAX_GPU_TEXTURES) {
-          let oldestKey = null;
-          let oldestScore = Infinity;
-          for (const [k, v] of textureCache.entries()) {
-            const parts = k.split('_');
-            const tr = parseInt(parts[1], 10);
-            const tc = parseInt(parts[2], 10);
-            const isVis = (tr >= currentMinRow && tr <= currentMaxRow && tc >= currentMinCol && tc <= currentMaxCol);
-            const score = isVis ? (v.lastUsed + 1e12) : v.lastUsed;
-            if (score < oldestScore) {
-              oldestScore = score;
-              oldestKey = k;
-            }
-          }
-          if (oldestKey) {
-            gl.deleteTexture(textureCache.get(oldestKey).tex);
-            textureCache.delete(oldestKey);
-          }
-        }
-
-        const tex = uploadTexture(bmp);
-        textureCache.set(key, { tex, lastUsed: performance.now() });
-        requestRender();
-      } catch (e) {
-        // Ignored or network error
-      } finally {
-        inFlightRequests.delete(key);
-        pendingLoads--;
-      }
-    }
-
-    // --- Render Loop ---
-    let animFrame = null;
-    function requestRender() {
-      if (!animFrame) {
-        animFrame = requestAnimationFrame(render);
-      }
-    }
-
-    function render(now) {
-      animFrame = null;
-
-      // FPS Calculation
-      const dt = now - lastTime;
-      lastTime = now;
-      frameTimes.push(dt);
-      if (frameTimes.length > 20) frameTimes.shift();
-      const avgDt = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
-      const fps = 1000 / avgDt;
-
-      document.getElementById('val-fps').textContent = `${fps.toFixed(1)} FPS`;
-      document.getElementById('val-frame-time').textContent = `${avgDt.toFixed(1)} ms`;
-      document.getElementById('val-gpu-textures').textContent = `${textureCache.size} in VRAM`;
-      document.getElementById('val-pending-loads').textContent = `${pendingLoads} in flight`;
-
-      // Resize canvas buffer to device display size
-      const width = canvas.clientWidth * window.devicePixelRatio;
-      const height = canvas.clientHeight * window.devicePixelRatio;
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
-      }
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      const aspect = canvas.width / canvas.height;
-
-      gl.clearColor(0.02, 0.03, 0.05, 1.0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-
-      render2D(aspect);
-    }
-
-    function render2D(aspect) {
-      gl.disable(gl.DEPTH_TEST);
-      gl.useProgram(prog2D);
-
-      const locOffset = gl.getUniformLocation(prog2D, "u_offset");
-      const locScale = gl.getUniformLocation(prog2D, "u_scale");
-      const locAspect = gl.getUniformLocation(prog2D, "u_aspect");
-      const locBrightness = gl.getUniformLocation(prog2D, "u_brightness");
-      const locContrast = gl.getUniformLocation(prog2D, "u_contrast");
-      const locSharpness = gl.getUniformLocation(prog2D, "u_sharpness");
-      const locGrid = gl.getUniformLocation(prog2D, "u_grid");
-
-      gl.uniform1f(locAspect, aspect);
-      gl.uniform1f(locBrightness, shaderParams.brightness);
-      gl.uniform1f(locContrast, shaderParams.contrast);
-      gl.uniform1f(locSharpness, shaderParams.sharpness);
-
-      // Camera view box: scale factor maps 360 deg Lon to view width
-      const scaleX = (camera2D.zoom / 180.0) * aspect;
-      const scaleY = (camera2D.zoom / 90.0);
-
-      gl.uniform2f(locOffset, camera2D.centerLon, camera2D.centerLat);
-      gl.uniform2f(locScale, scaleX, scaleY);
-
-      // Bind quad buffers
-      const aPos = gl.getAttribLocation(prog2D, "a_pos");
-      const aUv = gl.getAttribLocation(prog2D, "a_uv");
-
-      // Calculate Visible Viewport Bounding Box in Planetary Lon/Lat
-      const halfWidthDeg = (1.0 / scaleX) * aspect;
-      const halfHeightDeg = (1.0 / scaleY);
-
-      const visMinLon = camera2D.centerLon - halfWidthDeg;
-      const visMaxLon = camera2D.centerLon + halfWidthDeg;
-      const visMinLat = camera2D.centerLat - halfHeightDeg;
-      const visMaxLat = camera2D.centerLat + halfHeightDeg;
-
-      // Draw Base Texture across full planetary quad [-180..180, -90..90]
-      if (baseTexture) {
-        gl.uniform1f(locGrid, 0.0);
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, baseTexture);
-
-        const baseQuad = new Float32Array([
-          -180, -90,   180, -90,  -180,  90,
-          -180,  90,   180, -90,   180,  90
-        ]);
-        const baseUv = new Float32Array([
-          0, 1,  1, 1,  0, 0,
-          0, 0,  1, 1,  1, 0
-        ]);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, quadPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, baseQuad, gl.DYNAMIC_DRAW);
-        gl.enableVertexAttribArray(aPos);
-        gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, quadUvBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, baseUv, gl.DYNAMIC_DRAW);
-        gl.enableVertexAttribArray(aUv);
-        gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 0, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-      }
-
-      // Calculate Tile Row / Col Range Visible in Viewport Frustum
-      const minCol = Math.max(0, Math.floor((visMinLon + 180.0) / TILE_DEG));
-      const maxCol = Math.min(COLS - 1, Math.floor((visMaxLon + 180.0) / TILE_DEG));
-      const minRow = Math.max(0, Math.floor((90.0 - visMaxLat) / TILE_DEG));
-      const maxRow = Math.min(ROWS - 1, Math.floor((90.0 - visMinLat) / TILE_DEG));
-
-      currentMinRow = minRow;
-      currentMaxRow = maxRow;
-      currentMinCol = minCol;
-      currentMaxCol = maxCol;
-
-      const totalFrustumTiles = (maxCol - minCol + 1) * (maxRow - minRow + 1);
-      const shouldStreamTiles = (camera2D.zoom >= 1.6 || totalFrustumTiles <= MAX_GPU_TEXTURES || !baseTexture);
-
-      let visibleCount = 0;
-
-      // Stream & Render Visible Tiles as GPU Quads
-      for (let r = minRow; r <= maxRow; r++) {
-        const topLat = 90.0 - r * TILE_DEG;
-        const bottomLat = 90.0 - (r + 1) * TILE_DEG;
-
-        for (let c = minCol; c <= maxCol; c++) {
-          const leftLon = -180.0 + c * TILE_DEG;
-          const rightLon = -180.0 + (c + 1) * TILE_DEG;
-
-          const key = `5_${r}_${c}`;
-          if (!textureCache.has(key)) {
-            if (shouldStreamTiles) {
-              requestTileAsync(r, c);
-            }
-            continue;
-          }
-
-          visibleCount++;
-          // Render Tile Quad
-          const tileItem = textureCache.get(key);
-          tileItem.lastUsed = performance.now();
-
-          gl.uniform1f(locGrid, shaderParams.showGrid ? 1.0 : 0.0);
-          gl.activeTexture(gl.TEXTURE0);
-          gl.bindTexture(gl.TEXTURE_2D, tileItem.tex);
-
-          const tileQuad = new Float32Array([
-            leftLon, bottomLat,   rightLon, bottomLat,  leftLon,  topLat,
-            leftLon,  topLat,     rightLon, bottomLat,  rightLon, topLat
-          ]);
-          const tileUv = new Float32Array([
-            0, 1,  1, 1,  0, 0,
-            0, 0,  1, 1,  1, 0
-          ]);
-
-          gl.bindBuffer(gl.ARRAY_BUFFER, quadPosBuffer);
-          gl.bufferData(gl.ARRAY_BUFFER, tileQuad, gl.DYNAMIC_DRAW);
-          gl.enableVertexAttribArray(aPos);
-          gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-          gl.bindBuffer(gl.ARRAY_BUFFER, quadUvBuffer);
-          gl.bufferData(gl.ARRAY_BUFFER, tileUv, gl.DYNAMIC_DRAW);
-          gl.enableVertexAttribArray(aUv);
-          gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 0, 0);
-
-          gl.drawArrays(gl.TRIANGLES, 0, 6);
-        }
-      }
-
-      document.getElementById('val-visible-tiles').textContent = baseTexture && !shouldStreamTiles ? 'Global 16K LOD' : `${visibleCount} quads`;
-    }
-
-    // --- Interactive Mouse & Touch Controls ---
-    let isDragging = false;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-
-    canvas.addEventListener('mousedown', e => {
-      isDragging = true;
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    window.addEventListener('mousemove', e => {
-      const dx = e.clientX - lastMouseX;
-      const dy = e.clientY - lastMouseY;
-      lastMouseX = e.clientX;
-      lastMouseY = e.clientY;
-
-      if (isDragging) {
-        const degPerPixelX = 360.0 / (camera2D.zoom * canvas.clientWidth);
-        const degPerPixelY = 180.0 / (camera2D.zoom * canvas.clientHeight);
-
-        camera2D.centerLon -= dx * degPerPixelX;
-        camera2D.centerLat += dy * degPerPixelY;
-
-        // Clamp Lon and Lat strictly within physical planetary boundaries without looping
-        camera2D.centerLon = Math.max(-180.0, Math.min(180.0, camera2D.centerLon));
-        camera2D.centerLat = Math.max(-89.9, Math.min(89.9, camera2D.centerLat));
-        requestRender();
-      }
-
-      // Planetary Inspector Mouse Position
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      const aspect = canvas.width / canvas.height;
-      const normX = (mouseX / rect.width) * 2.0 - 1.0;
-      const normY = 1.0 - (mouseY / rect.height) * 2.0;
-
-      const lon = camera2D.centerLon + (normX * aspect) / ((camera2D.zoom / 180.0) * aspect);
-      const lat = camera2D.centerLat + normY / (camera2D.zoom / 90.0);
-
-      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
-        updateInspector(lat, lon);
-      }
-    });
-
-    canvas.addEventListener('wheel', e => {
-      e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-      camera2D.zoom = Math.max(camera2D.minZoom, Math.min(camera2D.maxZoom, camera2D.zoom * zoomFactor));
-      requestRender();
-    }, { passive: false });
-
-    // Planetary Coordinate Inspector Logic
-    function updateInspector(lat, lon) {
-      const clampedLat = Math.max(-90, Math.min(90, lat));
-      const clampedLon = Math.max(-180, Math.min(180, lon));
-
-      // Row 0..31, Col 0..63
-      const row = Math.min(31, Math.max(0, Math.floor((90 - clampedLat) / TILE_DEG)));
-      const col = Math.min(63, Math.max(0, Math.floor((clampedLon + 180) / TILE_DEG)));
-
-      // Local Pixel
-      const latRem = (90 - clampedLat) % TILE_DEG;
-      const lonRem = (clampedLon + 180) % TILE_DEG;
-      const localY = Math.min(255, Math.floor((latRem / TILE_DEG) * 256));
-      const localX = Math.min(255, Math.floor((lonRem / TILE_DEG) * 256));
-
-      // Global 16K Pixel
-      const globalX = col * 256 + localX;
-      const globalY = row * 256 + localY;
-
-      document.getElementById('val-lat').textContent = `${clampedLat.toFixed(4)}° ${clampedLat >= 0 ? 'N' : 'S'}`;
-      document.getElementById('val-lon').textContent = `${clampedLon.toFixed(4)}° ${clampedLon >= 0 ? 'E' : 'W'}`;
-      const lon360 = (clampedLon + 360) % 360;
-      document.getElementById('val-lon360').textContent = `${lon360.toFixed(4)}° E`;
-
-      document.getElementById('val-matrix').textContent = `Row: ${row}, Col: ${col}`;
-      document.getElementById('val-local-pixel').textContent = `(x: ${localX}, y: ${localY})`;
-      document.getElementById('val-global-pixel').textContent = `(X: ${globalX}, Y: ${globalY})`;
-      document.getElementById('hud-tile-name').textContent = `5_${row}_${col}.jpg`;
-    }
-
-    // Reset View Button
-    document.getElementById('btn-reset-view').addEventListener('click', () => {
-      camera2D.centerLon = 0.0;
-      camera2D.centerLat = 0.0;
-      camera2D.zoom = 1.0;
-      requestRender();
-    });
-
-    // Landmark Fly-To Buttons
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const lat = parseFloat(chip.dataset.lat);
-        const lon = parseFloat(chip.dataset.lon);
-        const zoom = parseFloat(chip.dataset.zoom);
-
-        const startLon = camera2D.centerLon;
-        const startLat = camera2D.centerLat;
-        const startZoom = camera2D.zoom;
-        const targetZoom = zoom * 0.7;
-        const startTime = performance.now();
-        const duration = 800;
-
-        function animateFly(now) {
-          const t = Math.min(1.0, (now - startTime) / duration);
-          const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-
-          camera2D.centerLon = startLon + (lon - startLon) * ease;
-          camera2D.centerLat = startLat + (lat - startLat) * ease;
-          camera2D.zoom = startZoom + (targetZoom - startZoom) * ease;
-
-          requestRender();
-          if (t < 1.0) requestAnimationFrame(animateFly);
-        }
-        requestAnimationFrame(animateFly);
-
-        updateInspector(lat, lon);
+    const marsGlobe = new THREE.Mesh(sphereGeo, marsMaterial);
+    marsGlobe.castShadow = true;
+    marsGlobe.receiveShadow = true;
+    scene.add(marsGlobe);
+
+    // Progressive Texture: 2K Fast -> 8K Master
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load('/mars_mola_base_2k.jpg', (tex2k) => {
+      marsMaterial.map = tex2k;
+      marsMaterial.needsUpdate = true;
+      textureLoader.load('/mars_mola_8k.jpg', (tex8k) => {
+        tex8k.generateMipmaps = true;
+        tex8k.minFilter = THREE.LinearMipmapLinearFilter;
+        tex8k.magFilter = THREE.LinearFilter;
+        marsMaterial.map = tex8k;
+        marsMaterial.needsUpdate = true;
       });
     });
 
-    // Shader Controls Event Listeners
-    document.getElementById('slider-brightness').addEventListener('input', e => {
-      shaderParams.brightness = parseFloat(e.target.value);
-      document.getElementById('label-brightness').textContent = shaderParams.brightness.toFixed(2);
-      requestRender();
+    // Atmosphere Mesh
+    const atmosGeo = new THREE.SphereGeometry(MARS_RADIUS * 1.018, 64, 32);
+    const atmosMat = new THREE.ShaderMaterial({
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        void main() {
+          float intensity = pow(0.65 - dot(vNormal, vec3(0, 0, 1.0)), 2.0);
+          gl_FragColor = vec4(0.85, 0.42, 0.22, 1.0) * intensity * 0.7;
+        }
+      `,
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      transparent: true
+    });
+    const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+    scene.add(atmosMesh);
+
+    // Groups
+    const markersGroup = new THREE.Group();
+    scene.add(markersGroup);
+
+    const routesGroup = new THREE.Group();
+    scene.add(routesGroup);
+
+    // Coordinate Math
+    function latLonToVector3(lat, lon, radius = MARS_RADIUS) {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lon + 180) * (Math.PI / 180);
+      const x = -(radius * Math.sin(phi) * Math.cos(theta));
+      const z = (radius * Math.sin(phi) * Math.sin(theta));
+      const y = (radius * Math.cos(phi));
+      return new THREE.Vector3(x, y, z);
+    }
+
+    function vector3ToLatLon(v) {
+      const norm = v.clone().normalize();
+      const lat = 90 - (Math.acos(norm.y) * 180 / Math.PI);
+      let lon = (Math.atan2(norm.z, -norm.x) * 180 / Math.PI) - 180;
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+      return { lat, lon };
+    }
+
+    // Google Earth Smooth Fly-To
+    let isTransitioning = false;
+    let transitionStart = 0;
+    let transitionDuration = 1200;
+    let startCamPos = new THREE.Vector3();
+    let targetCamPos = new THREE.Vector3();
+
+    function flyToCoordinate(lat, lon, targetDist = 1.35) {
+      if (appMode === '2D') setMode('3D');
+      isTransitioning = true;
+      transitionStart = performance.now();
+      startCamPos.copy(camera.position);
+
+      const targetSurface = latLonToVector3(lat, lon, targetDist);
+      targetCamPos.copy(targetSurface);
+      controls.target.set(0, 0, 0);
+
+      currentLat = lat;
+      currentLon = lon;
+      updateStatusHUD();
+    }
+
+    // Load & Render Landmarks with Beacon Graphics
+    async function fetchLandmarks() {
+      try {
+        const resp = await fetch('/api/landmarks');
+        const data = await resp.json();
+        if (data.status === 'success') {
+          landmarksData = data.landmarks;
+          renderDrawerDestinations(landmarksData);
+          create3DLandmarks(landmarksData);
+        }
+      } catch (e) {
+        console.error("Failed loading landmarks:", e);
+      }
+    }
+
+    function renderDrawerDestinations(list) {
+      const listContainer = document.getElementById('dest-list');
+      listContainer.innerHTML = '';
+      list.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'dest-card';
+        card.innerHTML = `
+          <div>
+            <div class="dest-name">${item.name}</div>
+            <div class="dest-sub">${item.lat.toFixed(2)}°, ${item.lon.toFixed(2)}° • ${item.category}</div>
+          </div>
+          <span style="font-size:14px; color:var(--accent-orange);">➔</span>
+        `;
+        card.onclick = () => {
+          flyToCoordinate(item.lat, item.lon, item.category === 'polar_cap' ? 1.8 : 1.25);
+          currentElevation = item.elevation_m;
+          updateStatusHUD();
+        };
+        listContainer.appendChild(card);
+      });
+    }
+
+    function create3DLandmarks(list) {
+      while (markersGroup.children.length > 0) markersGroup.remove(markersGroup.children[0]);
+
+      list.forEach(lm => {
+        const pos = latLonToVector3(lm.lat, lm.lon, MARS_RADIUS * 1.002);
+        const normal = pos.clone().normalize();
+
+        // Elegant, professional, sober palette (muted titanium, slate, celestial ice, amber)
+        let colorHex = 0xe2e8f0; // default clean platinum white / slate
+        if (lm.category === 'polar_cap') colorHex = 0xb0c4de; // light steel ice
+        else if (lm.category === 'landing_site') colorHex = 0x5eead4; // soft muted mint/teal
+        else if (lm.category === 'volcano') colorHex = 0xf4a261; // muted terracotta / sandstone
+        else if (lm.category === 'canyon') colorHex = 0xd4a373; // warm ochre slate
+        else if (lm.category === 'basin') colorHex = 0x93c5fd; // soft periwinkle
+
+        // 1. Sleek Matte Pin Head (Subtle Sphere)
+        const pinGeo = new THREE.SphereGeometry(0.008, 20, 20);
+        const pinMat = new THREE.MeshStandardMaterial({
+          color: colorHex,
+          roughness: 0.4,
+          metalness: 0.2
+        });
+        const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+        pinMesh.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.016)));
+        pinMesh.castShadow = true;
+        pinMesh.userData = lm;
+
+        // 2. Refined, Minimalist Stem (Thin Titanium Needle)
+        const stemGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.018, 8);
+        const stemMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
+        const stemMesh = new THREE.Mesh(stemGeo, stemMat);
+        stemMesh.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.008)));
+        stemMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+        stemMesh.castShadow = true;
+
+        // 3. Delicate Surface Target Ring (Semi-transparent, non-distracting)
+        const ringGeo = new THREE.RingGeometry(0.006, 0.009, 32);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: colorHex,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.55
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.position.copy(pos);
+        ringMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+
+        const beaconGroup = new THREE.Group();
+        beaconGroup.add(pinMesh);
+        beaconGroup.add(stemMesh);
+        beaconGroup.add(ringMesh);
+        markersGroup.add(beaconGroup);
+      });
+    }
+
+    // --- High-Visibility 3D Tube Traverse & Historical Rover Path Geometry ---
+    let historicalMissions = [];
+
+    async function loadEVARoute(presetId = 'm20_perseverance') {
+      try {
+        // Fetch both preset EVA routes and historical NASA rover missions
+        let routeObj = null;
+        let isRoverMission = false;
+
+        if (!historicalMissions || historicalMissions.length === 0) {
+          const misResp = await fetch('/api/rover/missions');
+          const misData = await misResp.json();
+          if (misData.status === 'success') historicalMissions = misData.missions;
+        }
+
+        const roverMatch = historicalMissions.find(m => m.id === presetId);
+        let actualPath = null;
+        if (roverMatch) {
+          isRoverMission = true;
+          actualPath = roverMatch.actual_path || null;
+          routeObj = {
+            id: roverMatch.id,
+            name: roverMatch.rover,
+            description: roverMatch.hazard_strategy,
+            waypoints: roverMatch.waypoints,
+            actual_path: actualPath
+          };
+        } else {
+          const presetsResp = await fetch('/api/eva/presets');
+          const presetsData = await presetsResp.json();
+          routeObj = presetsData.routes.find(r => r.id === presetId) || presetsData.routes[0];
+        }
+
+        const planResp = await fetch(`/api/eva/plan?waypoints=${encodeURIComponent(JSON.stringify(routeObj.waypoints))}`);
+        const planData = await planResp.json();
+
+        if (planData.status === 'success') {
+          const s = planData.route_summary;
+          document.getElementById('eva-val-dist').textContent = `${s.total_distance_km} km`;
+          document.getElementById('eva-val-time').textContent = isRoverMission ? `${routeObj.waypoints.length} Sols` : `${s.estimated_eva_time_hrs} hrs`;
+          document.getElementById('eva-val-energy').textContent = isRoverMission ? `${(s.total_distance_km * 18.5).toFixed(0)} Wh/km` : `${s.estimated_energy_kcal} kcal`;
+          document.getElementById('eva-val-slope').textContent = `${s.max_slope_deg}°`;
+          const safetyEl = document.getElementById('eva-val-safety');
+          if (isRoverMission) {
+            safetyEl.textContent = s.max_slope_deg > 18.0 ? 'SLIP RISK DUNE/SCARP' : 'AUTONAV VERIFIED';
+            safetyEl.style.color = s.max_slope_deg > 18.0 ? 'var(--accent-yellow)' : 'var(--accent-green)';
+          } else {
+            safetyEl.textContent = s.walkback_safety === 'WITHIN_LIMITS' ? 'SAFE (<12.5km)' : 'CRITICAL HAZARD';
+            safetyEl.style.color = s.walkback_safety === 'WITHIN_LIMITS' ? 'var(--accent-green)' : 'var(--hazard-red)';
+          }
+
+          currentRouteSamples = (actualPath && actualPath.length > 1) ? actualPath : planData.profile_samples;
+          drawElevationChart(currentRouteSamples, isRoverMission ? routeObj.name : "Astronaut EVA");
+          renderHighlyVisibleTraverseTube(routeObj.waypoints, planData.profile_samples, isRoverMission, actualPath);
+
+          // Fly smoothly to route center/start with appropriate close-up zoom (1.06 instead of 1.22)
+          flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, 1.06);
+        }
+      } catch (err) {
+        console.error("Failed loading EVA/Rover route:", err);
+      }
+    }
+
+    function renderHighlyVisibleTraverseTube(waypoints, samples, isRover = false, actualPath = null) {
+      while (routesGroup.children.length > 0) routesGroup.remove(routesGroup.children[0]);
+
+      // 1. Sleek Cartographic Waypoint Pins (Clean, miniature, no clownish overlapping rings)
+      // For dense rover stops, only render major milestones (start, end, and selected science stops)
+      const renderWps = (waypoints.length > 8)
+        ? waypoints.filter((wp, idx) => idx === 0 || idx === waypoints.length - 1 || idx % 2 === 0)
+        : waypoints;
+
+      renderWps.forEach((wp, idx) => {
+        const isStart = (wp === waypoints[0]);
+        const isEnd = (wp === waypoints[waypoints.length - 1]);
+        const pos = latLonToVector3(wp.lat, wp.lon, MARS_RADIUS * 1.0008);
+        const normal = pos.clone().normalize();
+
+        // Palette: Start = Emerald green, End = Bright Cyan, Science Stops = Golden Amber
+        let colorHex = isStart ? 0x22c55e : (isEnd ? 0x38bdf8 : 0xfbbf24);
+        if (wp.hazard === 'CRITICAL_SLOPE') colorHex = 0xf87171;
+        else if (wp.hazard === 'CAUTION_STEEP') colorHex = 0xfb923c;
+
+        const pinGroup = new THREE.Group();
+
+        // Miniature Pin Head
+        const headRadius = (isStart || isEnd) ? 0.0016 : 0.0010;
+        const headGeo = new THREE.SphereGeometry(headRadius, 16, 16);
+        const headMat = new THREE.MeshBasicMaterial({ color: colorHex });
+        const head = new THREE.Mesh(headGeo, headMat);
+        const pinHeight = (isStart || isEnd) ? 0.0055 : 0.0035;
+        head.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
+        pinGroup.add(head);
+
+        // Slender Needle Stem
+        const stemGeo = new THREE.CylinderGeometry(0.00015, 0.00015, pinHeight, 8);
+        const stemMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
+        stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+        pinGroup.add(stem);
+
+        // Delicate Sub-Surface Target Dot (tiny, non-overlapping)
+        const dotGeo = new THREE.CircleGeometry((isStart || isEnd) ? 0.0012 : 0.0007, 16);
+        const dotMat = new THREE.MeshBasicMaterial({
+          color: colorHex,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.65
+        });
+        const dot = new THREE.Mesh(dotGeo, dotMat);
+        dot.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
+        dot.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+        pinGroup.add(dot);
+
+        routesGroup.add(pinGroup);
+      });
+
+      // 2. High-Precision Cartographic Continuous Drive Ribbon
+      const pathNodes = (actualPath && actualPath.length > 1) ? actualPath : samples;
+      const curvePoints = pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0012));
+
+      if (curvePoints.length > 1) {
+        // Crisp, delicate 3D tube hugging the Martian terrain (radius 0.00035 = ~1.2 km scale width)
+        const curve = new THREE.CatmullRomCurve3(curvePoints);
+        const tubeSegments = Math.min(480, Math.max(96, curvePoints.length * 2));
+        const tubeRadius = isRover ? 0.00032 : 0.00045;
+        const tubeGeo = new THREE.TubeGeometry(curve, tubeSegments, tubeRadius, 8, false);
+        const tubeMat = new THREE.MeshStandardMaterial({
+          color: isRover ? 0x00f0ff : 0xfbbf24,
+          roughness: 0.3,
+          metalness: 0.8,
+          emissive: isRover ? 0x0284c7 : 0xd97706,
+          emissiveIntensity: 0.55
+        });
+        const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+        routesGroup.add(tubeMesh);
+
+        // Surface track line (razor-sharp high-contrast line right on terrain)
+        const trackGeo = new THREE.BufferGeometry().setFromPoints(
+          pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0004))
+        );
+        const trackMat = new THREE.LineBasicMaterial({
+          color: isRover ? 0x38bdf8 : 0xfde047,
+          transparent: true,
+          opacity: 0.95
+        });
+        const trackLine = new THREE.Line(trackGeo, trackMat);
+        routesGroup.add(trackLine);
+      }
+    }
+
+    // Topographic Chart (NASA Professional Cross-Section Profile)
+    function drawElevationChart(samples, routeTitle = "Traverse") {
+      const cvs = document.getElementById('eva-canvas-chart');
+      cvs.width = cvs.parentElement.clientWidth;
+      cvs.height = cvs.parentElement.clientHeight;
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+      if (!samples || samples.length === 0) return;
+
+      const elevations = samples.map(s => (s.elev_m !== undefined ? s.elev_m : s.elevation_m)).filter(e => e !== undefined && !isNaN(e));
+      if (elevations.length === 0) return;
+
+      let minElev = Math.min(...elevations);
+      let maxElev = Math.max(...elevations);
+      let diff = maxElev - minElev;
+      if (diff < 15) {
+        minElev -= 10;
+        maxElev += 10;
+        diff = maxElev - minElev;
+      } else {
+        minElev -= diff * 0.08;
+        maxElev += diff * 0.08;
+        diff = maxElev - minElev;
+      }
+
+      const w = cvs.width;
+      const h = cvs.height;
+      const padTop = 22;
+      const padBottom = 16;
+      const padLeft = 46;
+      const padRight = 16;
+      const plotW = w - padLeft - padRight;
+      const plotH = h - padTop - padBottom;
+
+      // Subtle Background Grid Lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+      const gridSteps = 4;
+      for (let g = 0; g <= gridSteps; g++) {
+        const y = padTop + (g / gridSteps) * plotH;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(w - padRight, y);
+        ctx.stroke();
+
+        const gridVal = maxElev - (g / gridSteps) * diff;
+        ctx.fillStyle = '#64748b';
+        ctx.font = '9px monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${Math.round(gridVal)}m`, padLeft - 6, y + 3);
+      }
+
+      // Elevation Area Gradient Fill
+      const grad = ctx.createLinearGradient(0, padTop, 0, h - padBottom);
+      grad.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+      grad.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+      ctx.beginPath();
+      elevations.forEach((elev, i) => {
+        const x = padLeft + (i / (elevations.length - 1)) * plotW;
+        const y = padTop + plotH - ((elev - minElev) / diff) * plotH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.lineTo(padLeft + plotW, padTop + plotH);
+      ctx.lineTo(padLeft, padTop + plotH);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Topographic Line
+      ctx.beginPath();
+      elevations.forEach((elev, i) => {
+        const x = padLeft + (i / (elevations.length - 1)) * plotW;
+        const y = padTop + plotH - ((elev - minElev) / diff) * plotH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.0;
+      ctx.stroke();
+
+      // Title & Telemetry Header
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${routeTitle} Elevation Profile`, padLeft, 14);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText(`Δh: ${Math.round(Math.max(...elevations) - Math.min(...elevations))}m`, w - padRight, 14);
+    }
+
+    document.getElementById('select-eva-preset').onchange = (e) => loadEVARoute(e.target.value);
+
+    // --- Google Earth Raycaster Hover Card Detection ---
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    window.addEventListener('mousemove', (e) => {
+      // Calculate normalized device coordinates
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      if (appMode !== '3D') {
+        tooltip.style.display = 'none';
+        return;
+      }
+
+      raycaster.setFromCamera(mouse, camera);
+
+      // Check intersection with landmark pins
+      const interactivePins = [];
+      markersGroup.traverse(child => {
+        if (child.isMesh && child.userData && child.userData.name) {
+          interactivePins.push(child);
+        }
+      });
+
+      const intersects = raycaster.intersectObjects(interactivePins);
+
+      if (intersects.length > 0) {
+        const lm = intersects[0].object.userData;
+        document.getElementById('tt-name').textContent = lm.name;
+        document.getElementById('tt-category').textContent = lm.category.toUpperCase();
+        document.getElementById('tt-coords').textContent = `${Math.abs(lm.lat).toFixed(2)}° ${lm.lat >= 0 ? 'N' : 'S'}, ${Math.abs(lm.lon).toFixed(2)}° ${lm.lon >= 0 ? 'E' : 'W'} • ${lm.elevation_m.toLocaleString()} m`;
+        document.getElementById('tt-desc').textContent = lm.description;
+
+        tooltip.style.left = `${e.clientX}px`;
+        tooltip.style.top = `${e.clientY}px`;
+        tooltip.style.display = 'block';
+        renderer.domElement.style.cursor = 'pointer';
+      } else {
+        tooltip.style.display = 'none';
+        renderer.domElement.style.cursor = 'grab';
+      }
     });
 
-    document.getElementById('slider-contrast').addEventListener('input', e => {
-      shaderParams.contrast = parseFloat(e.target.value);
-      document.getElementById('label-contrast').textContent = shaderParams.contrast.toFixed(2);
-      requestRender();
+    // Search bar fast navigation
+    document.getElementById('search-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const query = e.target.value.toLowerCase().trim();
+        const found = landmarksData.find(lm => lm.name.toLowerCase().includes(query) || lm.id.includes(query));
+        if (found) {
+          flyToCoordinate(found.lat, found.lon, 1.25);
+          currentElevation = found.elevation_m;
+          updateStatusHUD();
+        }
+      }
     });
 
-    document.getElementById('slider-sharpness').addEventListener('input', e => {
-      shaderParams.sharpness = parseFloat(e.target.value);
-      document.getElementById('label-sharpness').textContent = shaderParams.sharpness.toFixed(2);
-      requestRender();
-    });
+    // Telemetry Update
+    function updateStatusHUD() {
+      document.getElementById('st-lat').textContent = `${Math.abs(currentLat).toFixed(4)}° ${currentLat >= 0 ? 'N' : 'S'}`;
+      document.getElementById('st-lon').textContent = `${Math.abs(currentLon).toFixed(4)}° ${currentLon >= 0 ? 'E' : 'W'}`;
+      document.getElementById('st-elev').textContent = `${Number(currentElevation).toLocaleString()} m (MOLA)`;
 
-    document.getElementById('toggle-grid').addEventListener('change', e => {
-      shaderParams.showGrid = e.target.checked;
-      requestRender();
-    });
+      const camDist = camera.position.length();
+      const altKm = Math.round((camDist - 1.0) * 3396.19);
+      document.getElementById('st-alt').textContent = `Alt: ${altKm.toLocaleString()} km`;
+    }
+
+    // Toggle Left Drawer
+    document.getElementById('btn-toggle-drawer').onclick = () => {
+      const drawer = document.getElementById('left-drawer');
+      drawer.classList.toggle('collapsed');
+      document.getElementById('btn-toggle-drawer').classList.toggle('active');
+    };
+
+    // Toggle 3D Routes
+    let routesVisible = true;
+    document.getElementById('btn-toggle-routes').onclick = () => {
+      routesVisible = !routesVisible;
+      routesGroup.visible = routesVisible;
+      document.getElementById('bottom-dock').style.display = routesVisible ? 'flex' : 'none';
+    };
+
+    // Reset North Up
+    document.getElementById('btn-compass').onclick = () => flyToCoordinate(0, 0, 3.2);
+
+    // Zoom
+    document.getElementById('btn-zoom-in').onclick = () => {
+      camera.position.multiplyScalar(0.85);
+      if (camera.position.length() < controls.minDistance) camera.position.setLength(controls.minDistance);
+    };
+    document.getElementById('btn-zoom-out').onclick = () => {
+      camera.position.multiplyScalar(1.18);
+      if (camera.position.length() > controls.maxDistance) camera.position.setLength(controls.maxDistance);
+    };
+
+    // Toggle Mode
+    function setMode(mode) {
+      appMode = mode;
+      const btn3D = document.getElementById('btn-mode-3d');
+      const btn2D = document.getElementById('btn-mode-2d');
+
+      if (mode === '3D') {
+        threeCanvas.style.display = 'block';
+        flatCanvas.style.display = 'none';
+        btn3D.classList.add('active');
+        btn2D.classList.remove('active');
+      } else {
+        threeCanvas.style.display = 'none';
+        flatCanvas.style.display = 'block';
+        btn3D.classList.remove('active');
+        btn2D.classList.add('active');
+        init2DFlatCanvas();
+      }
+    }
+
+    document.getElementById('btn-mode-3d').onclick = () => setMode('3D');
+    document.getElementById('btn-mode-2d').onclick = () => setMode('2D');
+
+    // NASA Scan
+    document.getElementById('btn-scan-nasa').onclick = async () => {
+      const summary = document.getElementById('nasa-scan-summary');
+      summary.textContent = `Scanning NASA MRO CTX & HiRISE near [${currentLat.toFixed(2)}°, ${currentLon.toFixed(2)}°]...`;
+
+      try {
+        const resp = await fetch(`/api/nasa/ode?lat=${currentLat.toFixed(3)}&lon=${currentLon.toFixed(3)}&radius=0.4&instrument=CTX`);
+        const data = await resp.json();
+        if (data.status === 'success' && data.count > 0) {
+          summary.innerHTML = `<span style="color:var(--accent-green);">✓ Found ${data.count} NASA products.</span> Clicking an observation loads full science browse image.`;
+          const p = data.products[0];
+          document.getElementById('modal-title').textContent = `${p.pdsid} [${p.instrument}]`;
+          document.getElementById('modal-meta').textContent = `Host: ${p.host} • Product: ${p.pt}`;
+          document.getElementById('modal-img').src = p.browse_url;
+          document.getElementById('modal-ode-link').href = p.nasa_ode_url;
+          document.getElementById('product-modal').style.display = 'block';
+        } else {
+          summary.textContent = "No observations indexed within this immediate box.";
+        }
+      } catch (err) {
+        summary.textContent = `NASA ODE Error: ${err.message}`;
+      }
+    };
+
+    document.getElementById('modal-close').onclick = () => document.getElementById('product-modal').style.display = 'none';
+    document.getElementById('modal-close-btn').onclick = () => document.getElementById('product-modal').style.display = 'none';
+
+    // 2D Flat Engine
+    let flatImg = new Image();
+    flatImg.src = '/mars_mola_8k.jpg';
+    let flatPanX = 0, flatPanY = 0, flatZoom = 1.0;
+
+    function init2DFlatCanvas() {
+      flatCanvas.width = container.clientWidth;
+      flatCanvas.height = container.clientHeight;
+      draw2DFlat();
+    }
+
+    function draw2DFlat() {
+      if (appMode !== '2D') return;
+      const ctx = flatCanvas.getContext('2d');
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, flatCanvas.width, flatCanvas.height);
+
+      if (flatImg.complete && flatImg.naturalWidth > 0) {
+        const aspect = flatImg.naturalWidth / flatImg.naturalHeight;
+        const drawW = flatCanvas.width * flatZoom;
+        const drawH = (flatCanvas.width / aspect) * flatZoom;
+        const drawX = (flatCanvas.width - drawW) / 2 + flatPanX;
+        const drawY = (flatCanvas.height - drawH) / 2 + flatPanY;
+        ctx.drawImage(flatImg, drawX, drawY, drawW, drawH);
+      }
+    }
+
+    // --- Dynamic Live Mars24 Ephemeris Engine (Allison & McEwen 2000 Formulation) ---
+    function computeLiveMarsEphemeris(targetDate = new Date()) {
+      const jd_ut = 2440587.5 + (targetDate.getTime() / 86400000.0);
+      const jd_tt = jd_ut + (69.184 / 86400.0);
+      const d2000 = jd_tt - 2451545.0;
+
+      // Mean anomaly M
+      const M = (19.3870 + 0.52402075 * d2000) % 360.0;
+      const M_rad = (M * Math.PI) / 180.0;
+
+      // Angle of Fictitious Mean Sun
+      const alpha_fms = (270.3863 + 0.52403840 * d2000) % 360.0;
+
+      // Planetary Perturbations & Equation of Center
+      const pbs = (
+        (10.691 + 3.0e-7 * d2000) * Math.sin(M_rad)
+        + 0.623 * Math.sin(2 * M_rad)
+        + 0.050 * Math.sin(3 * M_rad)
+        + 0.005 * Math.sin(4 * M_rad)
+        + 0.0005 * Math.sin(5 * M_rad)
+      );
+
+      // Areocentric Solar Longitude Ls
+      const Ls = (alpha_fms + pbs + 360.0) % 360.0;
+
+      // Equation of Time (EOT)
+      const eot_deg = (
+        (2.861 / 360.0) * Math.sin(2 * (Ls * Math.PI / 180.0))
+        - 0.071 * Math.sin(4 * (Ls * Math.PI / 180.0))
+        + 0.002 * Math.sin(6 * (Ls * Math.PI / 180.0))
+        - pbs
+      );
+
+      // Mars Sol Date (MSD)
+      const msd = ((jd_tt - 2451549.5) / 1.027491252) + 44796.0 - 0.00096;
+
+      // Coordinated Mars Time (MTC)
+      const mtc_hours = (24.0 * msd) % 24.0;
+      const mtc_h = Math.floor(mtc_hours);
+      const mtc_m = Math.floor((mtc_hours * 60) % 60);
+      const mtc_s = Math.floor((mtc_hours * 3600) % 60);
+
+      // Subsolar Coordinates (Mars Obliquity = 25.19 deg)
+      const obliq_rad = (25.19 * Math.PI) / 180.0;
+      const subsolar_lat = (Math.asin(Math.sin(obliq_rad) * Math.sin(Ls * Math.PI / 180.0)) * 180.0) / Math.PI;
+      let subsolar_lon = (12.0 - mtc_hours) * 15.0 - eot_deg;
+      while (subsolar_lon > 180.0) subsolar_lon -= 360.0;
+      while (subsolar_lon < -180.0) subsolar_lon += 360.0;
+
+      // Solar Irradiance
+      const r_sun_au = 1.5236 * (1.0 - 0.0934 * 0.0934) / (1.0 + 0.0934 * Math.cos(M_rad));
+      const solar_irradiance = Math.round(1361.0 / (r_sun_au * r_sun_au));
+
+      // Season
+      let season = "Northern Spring";
+      if (Ls >= 90 && Ls < 180) season = "Northern Summer";
+      else if (Ls >= 180 && Ls < 270) season = "Northern Autumn";
+      else if (Ls >= 270) season = "Northern Winter";
+
+      return {
+        earth_utc: targetDate.toISOString().replace('T', ' ').substring(0, 19) + ' UTC',
+        mars_sol_date: msd.toFixed(2),
+        sol_number: Math.floor(msd),
+        mtc_time: `${String(mtc_h).padStart(2, '0')}:${String(mtc_m).padStart(2, '0')}:${String(mtc_s).padStart(2, '0')}`,
+        solar_longitude_Ls: Ls.toFixed(2),
+        season: season,
+        solar_irradiance_wm2: solar_irradiance,
+        subsolar_point: {
+          lat: Number(subsolar_lat.toFixed(2)),
+          lon: Number(subsolar_lon.toFixed(2))
+        }
+      };
+    }
+
+    let currentEphemeris = computeLiveMarsEphemeris();
+
+    function updateLiveMarsEphemeris() {
+      const now = new Date();
+      currentEphemeris = computeLiveMarsEphemeris(now);
+
+      // 1-second live ticking Mars clock
+      document.getElementById('val-mtc-time').textContent = currentEphemeris.mtc_time;
+      document.getElementById('val-sol-num').textContent = `Sol ${currentEphemeris.sol_number.toLocaleString()}`;
+
+      // Update Floating Ephemeris HUD Panel
+      document.getElementById('eph-utc').textContent = currentEphemeris.earth_utc;
+      document.getElementById('eph-msd').textContent = currentEphemeris.mars_sol_date;
+      document.getElementById('eph-mtc').textContent = `${currentEphemeris.mtc_time} MTC`;
+      document.getElementById('eph-ls').textContent = `${currentEphemeris.solar_longitude_Ls}°`;
+      document.getElementById('eph-season').textContent = currentEphemeris.season;
+      const subLatStr = currentEphemeris.subsolar_point.lat >= 0 ? `${currentEphemeris.subsolar_point.lat}° N` : `${Math.abs(currentEphemeris.subsolar_point.lat)}° S`;
+      const subLonStr = currentEphemeris.subsolar_point.lon >= 0 ? `${currentEphemeris.subsolar_point.lon}° E` : `${Math.abs(currentEphemeris.subsolar_point.lon)}° W`;
+      document.getElementById('eph-subsolar').textContent = `${subLatStr}, ${subLonStr}`;
+      document.getElementById('eph-tsi').textContent = `${currentEphemeris.solar_irradiance_wm2} W/m²`;
+
+      // Update Sun vector if terminator mode is enabled
+      if (solarTerminatorActive) {
+        const sunPos = latLonToVector3(currentEphemeris.subsolar_point.lat, currentEphemeris.subsolar_point.lon, 6.0);
+        sunLight.position.copy(sunPos);
+      }
+    }
+
+    // Toggle Ephemeris Info Panel
+    const ephPanel = document.getElementById('ephemeris-panel');
+    document.getElementById('mars-clock-widget').onclick = () => {
+      ephPanel.style.display = ephPanel.style.display === 'none' ? 'block' : 'none';
+    };
+    document.getElementById('close-ephemeris').onclick = () => {
+      ephPanel.style.display = 'none';
+    };
+
+    // Toggle Realistic Solar Terminator & Sun Position
+    document.getElementById('btn-toggle-solar').onclick = () => {
+      solarTerminatorActive = !solarTerminatorActive;
+      const btn = document.getElementById('btn-toggle-solar');
+      btn.classList.toggle('active', solarTerminatorActive);
+
+      if (solarTerminatorActive) {
+        // True physical ephemeris mode: Sun positioned directly at subsolar point with dynamic shadows
+        ambientLight.intensity = 0.48; // Ambient radiance preserves crater/topography readability
+        cameraHeadlight.intensity = 0.22;
+        sunLight.intensity = 1.35;
+        sunLight.castShadow = true;
+        const sunPos = latLonToVector3(currentEphemeris.subsolar_point.lat, currentEphemeris.subsolar_point.lon, 6.0);
+        sunLight.position.copy(sunPos);
+        document.getElementById('eph-shadows').textContent = "REAL-TIME ASTRONOMICAL SUN";
+        document.getElementById('eph-shadows').style.color = "var(--accent-yellow)";
+      } else {
+        // Uniform global illumination mode
+        ambientLight.intensity = 0.85;
+        cameraHeadlight.intensity = 0.35;
+        sunLight.intensity = 1.2;
+        sunLight.castShadow = false;
+        sunLight.position.set(6, 4, 5);
+        document.getElementById('eph-shadows').textContent = "FULL UNIFORM ILLUMINATION";
+        document.getElementById('eph-shadows').style.color = "var(--accent-green)";
+      }
+    };
+
+    // Toggle Real-Time Decontourification (Anti-Banding & Ridge Sharpening)
+    const btnDecontour = document.getElementById('btn-toggle-decontour');
+    btnDecontour.classList.toggle('active', decontourActive);
+    btnDecontour.onclick = () => {
+      decontourActive = !decontourActive;
+      btnDecontour.classList.toggle('active', decontourActive);
+      decontourUniforms.u_decontour.value = decontourActive ? 1.0 : 0.0;
+      marsMaterial.needsUpdate = true;
+      const statusEl = document.getElementById('eph-decontour');
+      if (statusEl) {
+        statusEl.textContent = decontourActive ? "SMOOTH REAL-TIME ACTIVE" : "RAW DISCRETE MESH";
+        statusEl.style.color = decontourActive ? "var(--accent-green)" : "var(--text-dim)";
+      }
+    };
+
+    // Animation Loop
+    let lastRenderTime = performance.now();
+    let frameCount = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (isTransitioning) {
+        const elapsed = performance.now() - transitionStart;
+        const progress = Math.min(1.0, elapsed / transitionDuration);
+        const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        camera.position.lerpVectors(startCamPos, targetCamPos, ease);
+        controls.update();
+        if (progress >= 1.0) isTransitioning = false;
+      } else {
+        controls.update();
+      }
+
+      if (appMode === '3D') {
+        const centerCoord = vector3ToLatLon(camera.position);
+        currentLat = centerCoord.lat;
+        currentLon = centerCoord.lon;
+        updateStatusHUD();
+        renderer.render(scene, camera);
+      }
+
+      frameCount++;
+      const now = performance.now();
+      if (now - lastRenderTime >= 1000) {
+        document.getElementById('st-fps').textContent = `${frameCount} FPS`;
+        frameCount = 0;
+        lastRenderTime = now;
+      }
+    }
 
     window.addEventListener('resize', () => {
-      requestRender();
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      if (appMode === '2D') init2DFlatCanvas();
+      if (currentRouteSamples.length > 0) drawElevationChart(currentRouteSamples);
     });
 
-    // Initial render
-    requestRender();
+    // Start Engine
+    fetchLandmarks();
+    updateLiveMarsEphemeris();
+    setInterval(updateLiveMarsEphemeris, 1000); // 1-second live clock update
+    loadEVARoute('m20_perseverance');
+    animate();
   </script>
 </body>
 </html>
