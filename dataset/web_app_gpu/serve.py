@@ -24,15 +24,27 @@ import time
 import math
 
 PORT = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8083))
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-if os.path.exists(os.path.join(ROOT_DIR, "dataset", "web_app_gpu")):
-    GPU_DIR = os.path.join(ROOT_DIR, "dataset", "web_app_gpu")
-    WEB_APP_DIR = os.path.join(ROOT_DIR, "dataset", "web_app")
-    DATASET_DIR = os.path.join(ROOT_DIR, "dataset")
-else:
-    GPU_DIR = os.path.join(ROOT_DIR, "MALO_MARS_HiRes_Render", "dataset", "web_app_gpu")
-    WEB_APP_DIR = os.path.join(ROOT_DIR, "MALO_MARS_HiRes_Render", "dataset", "web_app")
-    DATASET_DIR = os.path.join(ROOT_DIR, "MALO_MARS_HiRes_Render", "dataset")
+CURRENT_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Auto-locate GPU_DIR, WEB_APP_DIR, DATASET_DIR reliably across all environments & working directories
+candidate_gpu_dirs = [
+    CURRENT_FILE_DIR,  # When file is in dataset/web_app_gpu
+    os.path.join(CURRENT_FILE_DIR, "dataset", "web_app_gpu"),
+    os.path.join(CURRENT_FILE_DIR, "MALO_MARS_HiRes_Render", "dataset", "web_app_gpu"),
+    os.path.join(os.path.dirname(CURRENT_FILE_DIR), "web_app_gpu"),
+    os.path.join(os.path.dirname(CURRENT_FILE_DIR), "dataset", "web_app_gpu"),
+    os.path.join(os.path.dirname(os.path.dirname(CURRENT_FILE_DIR)), "dataset", "web_app_gpu")
+]
+
+GPU_DIR = CURRENT_FILE_DIR
+for c in candidate_gpu_dirs:
+    if os.path.exists(os.path.join(c, "index.html")):
+        GPU_DIR = os.path.abspath(c)
+        break
+
+DATASET_DIR = os.path.abspath(os.path.join(GPU_DIR, ".."))
+WEB_APP_DIR = os.path.abspath(os.path.join(DATASET_DIR, "web_app"))
+ROOT_DIR = os.path.abspath(os.path.join(DATASET_DIR, ".."))
 
 CACHE = {}
 CACHE_TTL = 3600  # 1 hour

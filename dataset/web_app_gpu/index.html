@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mars 3D - Google Earth Planetary Explorer (NASA PDS / ODE / GDS)</title>
+  <title>Mars 3D - Planetary Explorer (NASA PDS / ODE / GDS)</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <style>
     :root {
@@ -36,7 +36,7 @@
       user-select: none;
     }
 
-    /* Minimalist Google Earth Style Header */
+    /* Planetary Navigation Header */
     header {
       position: absolute;
       top: 16px;
@@ -240,7 +240,7 @@
       z-index: 10;
     }
 
-    /* Google Earth Floating Landmark Hover Card */
+    /* Floating Landmark Hover Card */
     #hover-tooltip {
       position: absolute;
       display: none;
@@ -299,7 +299,7 @@
       color: #cbd5e1;
     }
 
-    /* Google Earth Side Destination Drawer (Left) */
+    /* Side Destination Drawer (Left) */
     #left-drawer {
       position: absolute;
       top: 76px;
@@ -455,7 +455,7 @@
       display: block;
     }
 
-    /* Google Earth Floating Navigation Toolbar (Bottom-Right) */
+    /* Floating Navigation Toolbar (Bottom-Right) */
     #ge-controls-dock {
       position: absolute;
       bottom: 24px;
@@ -563,12 +563,12 @@
 </head>
 <body>
 
-  <!-- Minimalist Google Earth Navigation Header -->
+  <!-- Navigation Header -->
   <header>
     <div class="ge-search-bar">
       <div class="brand-logo">
         <div class="mars-glyph"></div>
-        <span class="ge-title">Google Mars 3D</span>
+        <span class="ge-title">Mars 3D Explorer</span>
       </div>
       <input type="text" class="ge-search-input" id="search-input" placeholder="Search Olympus Mons, Jezero, Poles...">
     </div>
@@ -629,7 +629,7 @@
     <canvas id="three-canvas"></canvas>
     <canvas id="flat-canvas"></canvas>
 
-    <!-- Google Earth Landmark Hover Card -->
+    <!-- Landmark Hover Card -->
     <div id="hover-tooltip">
       <div class="tooltip-tag" id="tt-category">Volcano</div>
       <div class="tooltip-name" id="tt-name">Olympus Mons</div>
@@ -706,7 +706,7 @@
       <span id="st-fps" style="color:var(--accent-green);">60 FPS</span>
     </div>
 
-    <!-- Google Earth Floating Controls (Bottom-Right) -->
+    <!-- Floating Controls (Bottom-Right) -->
     <div id="ge-controls-dock">
       <div class="ge-btn-group">
         <button class="ge-ctrl-btn" id="btn-zoom-in" title="Zoom In (+)">➕</button>
@@ -734,10 +734,10 @@
 
   <script>
     /**
-     * Google Earth Style Mars 3D Explorer
+     * Mars 3D Planetary Explorer
      * Features:
      * - Highly visible 3D Tube traverse corridors & beacon markers
-     * - Raycaster Landmark hover detection with Google Earth info cards
+     * - Raycaster Landmark hover detection with detailed info cards
      * - Smooth orbit, zoom, and continuous flight physics
      * - 8K Progressive texture mapping & NASA ODE / GDS live sync
      */
@@ -769,7 +769,7 @@
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    // Smooth Orbit Controls (Google Earth feel)
+    // Smooth Orbit Controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
@@ -1420,7 +1420,7 @@
 
     document.getElementById('select-eva-preset').onchange = (e) => loadEVARoute(e.target.value, true);
 
-    // --- Google Earth Raycaster Hover Card Detection ---
+    // --- Raycaster Hover Card Detection ---
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
