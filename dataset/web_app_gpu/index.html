@@ -945,14 +945,24 @@
       return { lat, lon };
     }
 
-    // Smooth Planetary Fly-To
+    // Landmark & Destination Camera Zoom Distances
+    const DEFAULT_LANDMARK_CAM_DIST = 1.95; // Reduced zoom level for balanced terrain context (radius 1.0 = surface)
+    const POLAR_CAP_CAM_DIST = 2.40;        // Reduced zoom level for wide polar ice sheet observation
+
+    function getLandmarkZoomDist(item) {
+      if (!item) return DEFAULT_LANDMARK_CAM_DIST;
+      if (item.targetDist) return item.targetDist;
+      return item.category === 'polar_cap' ? POLAR_CAP_CAM_DIST : DEFAULT_LANDMARK_CAM_DIST;
+    }
+
+    // Google Earth Smooth Fly-To
     let isTransitioning = false;
     let transitionStart = 0;
     let transitionDuration = 1200;
     let startCamPos = new THREE.Vector3();
     let targetCamPos = new THREE.Vector3();
 
-    function flyToCoordinate(lat, lon, targetDist = 1.35) {
+    function flyToCoordinate(lat, lon, targetDist = DEFAULT_LANDMARK_CAM_DIST) {
       if (appMode === '2D') setMode('3D');
       isTransitioning = true;
       transitionStart = performance.now();
@@ -1097,7 +1107,7 @@
           <span style="font-size:14px; color:var(--accent-orange);">➔</span>
         `;
         card.onclick = () => {
-          flyToCoordinate(item.lat, item.lon, item.category === 'polar_cap' ? 1.8 : 1.25);
+          flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
           currentElevation = item.elevation_m;
           updateStatusHUD();
         };
@@ -1163,7 +1173,7 @@
     // --- High-Visibility 3D Tube Traverse & Historical Rover Path Geometry ---
     let historicalMissions = [];
 
-    async function loadEVARoute(presetId = 'm20_perseverance') {
+    async function loadEVARoute(presetId = 'm20_perseverance', autoFly = false) {
       try {
         // Fetch both preset EVA routes and historical NASA rover missions
         let routeObj = null;
@@ -1215,8 +1225,10 @@
           drawElevationChart(currentRouteSamples, isRoverMission ? routeObj.name : "Astronaut EVA");
           renderHighlyVisibleTraverseTube(routeObj.waypoints, planData.profile_samples, isRoverMission, actualPath);
 
-          // Fly smoothly to route center/start with appropriate close-up zoom (1.06 instead of 1.22)
-          flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, 1.06);
+          // Fly smoothly to route center/start only when explicitly requested by user (e.g. from preset dropdown)
+          if (autoFly) {
+            flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, 1.70);
+          }
         }
       } catch (err) {
         console.error("Failed loading EVA/Rover route:", err);
@@ -1406,7 +1418,7 @@
       ctx.fillText(`Δh: ${Math.round(Math.max(...elevations) - Math.min(...elevations))}m`, w - padRight, 14);
     }
 
-    document.getElementById('select-eva-preset').onchange = (e) => loadEVARoute(e.target.value);
+    document.getElementById('select-eva-preset').onchange = (e) => loadEVARoute(e.target.value, true);
 
     // --- Raycaster Hover Card Detection ---
     const raycaster = new THREE.Raycaster();
@@ -1458,7 +1470,7 @@
         const query = e.target.value.toLowerCase().trim();
         const found = landmarksData.find(lm => lm.name.toLowerCase().includes(query) || lm.id.includes(query));
         if (found) {
-          flyToCoordinate(found.lat, found.lon, 1.25);
+          flyToCoordinate(found.lat, found.lon, getLandmarkZoomDist(found));
           currentElevation = found.elevation_m;
           updateStatusHUD();
         }
@@ -1784,7 +1796,7 @@
     fetchLandmarks();
     updateLiveMarsEphemeris();
     setInterval(updateLiveMarsEphemeris, 1000); // 1-second live clock update
-    loadEVARoute('m20_perseverance');
+    loadEVARoute('m20_perseverance', false); // Initialize route metrics without hijacking camera view
     animate();
   </script>
 </body>
