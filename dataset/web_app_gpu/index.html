@@ -967,18 +967,119 @@
       updateStatusHUD();
     }
 
+    // Canonical IAU Landmark Catalog with embedded client-side fallback
+    const DEFAULT_LANDMARKS = [
+      {
+        "id": "olympus_mons",
+        "name": "Olympus Mons",
+        "lat": 18.65,
+        "lon": -133.80,
+        "elevation_m": 21287,
+        "category": "volcano",
+        "description": "Largest shield volcano in Solar System (21.3 km high, 600 km wide)."
+      },
+      {
+        "id": "valles_marineris",
+        "name": "Valles Marineris (Melas Chasma)",
+        "lat": -9.80,
+        "lon": -76.50,
+        "elevation_m": -8200,
+        "category": "canyon",
+        "description": "Tectonic chasma system spanning 4,000 km, plunging to depths of 8.2 km."
+      },
+      {
+        "id": "jezero_crater",
+        "name": "Jezero Crater (Perseverance / Ingenuity)",
+        "lat": 18.38,
+        "lon": 77.58,
+        "elevation_m": -2540,
+        "category": "landing_site",
+        "description": "Paleolake river delta. Site of Mars 2020 rover and sample caching."
+      },
+      {
+        "id": "gale_crater",
+        "name": "Gale Crater (Curiosity Rover)",
+        "lat": -4.59,
+        "lon": 137.44,
+        "elevation_m": -4450,
+        "category": "landing_site",
+        "description": "Mount Sharp (Aeolis Mons) sedimentary sequence exploring past habitability."
+      },
+      {
+        "id": "planum_boreum",
+        "name": "Planum Boreum (North Polar Cap)",
+        "lat": 84.50,
+        "lon": 0.00,
+        "elevation_m": -2000,
+        "category": "polar_cap",
+        "description": "Perennial northern water ice dome carved by spiral chasmata."
+      },
+      {
+        "id": "planum_australe",
+        "name": "Planum Australe (South Polar Cap)",
+        "lat": -85.00,
+        "lon": 0.00,
+        "elevation_m": 1500,
+        "category": "polar_cap",
+        "description": "Southern polar plateau capped by CO2 and underlying water ice sheets."
+      },
+      {
+        "id": "hellas_planitia",
+        "name": "Hellas Planitia Basin",
+        "lat": -42.70,
+        "lon": 70.00,
+        "elevation_m": -7152,
+        "category": "basin",
+        "description": "Enormous impact basin 2,300 km across; lowest elevation on Mars."
+      },
+      {
+        "id": "elysium_mons",
+        "name": "Elysium Mons",
+        "lat": 25.02,
+        "lon": 147.21,
+        "elevation_m": 12600,
+        "category": "volcano",
+        "description": "Volcanic peak rising 12.6 km above surrounding plains."
+      },
+      {
+        "id": "meridiani_planum",
+        "name": "Meridiani Planum (Opportunity Rover)",
+        "lat": -1.95,
+        "lon": -5.53,
+        "elevation_m": -1400,
+        "category": "landing_site",
+        "description": "Hematite-rich plain revealing past surface water in sedimentary rocks."
+      },
+      {
+        "id": "gusev_crater",
+        "name": "Gusev Crater (Spirit Rover)",
+        "lat": -14.57,
+        "lon": 175.47,
+        "elevation_m": -1930,
+        "category": "landing_site",
+        "description": "Columbia Hills exploration site connected to ancient Ma'adim Vallis."
+      }
+    ];
+
     // Load & Render Landmarks with Beacon Graphics
     async function fetchLandmarks() {
+      // First populate immediately with built-in IAU landmarks so UI is never blank
+      landmarksData = [...DEFAULT_LANDMARKS];
+      renderDrawerDestinations(landmarksData);
+      create3DLandmarks(landmarksData);
+
       try {
         const resp = await fetch('/api/landmarks');
-        const data = await resp.json();
-        if (data.status === 'success') {
-          landmarksData = data.landmarks;
-          renderDrawerDestinations(landmarksData);
-          create3DLandmarks(landmarksData);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.status === 'success' && data.landmarks && data.landmarks.length > 0) {
+            landmarksData = data.landmarks;
+            renderDrawerDestinations(landmarksData);
+            create3DLandmarks(landmarksData);
+          }
         }
       } catch (e) {
-        console.error("Failed loading landmarks:", e);
+        console.warn("Using embedded IAU landmarks fallback:", e);
       }
     }
 
