@@ -459,6 +459,10 @@
           <span>Landmark Annotations</span>
           <input type="checkbox" id="toggle-landmarks" checked>
         </label>
+        <label class="toggle-item">
+          <span>Exploration & Rover Traverses</span>
+          <input type="checkbox" id="toggle-exploration" checked>
+        </label>
       </div>
     </div>
 
@@ -762,6 +766,198 @@
       if (e.target.checked) map.addLayer(landmarksGroup);
       else map.removeLayer(landmarksGroup);
     });
+    document.getElementById('toggle-exploration').addEventListener('change', e => {
+      if (e.target.checked) map.addLayer(roverTraversesGroup);
+      else map.removeLayer(roverTraversesGroup);
+    });
+
+    // --- Exploration Paths & Landers (Status-based Colors & Hover Tooltips) ---
+    const roverTraversesGroup = L.layerGroup().addTo(map);
+
+    function getStatusColor(status) {
+      return status === 'Active' ? '#22c55e' :
+             status === 'Failed' ? '#ef4444' : '#94a3b8';
+    }
+
+    async function loadRoverTraverses() {
+      // 1. Try local GeoJSON exploration dataset
+      try {
+        const resp = await fetch('data/astronaut_paths.geojson');
+        if (resp.ok) {
+          const geojsonData = await resp.json();
+          renderGeoJSONExploration(geojsonData);
+          return;
+        }
+      } catch (e) {
+        console.warn("Could not load local astronaut_paths.geojson, trying live missions API fallback:", e);
+      }
+
+      // 2. Fallback to API if running on port 8083 or CORS available
+      try {
+        const resp2 = await fetch('http://localhost:8083/api/rover/missions');
+        if (resp2.ok) {
+          const apiData = await resp2.json();
+          if (apiData.missions) {
+            renderRoverTraverses(apiData.missions);
+          }
+        }
+      } catch (err) {
+        console.warn("Live rover API unreachable:", err);
+      }
+    }
+
+    function renderGeoJSONExploration(geojsonData) {
+      roverTraversesGroup.clearLayers();
+      if (!geojsonData || !geojsonData.features) return;
+
+      geojsonData.features.forEach(feature => {
+        const props = feature.properties || {};
+        const geom = feature.geometry || {};
+        const color = getStatusColor(props.status);
+
+        if (geom.type === 'LineString' && Array.isArray(geom.coordinates)) {
+          // Leaflet expects [lat, lon]
+          const latLngs = geom.coordinates.map(c => [c[1], c[0]]);
+          const polyline = L.polyline(latLngs, {
+            color: color,
+            weight: 3.5,
+            dashArray: '4, 4',
+            opacity: 0.95
+          });
+
+          const tooltipContent = `
+            <div style="font-family:sans-serif; font-size:12px; line-height:1.4;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <strong style="color:${color}; font-size:13px;">${props.name}</strong>
+                <span style="font-size:10px; font-weight:700; padding:1px 5px; border-radius:3px; background:${color}22; color:${color}; border:1px solid ${color}55;">${props.status.toUpperCase()}</span>
+              </div>
+              <div style="color:#cbd5e1; margin-top:3px;">${props.description || (props.landing_site ? 'Landing Site: ' + props.landing_site : '')}</div>
+              <div style="color:#94a3b8; font-size:11px; margin-top:2px;">
+                ${props.total_odometry_km ? `Odometry: ${props.total_odometry_km} km` : ''} ${props.sol_range ? `• Duration: ${props.sol_range}` : ''}
+              </div>
+            </div>
+          `;
+
+          polyline.on('mouseover', (e) => {
+            polyline.bindTooltip(tooltipContent, {
+              direction: 'top',
+              sticky: true,
+              interactive: true
+            }).openTooltip();
+          });
+          polyline.on('mouseout', () => polyline.unbindTooltip());
+
+          roverTraversesGroup.addLayer(polyline);
+
+          // Add landing start marker
+          if (latLngs.length > 0) {
+            const startMarker = L.circleMarker(latLngs[0], {
+              radius: 5,
+              color: color,
+              fillColor: color,
+              fillOpacity: 0.9,
+              weight: 2
+            });
+            startMarker.bindTooltip(`<strong>${props.name}</strong><br>Landing Site: ${props.landing_site || 'Sol 0'}`, { direction: 'top', offset: [0, -6] });
+            roverTraversesGroup.addLayer(startMarker);
+          }
+
+        } else if (geom.type === 'Point' && Array.isArray(geom.coordinates) && geom.coordinates.length >= 2) {
+          const lon = geom.coordinates[0];
+          const lat = geom.coordinates[1];
+          const elev = geom.coordinates.length >= 3 ? geom.coordinates[2] : (props.elevation_m || 0);
+
+          const marker = L.circleMarker([lat, lon], {
+            radius: 7,
+            color: color,
+            fillColor: color,
+            fillOpacity: 0.85,
+            weight: 2
+          });
+
+          const tooltipContent = `
+            <div style="font-family:sans-serif; font-size:12px; line-height:1.4;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <strong style="color:${color}; font-size:13px;">${props.name}</strong>
+                <span style="font-size:10px; font-weight:700; padding:1px 5px; border-radius:3px; background:${color}22; color:${color}; border:1px solid ${color}55;">${props.status.toUpperCase()}</span>
+              </div>
+              <div style="color:#cbd5e1; margin-top:3px;">${props.description || (props.landing_site ? 'Landing Site: ' + props.landing_site : '')}</div>
+              <div style="color:#94a3b8; font-size:11px; margin-top:2px;">
+                Lat: ${lat.toFixed(3)}° • Lon: ${lon.toFixed(3)}° ${elev ? `• Elev: ${Number(elev).toLocaleString()} m` : ''}
+              </div>
+            </div>
+          `;
+
+          marker.on('mouseover', (e) => {
+            marker.bindTooltip(tooltipContent, {
+              direction: 'top',
+              offset: [0, -10],
+              sticky: true,
+              interactive: true
+            }).openTooltip();
+          });
+          marker.on('mouseout', () => marker.unbindTooltip());
+
+          roverTraversesGroup.addLayer(marker);
+        }
+      });
+    }
+
+    function renderRoverTraverses(missions) {
+      roverTraversesGroup.clearLayers();
+      missions.forEach(mission => {
+        const isLive = mission.data_source && mission.data_source.includes('LIVE');
+        const status = isLive ? 'Active' : 'Completed';
+        const color = getStatusColor(status);
+
+        const path = (mission.actual_path && mission.actual_path.length > 1)
+          ? mission.actual_path
+          : (mission.waypoints || []);
+
+        if (path.length > 1) {
+          const latLngs = path.map(p => [p.lat, p.lon]);
+          const polyline = L.polyline(latLngs, {
+            color: color,
+            weight: 3,
+            dashArray: '4, 4'
+          });
+
+          const tooltipContent = `
+            <div style="font-family:sans-serif; font-size:12px;">
+              <strong style="color:${color};">${mission.rover}</strong>
+              <span style="display:inline-block; margin-left:6px; padding:1px 5px; border-radius:3px; font-size:10px; background:${color}22; color:${color}; font-weight:bold;">${status.toUpperCase()}</span>
+              <div style="margin-top:3px; color:#cbd5e1;">${mission.hazard_strategy || mission.landing_site || ''}</div>
+              <div style="margin-top:2px; font-size:11px; color:#94a3b8;">Odometry: ${mission.total_odometry_km || '?'} km • ${mission.sol_range || ''}</div>
+            </div>
+          `;
+
+          polyline.on('mouseover', (e) => {
+            polyline.bindTooltip(tooltipContent, {
+              direction: 'top',
+              sticky: true,
+              interactive: true
+            }).openTooltip();
+          });
+          polyline.on('mouseout', () => polyline.unbindTooltip());
+
+          roverTraversesGroup.addLayer(polyline);
+
+          // Landing site marker
+          const startPt = latLngs[0];
+          const marker = L.circleMarker(startPt, {
+            radius: 6,
+            color: color,
+            fillColor: color,
+            fillOpacity: 0.9,
+            weight: 2
+          });
+          marker.bindTooltip(`<strong>${mission.rover}</strong><br>${mission.landing_site}`, { direction: 'top', offset: [0, -10] });
+          roverTraversesGroup.addLayer(marker);
+        }
+      });
+    }
+
+    loadRoverTraverses();
 
     // Reset View Button
     document.getElementById('btn-reset-view').addEventListener('click', () => {

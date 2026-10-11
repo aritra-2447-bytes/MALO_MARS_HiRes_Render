@@ -276,6 +276,14 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=GPU_DIR, **kwargs)
 
+    def do_OPTIONS(self):
+        # CORS preflight
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
     def do_GET(self):
         parsed = urllib.parse.urlsplit(self.path)
         path = parsed.path
@@ -340,6 +348,15 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         if clean_path in ("/", "\\"):
             return os.path.join(GPU_DIR, "index.html")
 
+        if clean_path.startswith("/data/") or clean_path.startswith("\\data\\"):
+            rel = clean_path[len("/data/"):].lstrip("/\\")
+            candidate = os.path.join(GPU_DIR, "data", rel)
+            if os.path.exists(candidate):
+                return candidate
+            candidate2 = os.path.join(WEB_APP_DIR, "data", rel)
+            if os.path.exists(candidate2):
+                return candidate2
+
         if clean_path.startswith("/web_app_gpu/") or clean_path.startswith("\\web_app_gpu\\"):
             rel = clean_path[len("/web_app_gpu/"):].lstrip("/\\")
             return os.path.join(GPU_DIR, rel)
@@ -347,6 +364,12 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         if clean_path.startswith("/web_app/") or clean_path.startswith("\\web_app\\"):
             rel = clean_path[len("/web_app/"):].lstrip("/\\")
             return os.path.join(WEB_APP_DIR, rel)
+
+        if clean_path.startswith("/tiles/") or clean_path.startswith("\\tiles\\"):
+            rel = clean_path[len("/tiles/"):].lstrip("/\\")
+            candidate = os.path.join(DATASET_DIR, rel)
+            if os.path.exists(candidate):
+                return candidate
 
         basename = os.path.basename(clean_path)
         if basename.startswith("5_") and basename.endswith(".jpg"):

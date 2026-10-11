@@ -371,6 +371,134 @@
       color: var(--text-dim);
     }
 
+    /* Left Drawer Navigation Tabs */
+    .drawer-tabs {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+    }
+
+    .drawer-tab-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .drawer-tab-btn.active {
+      background: rgba(255, 94, 54, 0.2);
+      border-color: var(--accent-orange);
+      color: #fff;
+    }
+
+    .landing-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .landing-card:hover {
+      background: rgba(34, 197, 94, 0.12);
+      border-color: var(--accent-green);
+      transform: translateX(3px);
+    }
+
+    .status-pill {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .status-pill.active {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .status-pill.completed {
+      background: rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .status-pill.failed {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    /* Floating Exploration Paths Legend Panel */
+    #legend-panel {
+      position: absolute;
+      top: 76px;
+      right: 16px;
+      width: 320px;
+      max-height: calc(100vh - 160px);
+      background: var(--card-bg);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .legend-scroll {
+      overflow-y: auto;
+      max-height: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 11px;
+    }
+
+    .legend-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .legend-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .legend-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
     /* Bottom Dock: Astronaut EVA Traverse & Topography Cross-Section */
     #bottom-dock {
       position: absolute;
@@ -583,6 +711,7 @@
       <button class="pill-btn" id="btn-mode-2d">🗺️ 2D Flat Map</button>
       <button class="pill-btn" id="btn-toggle-decontour" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
       <button class="pill-btn" id="btn-toggle-drawer">📍 Destinations</button>
+      <button class="pill-btn" id="btn-toggle-legend" title="Toggle Exploration Paths Legend (Shortcut: 'L')">🏷️ Legend [L]</button>
       <button class="pill-btn active" id="btn-toggle-solar" title="Toggle Real-Time Astronomical Sun Position & Surface Shadows">☀️ Live Sun Shadows</button>
       <button class="pill-btn" id="btn-scan-nasa">🛰️ Scan NASA Orbiters</button>
     </div>
@@ -624,6 +753,16 @@
     </div>
   </div>
 
+  <!-- Exploration Paths & Landers Legend Floating Panel (L key toggle) -->
+  <div id="legend-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+      <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--accent-cyan);">🏷️ Exploration Paths & Landers</span>
+      <span style="font-size:16px; cursor:pointer; color:#94a3b8;" id="close-legend">&times;</span>
+    </div>
+    <div style="font-size:10px; color:var(--text-dim); margin-bottom:6px;">Status color coding & per-feature visibility toggle:</div>
+    <div class="legend-scroll" id="legend-list"></div>
+  </div>
+
   <!-- Main Viewport -->
   <div id="viewport-container">
     <canvas id="three-canvas"></canvas>
@@ -640,10 +779,15 @@
     <!-- Side Destinations Drawer (Left) -->
     <div id="left-drawer">
       <div class="drawer-title">
-        <span>Curated Exploration Sites</span>
+        <span>Exploration Sites</span>
         <span style="font-size:10px; color:var(--accent-orange);">IAU Geodetic</span>
       </div>
+      <div class="drawer-tabs">
+        <button class="drawer-tab-btn active" id="tab-landmarks">📍 Landmarks</button>
+        <button class="drawer-tab-btn" id="tab-landings">🛬 Landings</button>
+      </div>
       <div class="destinations-scroll" id="dest-list"></div>
+      <div class="destinations-scroll" id="landings-list" style="display:none;"></div>
       <div style="border-top: 1px solid var(--card-border); padding-top: 8px;">
         <div style="font-size:10px; text-transform:uppercase; color:var(--text-dim); margin-bottom:4px;">NASA Active Scans</div>
         <div id="nasa-scan-summary" style="font-size:11px; color:#cbd5e1;">Click "Scan NASA Orbiters" to stream high-res CTX footprints at camera center.</div>
@@ -974,6 +1118,16 @@
     const routesGroup = new THREE.Group();
     scene.add(routesGroup);
 
+    const astroPathsGroup = new THREE.Group();
+    scene.add(astroPathsGroup);
+
+    const landingSiteMarkersGroup = new THREE.Group();
+    scene.add(landingSiteMarkersGroup);
+    window.landingSiteMarkersGroup = landingSiteMarkersGroup;
+
+    const corridorHighlightGroup = new THREE.Group();
+    scene.add(corridorHighlightGroup);
+
     // Coordinate Math
     function latLonToVector3(lat, lon, radius = MARS_RADIUS) {
       const phi = (90 - lat) * (Math.PI / 180);
@@ -1216,6 +1370,390 @@
         beaconGroup.add(ringMesh);
         markersGroup.add(beaconGroup);
       });
+    }
+
+    // --- Status-Based Color System & Helpers ---
+    const STATUS_COLORS = {
+      'Active': 0x22c55e,      // Emerald green
+      'Completed': 0x94a3b8,   // Slate gray
+      'Failed': 0xef4444       // Red
+    };
+
+    function getStatusColor(status) {
+      return STATUS_COLORS[status] || STATUS_COLORS['Completed'];
+    }
+
+    function getStatusColorHexStr(status) {
+      if (status === 'Active') return '#22c55e';
+      if (status === 'Failed') return '#ef4444';
+      return '#94a3b8';
+    }
+
+    // --- Landing Site Markers (9 Historical / Active Missions) ---
+    const DEFAULT_LANDING_SITES = [
+      { id: "m20_perseverance", name: "Perseverance (Mars 2020)", site: "Jezero Crater", lat: 18.380, lon: 77.580, elevation_m: -2540, status: "Active", type: "rover", year: 2021, agency: "NASA" },
+      { id: "msl_curiosity", name: "Curiosity (MSL)", site: "Gale Crater", lat: -4.589, lon: 137.441, elevation_m: -4450, status: "Active", type: "rover", year: 2012, agency: "NASA" },
+      { id: "mer_opportunity", name: "Opportunity (MER-B)", site: "Meridiani Planum", lat: -1.946, lon: -5.530, elevation_m: -1400, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
+      { id: "mer_spirit", name: "Spirit (MER-A)", site: "Gusev Crater", lat: -14.568, lon: 175.473, elevation_m: -1930, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
+      { id: "cnsa_zhurong", name: "Zhurong (Tianwen-1)", site: "Utopia Planitia", lat: 25.066, lon: 109.925, elevation_m: -4100, status: "Completed", type: "rover", year: 2021, agency: "CNSA" },
+      { id: "insight_lander", name: "InSight Lander", site: "Elysium Planitia", lat: 4.502, lon: 135.623, elevation_m: -2613, status: "Completed", type: "lander", year: 2018, agency: "NASA" },
+      { id: "phoenix_landing_site", name: "Phoenix Lander", site: "Vastitas Borealis", lat: 68.219, lon: -125.750, elevation_m: -3500, status: "Completed", type: "lander", year: 2008, agency: "NASA" },
+      { id: "viking1_lander", name: "Viking 1 Lander", site: "Chryse Planitia", lat: 22.480, lon: -47.970, elevation_m: -2690, status: "Completed", type: "lander", year: 1976, agency: "NASA" },
+      { id: "viking2_lander", name: "Viking 2 Lander", site: "Utopia Planitia", lat: 48.269, lon: 134.010, elevation_m: -4230, status: "Completed", type: "lander", year: 1976, agency: "NASA" }
+    ];
+
+    function renderLandingSiteMarkers(sites) {
+      if (!window.landingSiteMarkersGroup) {
+        window.landingSiteMarkersGroup = new THREE.Group();
+        scene.add(window.landingSiteMarkersGroup);
+      }
+
+      while (window.landingSiteMarkersGroup.children.length > 0) {
+        const child = window.landingSiteMarkersGroup.children[0];
+        window.landingSiteMarkersGroup.remove(child);
+      }
+
+      sites.forEach(site => {
+        const pos = latLonToVector3(site.lat, site.lon, MARS_RADIUS * 1.0015);
+        const normal = pos.clone().normalize();
+        const colorHex = getStatusColor(site.status);
+
+        const beaconGroup = new THREE.Group();
+
+        // 1. Pin Head (Status-colored)
+        const headGeo = new THREE.SphereGeometry(0.0022, 16, 16);
+        const headMat = new THREE.MeshStandardMaterial({
+          color: colorHex,
+          emissive: colorHex,
+          emissiveIntensity: 0.5,
+          roughness: 0.3
+        });
+        const pinHead = new THREE.Mesh(headGeo, headMat);
+        const pinHeight = 0.007;
+        pinHead.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
+        beaconGroup.add(pinHead);
+
+        // 2. Needle Stem
+        const stemGeo = new THREE.CylinderGeometry(0.0002, 0.0002, pinHeight, 8);
+        const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
+        stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+        beaconGroup.add(stem);
+
+        // 3. Ground Target Ring (Status-colored)
+        const ringGeo = new THREE.RingGeometry(0.0035, 0.006, 32);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: colorHex,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.75
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
+        ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+        beaconGroup.add(ring);
+
+        const siteData = {
+          type: 'lander',
+          missionId: site.id,
+          name: site.name,
+          site: site.site,
+          lat: site.lat,
+          lon: site.lon,
+          elevation_m: site.elevation_m || 0,
+          status: site.status,
+          category: 'LANDING SITE',
+          description: `${site.site} • ${site.agency || 'NASA'} (${site.year || ''}) • Status: ${site.status}`
+        };
+
+        beaconGroup.userData = siteData;
+        pinHead.userData = siteData;
+        ring.userData = siteData;
+
+        window.landingSiteMarkersGroup.add(beaconGroup);
+      });
+    }
+
+    function renderDrawerLandings(sites) {
+      const listContainer = document.getElementById('landings-list');
+      if (!listContainer) return;
+      listContainer.innerHTML = '';
+      sites.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'landing-card';
+        const statusClass = item.status === 'Active' ? 'active' : (item.status === 'Failed' ? 'failed' : 'completed');
+        card.innerHTML = `
+          <div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="dest-name">${item.name}</span>
+              <span class="status-pill ${statusClass}">${item.status}</span>
+            </div>
+            <div class="dest-sub">${item.site} • ${item.lat.toFixed(2)}°, ${item.lon.toFixed(2)}° • ${Number(item.elevation_m).toLocaleString()} m</div>
+          </div>
+          <span style="font-size:14px; color:${getStatusColorHexStr(item.status)};">➔</span>
+        `;
+        card.onclick = () => {
+          flyToCoordinate(item.lat, item.lon, 1.85);
+          currentElevation = item.elevation_m;
+          updateStatusHUD();
+        };
+        listContainer.appendChild(card);
+      });
+    }
+
+    // --- GeoJSON Exploration Paths & Landers Dataset (3D Viewer) ---
+    let astroPathsData = null;
+
+    async function loadAstroPaths() {
+      try {
+        const resp = await fetch('/data/astronaut_paths.geojson');
+        if (resp.ok) {
+          astroPathsData = await resp.json();
+          renderAstroPaths(astroPathsData);
+          populateAstroPathsLegend(astroPathsData);
+        }
+      } catch (err) {
+        console.warn("Could not load astronaut_paths.geojson:", err);
+      }
+    }
+
+    function renderAstroPaths(data) {
+      while (astroPathsGroup.children.length > 0) {
+        const child = astroPathsGroup.children[0];
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) child.material.forEach(m => m.dispose());
+          else child.material.dispose();
+        }
+        astroPathsGroup.remove(child);
+      }
+
+      if (!data || !data.features) return;
+
+      data.features.forEach(feature => {
+        const props = feature.properties || {};
+        const geom = feature.geometry || {};
+        const statusColor = getStatusColor(props.status);
+        let colorHex = statusColor;
+        if (props.color) {
+          if (typeof props.color === 'string' && props.color.startsWith('#')) {
+            colorHex = parseInt(props.color.replace('#', '0x'));
+          } else if (typeof props.color === 'number') {
+            colorHex = props.color;
+          }
+        }
+
+        if (geom.type === 'LineString' && Array.isArray(geom.coordinates)) {
+          // Convert [lon, lat, elev] to 3D vectors
+          const curvePoints = geom.coordinates.map(c =>
+            latLonToVector3(c[1], c[0], MARS_RADIUS + ((c[2] || 0) / 3396190.0) * 1.5 + 0.0006)
+          );
+
+          if (curvePoints.length > 1) {
+            // Emissive 3D Tube
+            const curve = new THREE.CatmullRomCurve3(curvePoints);
+            const segments = Math.max(32, curvePoints.length * 4);
+            const radius = props.type === 'rover_traverse' ? 0.0004 : 0.00055;
+            const tubeGeo = new THREE.TubeGeometry(curve, segments, radius, 8, false);
+            const tubeMat = new THREE.MeshStandardMaterial({
+              color: colorHex,
+              emissive: colorHex,
+              emissiveIntensity: 0.45,
+              transparent: true,
+              opacity: 0.95,
+              roughness: 0.4,
+              metalness: 0.2
+            });
+            const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+            tubeMesh.userData = { feature, type: 'traverse_tube', missionId: props.id, name: props.name };
+            astroPathsGroup.add(tubeMesh);
+
+            // Sub-surface line
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(
+              geom.coordinates.map(c => latLonToVector3(c[1], c[0], MARS_RADIUS * 1.0005))
+            );
+            const lineMat = new THREE.LineBasicMaterial({
+              color: colorHex,
+              transparent: true,
+              opacity: 0.7
+            });
+            const lineMesh = new THREE.Line(lineGeo, lineMat);
+            lineMesh.userData = { feature, type: 'surface_line', missionId: props.id, name: props.name };
+            astroPathsGroup.add(lineMesh);
+          }
+        } else if (geom.type === 'Point' && Array.isArray(geom.coordinates) && geom.coordinates.length >= 2) {
+          // Lander marker (pin + stem + ring) using status color
+          const lon = geom.coordinates[0];
+          const lat = geom.coordinates[1];
+          const elev = geom.coordinates.length >= 3 ? geom.coordinates[2] : (props.elevation_m || 0);
+          const pos = latLonToVector3(lat, lon, MARS_RADIUS * 1.0015);
+          const normal = pos.clone().normalize();
+          const markerColor = getStatusColor(props.status);
+
+          const landerGroup = new THREE.Group();
+
+          const headGeo = new THREE.SphereGeometry(0.0022, 16, 16);
+          const headMat = new THREE.MeshStandardMaterial({
+            color: markerColor,
+            emissive: markerColor,
+            emissiveIntensity: 0.5,
+            roughness: 0.3
+          });
+          const pinHead = new THREE.Mesh(headGeo, headMat);
+          const pinHeight = 0.007;
+          pinHead.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
+          landerGroup.add(pinHead);
+
+          const stemGeo = new THREE.CylinderGeometry(0.0002, 0.0002, pinHeight, 8);
+          const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+          const stem = new THREE.Mesh(stemGeo, stemMat);
+          stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
+          stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+          landerGroup.add(stem);
+
+          const ringGeo = new THREE.RingGeometry(0.003, 0.005, 32);
+          const ringMat = new THREE.MeshBasicMaterial({
+            color: markerColor,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.75
+          });
+          const ring = new THREE.Mesh(ringGeo, ringMat);
+          ring.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
+          ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+          landerGroup.add(ring);
+
+          const dataObj = {
+            feature,
+            type: 'lander',
+            missionId: props.id,
+            name: props.name,
+            status: props.status,
+            lat: lat,
+            lon: lon,
+            elevation_m: elev,
+            category: props.type ? props.type.toUpperCase() : 'LANDER',
+            description: props.description || (props.landing_site ? `Landing Site: ${props.landing_site}` : `${props.name} Landing Site`)
+          };
+
+          landerGroup.userData = dataObj;
+          pinHead.userData = dataObj;
+          ring.userData = dataObj;
+
+          astroPathsGroup.add(landerGroup);
+        }
+      });
+    }
+
+    function populateAstroPathsLegend(data) {
+      const legendList = document.getElementById('legend-list');
+      if (!legendList || !data || !data.features) return;
+      legendList.innerHTML = '';
+
+      data.features.forEach(feature => {
+        const props = feature.properties || {};
+        const geom = feature.geometry || {};
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+
+        const statusHex = getStatusColorHexStr(props.status);
+        const coords = (geom.type === 'Point')
+          ? [geom.coordinates[1], geom.coordinates[0]]
+          : (geom.coordinates && geom.coordinates[0] ? [geom.coordinates[0][1], geom.coordinates[0][0]] : [props.lat || 0, props.lon || 0]);
+
+        item.innerHTML = `
+          <div class="legend-item-left">
+            <input type="checkbox" checked data-feature-id="${props.id}" style="cursor:pointer; accent-color:${statusHex};">
+            <div class="legend-color-dot" style="background:${statusHex};"></div>
+            <div style="cursor:pointer;" title="Click to fly to mission site">
+              <div style="font-weight:600; color:#fff;">${props.name}</div>
+              <div style="font-size:10px; color:#94a3b8;">${props.status} • ${props.type.replace('_', ' ')}</div>
+            </div>
+          </div>
+          <button class="pill-btn" style="padding:2px 8px; font-size:10px;" title="Fly to location">Fly</button>
+        `;
+
+        const chk = item.querySelector('input[type="checkbox"]');
+        chk.onchange = (e) => {
+          const visible = e.target.checked;
+          astroPathsGroup.children.forEach(child => {
+            if (child.userData?.missionId === props.id || child.userData?.feature?.properties?.id === props.id) {
+              child.visible = visible;
+            }
+          });
+        };
+
+        const flyAction = () => {
+          flyToCoordinate(coords[0], coords[1], 1.85);
+          if (props.elevation_m) currentElevation = props.elevation_m;
+          updateStatusHUD();
+        };
+
+        item.querySelector('.legend-item-left div:last-child').onclick = flyAction;
+        item.querySelector('button').onclick = flyAction;
+
+        legendList.appendChild(item);
+      });
+    }
+
+    // --- Dynamic Corridor Highlighting on Hover ---
+    let hoveredMissionId = null;
+
+    function clearCorridorHighlight() {
+      while (corridorHighlightGroup.children.length > 0) {
+        const mesh = corridorHighlightGroup.children[0];
+        if (mesh.geometry) mesh.geometry.dispose();
+        if (mesh.material) mesh.material.dispose();
+        corridorHighlightGroup.remove(mesh);
+      }
+    }
+
+    function highlightMissionCorridor(missionId, status) {
+      clearCorridorHighlight();
+
+      let actualPath = null;
+      // 1. Check in astroPathsData
+      if (astroPathsData && astroPathsData.features) {
+        const feat = astroPathsData.features.find(f => f.properties?.id === missionId && f.geometry?.type === 'LineString');
+        if (feat && feat.geometry.coordinates) {
+          actualPath = feat.geometry.coordinates.map(c => ({ lon: c[0], lat: c[1], elev: c[2] || 0 }));
+        }
+      }
+
+      // 2. Check in historicalMissions
+      if (!actualPath && historicalMissions) {
+        const m = historicalMissions.find(h => h.id === missionId);
+        if (m) {
+          if (m.actual_path && m.actual_path.length > 1) {
+            actualPath = m.actual_path;
+          } else if (m.waypoints && m.waypoints.length > 1) {
+            actualPath = m.waypoints.map(wp => ({ lon: wp.lon, lat: wp.lat, elev: wp.elev_m || 0 }));
+          }
+        }
+      }
+
+      if (!actualPath || actualPath.length < 2) return;
+
+      const colorHex = getStatusColor(status || 'Active');
+      const highlightPoints = actualPath.map(p =>
+        latLonToVector3(p.lat, p.lon, MARS_RADIUS + ((p.elev || 0) / 3396190.0) * 1.5 + 0.002)
+      );
+
+      const curve = new THREE.CatmullRomCurve3(highlightPoints);
+      const segments = Math.min(320, Math.max(48, highlightPoints.length * 4));
+      const tubeGeo = new THREE.TubeGeometry(curve, segments, 0.0006, 8, false);
+      const tubeMat = new THREE.MeshStandardMaterial({
+        color: colorHex,
+        emissive: colorHex,
+        emissiveIntensity: 0.85,
+        transparent: true,
+        opacity: 0.95
+      });
+
+      const mesh = new THREE.Mesh(tubeGeo, tubeMat);
+      mesh.userData = { type: 'corridor_highlight', missionId };
+      corridorHighlightGroup.add(mesh);
     }
 
     // --- High-Visibility 3D Tube Traverse & Historical Rover Path Geometry ---
@@ -1468,7 +2006,7 @@
 
     document.getElementById('select-eva-preset').onchange = (e) => loadEVARoute(e.target.value, true);
 
-    // --- Raycaster Hover Card Detection ---
+    // --- Raycaster Hover Card Detection & Corridor Highlighting ---
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
@@ -1485,10 +2023,37 @@
 
       raycaster.setFromCamera(mouse, camera);
 
-      // Check intersection with landmark pins
+      // Collect interactive pins & meshes across all layers
       const interactivePins = [];
+
+      // 1. Landmarks
       markersGroup.traverse(child => {
         if (child.isMesh && child.userData && child.userData.name) {
+          interactivePins.push(child);
+        }
+      });
+
+      // 2. GeoJSON Exploration Paths & Landers
+      if (astroPathsGroup) {
+        astroPathsGroup.traverse(child => {
+          if (child.isMesh && (child.userData?.type === 'lander' || child.userData?.type === 'traverse_tube' || child.userData?.feature)) {
+            interactivePins.push(child);
+          }
+        });
+      }
+
+      // 3. Landing site markers
+      if (window.landingSiteMarkersGroup) {
+        window.landingSiteMarkersGroup.traverse(child => {
+          if (child.isMesh && (child.userData?.type === 'lander' || child.userData?.name)) {
+            interactivePins.push(child);
+          }
+        });
+      }
+
+      // 4. Rover traverse tubes & waypoint pins
+      routesGroup.traverse(child => {
+        if (child.isMesh && (child.userData?.type === 'traverse_tube' || child.userData?.type === 'landing_site' || child.userData?.name)) {
           interactivePins.push(child);
         }
       });
@@ -1496,19 +2061,97 @@
       const intersects = raycaster.intersectObjects(interactivePins);
 
       if (intersects.length > 0) {
-        const lm = intersects[0].object.userData;
-        document.getElementById('tt-name').textContent = lm.name;
-        document.getElementById('tt-category').textContent = lm.category.toUpperCase();
-        document.getElementById('tt-coords').textContent = `${Math.abs(lm.lat).toFixed(2)}° ${lm.lat >= 0 ? 'N' : 'S'}, ${Math.abs(lm.lon).toFixed(2)}° ${lm.lon >= 0 ? 'E' : 'W'} • ${lm.elevation_m.toLocaleString()} m`;
-        document.getElementById('tt-desc').textContent = lm.description;
+        const hitObj = intersects[0].object;
+        const userData = hitObj.userData || {};
+        let displayData = null;
 
-        tooltip.style.left = `${e.clientX}px`;
-        tooltip.style.top = `${e.clientY}px`;
-        tooltip.style.display = 'block';
-        renderer.domElement.style.cursor = 'pointer';
+        if (userData.feature) {
+          const props = userData.feature.properties || {};
+          const geom = userData.feature.geometry || {};
+
+          // Extract coordinates from properties OR geometry (GeoJSON Point stores in geometry)
+          let lat = props.lat, lon = props.lon, elevation_m = props.elevation_m;
+
+          if ((lat === undefined || lat === 0) && geom && geom.coordinates && geom.coordinates.length >= 2) {
+            // GeoJSON Point: coordinates are [lon, lat, elev?]
+            lon = geom.coordinates[0];
+            lat = geom.coordinates[1];
+            if (geom.coordinates.length >= 3) elevation_m = geom.coordinates[2];
+          }
+
+          displayData = {
+            name: props.name || 'Exploration Mission',
+            lat: lat || 0,
+            lon: lon || 0,
+            elevation_m: elevation_m || 0,
+            status: props.status || 'Active',
+            category: props.type ? props.type.replace('_', ' ').toUpperCase() : 'MISSION',
+            description: props.description || (props.landing_site ? `Landing Site: ${props.landing_site}` : props.sol_range ? `Mission Duration: ${props.sol_range}` : props.name),
+            missionId: props.id
+          };
+        } else if (userData.type === 'lander' || userData.type === 'landing_site' || userData.site) {
+          displayData = {
+            name: userData.name,
+            lat: userData.lat || 0,
+            lon: userData.lon || 0,
+            elevation_m: userData.elevation_m || 0,
+            status: userData.status || 'Completed',
+            category: (userData.category || 'LANDING SITE').toUpperCase(),
+            description: userData.description || `${userData.name} Landing Site`,
+            missionId: userData.missionId
+          };
+        } else if (userData.name) {
+          displayData = {
+            name: userData.name,
+            lat: userData.lat || 0,
+            lon: userData.lon || 0,
+            elevation_m: userData.elevation_m || 0,
+            status: userData.status,
+            category: (userData.category || 'LANDMARK').toUpperCase(),
+            description: userData.description || '',
+            missionId: userData.missionId
+          };
+        }
+
+        if (displayData) {
+          const statusHex = displayData.status ? getStatusColorHexStr(displayData.status) : '#94a3b8';
+          const statusBadge = displayData.status ? `<span style="display:inline-block; margin-left:6px; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; text-transform:uppercase; background:${statusHex}22; color:${statusHex}; border:1px solid ${statusHex}55;">${displayData.status}</span>` : '';
+
+          document.getElementById('tt-name').innerHTML = `${displayData.name} ${statusBadge}`;
+          document.getElementById('tt-category').textContent = displayData.category;
+          document.getElementById('tt-coords').textContent = `${Math.abs(displayData.lat).toFixed(2)}° ${displayData.lat >= 0 ? 'N' : 'S'}, ${Math.abs(displayData.lon).toFixed(2)}° ${displayData.lon >= 0 ? 'E' : 'W'}${displayData.elevation_m !== undefined ? ` • ${Number(displayData.elevation_m).toLocaleString()} m` : ''}`;
+          document.getElementById('tt-desc').textContent = displayData.description;
+
+          tooltip.style.left = `${e.clientX + 12}px`;
+          tooltip.style.top = `${e.clientY + 12}px`;
+          tooltip.style.display = 'block';
+          renderer.domElement.style.cursor = 'pointer';
+
+          // Trigger dynamic corridor highlighting on hover
+          const mId = displayData.missionId || (userData.feature ? userData.feature.properties?.id : null);
+          if (mId) {
+            if (window.corridorClearTimeout) {
+              clearTimeout(window.corridorClearTimeout);
+              window.corridorClearTimeout = null;
+            }
+            if (hoveredMissionId !== mId) {
+              hoveredMissionId = mId;
+              highlightMissionCorridor(mId, displayData.status);
+            }
+          }
+        }
       } else {
         tooltip.style.display = 'none';
         renderer.domElement.style.cursor = 'grab';
+
+        // Debounced clear on un-hover (300ms)
+        if (hoveredMissionId !== null) {
+          if (window.corridorClearTimeout) clearTimeout(window.corridorClearTimeout);
+          window.corridorClearTimeout = setTimeout(() => {
+            clearCorridorHighlight();
+            hoveredMissionId = null;
+          }, 300);
+        }
       }
     });
 
@@ -1813,6 +2456,16 @@
         controls.update();
       }
 
+      // Pulsing corridor highlight animation
+      if (corridorHighlightGroup.children.length > 0) {
+        const pulse = 0.55 + 0.35 * Math.sin(performance.now() * 0.006);
+        corridorHighlightGroup.children.forEach(c => {
+          if (c.material && c.material.emissiveIntensity !== undefined) {
+            c.material.emissiveIntensity = pulse;
+          }
+        });
+      }
+
       if (appMode === '3D') {
         const centerCoord = vector3ToLatLon(camera.position);
         currentLat = centerCoord.lat;
@@ -1830,6 +2483,42 @@
       }
     }
 
+    // Toggle Legend Panel ('L' key or button)
+    function toggleLegend() {
+      const p = document.getElementById('legend-panel');
+      const isVisible = p.style.display === 'flex';
+      p.style.display = isVisible ? 'none' : 'flex';
+      document.getElementById('btn-toggle-legend').classList.toggle('active', !isVisible);
+    }
+
+    document.getElementById('btn-toggle-legend').onclick = toggleLegend;
+    document.getElementById('close-legend').onclick = () => {
+      document.getElementById('legend-panel').style.display = 'none';
+      document.getElementById('btn-toggle-legend').classList.remove('active');
+    };
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) return;
+      if (e.key === 'l' || e.key === 'L') {
+        toggleLegend();
+      }
+    });
+
+    // Drawer Tabs Switching
+    document.getElementById('tab-landmarks').onclick = () => {
+      document.getElementById('tab-landmarks').classList.add('active');
+      document.getElementById('tab-landings').classList.remove('active');
+      document.getElementById('dest-list').style.display = 'flex';
+      document.getElementById('landings-list').style.display = 'none';
+    };
+
+    document.getElementById('tab-landings').onclick = () => {
+      document.getElementById('tab-landings').classList.add('active');
+      document.getElementById('tab-landmarks').classList.remove('active');
+      document.getElementById('dest-list').style.display = 'none';
+      document.getElementById('landings-list').style.display = 'flex';
+    };
+
     window.addEventListener('resize', () => {
       const w = container.clientWidth;
       const h = container.clientHeight;
@@ -1842,6 +2531,9 @@
 
     // Start Engine
     fetchLandmarks();
+    renderLandingSiteMarkers(DEFAULT_LANDING_SITES);
+    renderDrawerLandings(DEFAULT_LANDING_SITES);
+    loadAstroPaths();
     updateLiveMarsEphemeris();
     setInterval(updateLiveMarsEphemeris, 1000); // 1-second live clock update
     loadEVARoute('m20_perseverance', false); // Initialize route metrics without hijacking camera view
