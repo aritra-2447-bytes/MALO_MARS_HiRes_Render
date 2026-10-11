@@ -756,7 +756,7 @@
 
     // --- Scene Setup ---
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.01, 100);
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.01, 250);
     camera.position.set(0, 0, 3.2);
 
     const renderer = new THREE.WebGLRenderer({
@@ -804,17 +804,65 @@
     camera.add(cameraHeadlight);
     scene.add(camera);
 
-    // Deep Space Starfield
-    const starsGeo = new THREE.BufferGeometry();
-    const starCount = 2000;
-    const starPositions = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount * 3; i += 3) {
-      starPositions[i] = (Math.random() - 0.5) * 90;
-      starPositions[i + 1] = (Math.random() - 0.5) * 90;
-      starPositions[i + 2] = (Math.random() - 0.5) * 90;
+    // Deep Space Celestial Starfield
+    function createStarTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
+      grad.addColorStop(0.2, 'rgba(235, 245, 255, 0.9)');
+      grad.addColorStop(0.5, 'rgba(170, 205, 255, 0.3)');
+      grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(canvas);
     }
+
+    const starsGeo = new THREE.BufferGeometry();
+    const starCount = 2400;
+    const starPositions = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+
+    const starPalettes = [
+      new THREE.Color(0xffffff),
+      new THREE.Color(0xdbeafe),
+      new THREE.Color(0xbfdbfe),
+      new THREE.Color(0xfef3c7),
+      new THREE.Color(0xe0e7ff)
+    ];
+
+    for (let i = 0; i < starCount; i++) {
+      // Distribute stars on a distant spherical shell far beyond camera orbit (r in [140, 180])
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const r = 140.0 + Math.random() * 40.0;
+
+      starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      starPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      starPositions[i * 3 + 2] = r * Math.cos(phi);
+
+      const col = starPalettes[Math.floor(Math.random() * starPalettes.length)];
+      starColors[i * 3] = col.r;
+      starColors[i * 3 + 1] = col.g;
+      starColors[i * 3 + 2] = col.b;
+    }
+
     starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    scene.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({ color: 0x94a3b8, size: 0.16 })));
+    starsGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+
+    const starsMaterial = new THREE.PointsMaterial({
+      size: 1.25,
+      map: createStarTexture(),
+      vertexColors: true,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    scene.add(new THREE.Points(starsGeo, starsMaterial));
 
     // Mars 3D Sphere & Real-Time Decontourification Shader Architecture
     const MARS_RADIUS = 1.0;
