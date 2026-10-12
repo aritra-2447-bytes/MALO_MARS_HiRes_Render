@@ -848,57 +848,6 @@
           polyline.on('mouseout', () => polyline.unbindTooltip());
 
           roverTraversesGroup.addLayer(polyline);
-
-          // Add landing start marker
-          if (latLngs.length > 0) {
-            const startMarker = L.circleMarker(latLngs[0], {
-              radius: 5,
-              color: color,
-              fillColor: color,
-              fillOpacity: 0.9,
-              weight: 2
-            });
-            startMarker.bindTooltip(`<strong>${props.name}</strong><br>Landing Site: ${props.landing_site || 'Sol 0'}`, { direction: 'top', offset: [0, -6] });
-            roverTraversesGroup.addLayer(startMarker);
-          }
-
-        } else if (geom.type === 'Point' && Array.isArray(geom.coordinates) && geom.coordinates.length >= 2) {
-          const lon = geom.coordinates[0];
-          const lat = geom.coordinates[1];
-          const elev = geom.coordinates.length >= 3 ? geom.coordinates[2] : (props.elevation_m || 0);
-
-          const marker = L.circleMarker([lat, lon], {
-            radius: 7,
-            color: color,
-            fillColor: color,
-            fillOpacity: 0.85,
-            weight: 2
-          });
-
-          const tooltipContent = `
-            <div style="font-family:sans-serif; font-size:12px; line-height:1.4;">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <strong style="color:${color}; font-size:13px;">${props.name}</strong>
-                <span style="font-size:10px; font-weight:700; padding:1px 5px; border-radius:3px; background:${color}22; color:${color}; border:1px solid ${color}55;">${props.status.toUpperCase()}</span>
-              </div>
-              <div style="color:#cbd5e1; margin-top:3px;">${props.description || (props.landing_site ? 'Landing Site: ' + props.landing_site : '')}</div>
-              <div style="color:#94a3b8; font-size:11px; margin-top:2px;">
-                Lat: ${lat.toFixed(3)}° • Lon: ${lon.toFixed(3)}° ${elev ? `• Elev: ${Number(elev).toLocaleString()} m` : ''}
-              </div>
-            </div>
-          `;
-
-          marker.on('mouseover', (e) => {
-            marker.bindTooltip(tooltipContent, {
-              direction: 'top',
-              offset: [0, -10],
-              sticky: true,
-              interactive: true
-            }).openTooltip();
-          });
-          marker.on('mouseout', () => marker.unbindTooltip());
-
-          roverTraversesGroup.addLayer(marker);
         }
       });
     }
@@ -941,18 +890,6 @@
           polyline.on('mouseout', () => polyline.unbindTooltip());
 
           roverTraversesGroup.addLayer(polyline);
-
-          // Landing site marker
-          const startPt = latLngs[0];
-          const marker = L.circleMarker(startPt, {
-            radius: 6,
-            color: color,
-            fillColor: color,
-            fillOpacity: 0.9,
-            weight: 2
-          });
-          marker.bindTooltip(`<strong>${mission.rover}</strong><br>${mission.landing_site}`, { direction: 'top', offset: [0, -10] });
-          roverTraversesGroup.addLayer(marker);
         }
       });
     }

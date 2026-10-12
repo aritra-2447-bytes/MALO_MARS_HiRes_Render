@@ -304,7 +304,7 @@
       position: absolute;
       top: 76px;
       left: 16px;
-      width: 310px;
+      width: 330px;
       max-height: calc(100vh - 160px);
       background: var(--card-bg);
       backdrop-filter: blur(16px);
@@ -320,7 +320,7 @@
     }
 
     #left-drawer.collapsed {
-      transform: translateX(-340px);
+      transform: translateX(-360px);
     }
 
     .drawer-title {
@@ -336,7 +336,8 @@
 
     .destinations-scroll {
       overflow-y: auto;
-      max-height: 220px;
+      max-height: calc(100vh - 310px);
+      min-height: 220px;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -402,18 +403,15 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 8px 10px;
-      cursor: pointer;
+      padding: 7px 10px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
       transition: all 0.2s;
     }
 
     .landing-card:hover {
-      background: rgba(34, 197, 94, 0.12);
-      border-color: var(--accent-green);
-      transform: translateX(3px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
     .status-pill {
@@ -441,55 +439,6 @@
       background: rgba(239, 68, 68, 0.2);
       color: #ef4444;
       border: 1px solid rgba(239, 68, 68, 0.4);
-    }
-
-    /* Floating Exploration Paths Legend Panel */
-    #legend-panel {
-      position: absolute;
-      top: 76px;
-      right: 16px;
-      width: 320px;
-      max-height: calc(100vh - 160px);
-      background: var(--card-bg);
-      backdrop-filter: blur(18px);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 14px;
-      z-index: 1000;
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
-    }
-
-    .legend-scroll {
-      overflow-y: auto;
-      max-height: 380px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 8px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      font-size: 11px;
-    }
-
-    .legend-item:hover {
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .legend-item-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      overflow: hidden;
     }
 
     .legend-color-dot {
@@ -711,7 +660,6 @@
       <button class="pill-btn" id="btn-mode-2d">🗺️ 2D Flat Map</button>
       <button class="pill-btn" id="btn-toggle-decontour" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
       <button class="pill-btn" id="btn-toggle-drawer">📍 Destinations</button>
-      <button class="pill-btn" id="btn-toggle-legend" title="Toggle Exploration Paths Legend (Shortcut: 'L')">🏷️ Legend [L]</button>
       <button class="pill-btn active" id="btn-toggle-solar" title="Toggle Real-Time Astronomical Sun Position & Surface Shadows">☀️ Live Sun Shadows</button>
       <button class="pill-btn" id="btn-scan-nasa">🛰️ Scan NASA Orbiters</button>
     </div>
@@ -751,16 +699,6 @@
       <span class="eph-label">Decontour Filter:</span>
       <span class="eph-val" id="eph-decontour" style="color:var(--accent-green);">SMOOTH REAL-TIME ACTIVE</span>
     </div>
-  </div>
-
-  <!-- Exploration Paths & Landers Legend Floating Panel (L key toggle) -->
-  <div id="legend-panel">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-      <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--accent-cyan);">🏷️ Exploration Paths & Landers</span>
-      <span style="font-size:16px; cursor:pointer; color:#94a3b8;" id="close-legend">&times;</span>
-    </div>
-    <div style="font-size:10px; color:var(--text-dim); margin-bottom:6px;">Status color coding & per-feature visibility toggle:</div>
-    <div class="legend-scroll" id="legend-list"></div>
   </div>
 
   <!-- Main Viewport -->
@@ -1475,29 +1413,155 @@
       });
     }
 
-    function renderDrawerLandings(sites) {
+    const featureVisibility = {};
+
+    function renderDrawerLandings(inputData) {
       const listContainer = document.getElementById('landings-list');
-      if (!listContainer) return;
+      if (!listContainer || !inputData) return;
       listContainer.innerHTML = '';
-      sites.forEach(item => {
+
+      let items = [];
+      if (inputData.features) {
+        items = inputData.features.map(f => {
+          const props = f.properties || {};
+          const geom = f.geometry || {};
+          let lat = props.lat;
+          let lon = props.lon;
+          if (lat === undefined || lon === undefined) {
+            if (geom.type === 'Point' && Array.isArray(geom.coordinates)) {
+              lon = geom.coordinates[0];
+              lat = geom.coordinates[1];
+            } else if (geom.coordinates && geom.coordinates[0]) {
+              lon = geom.coordinates[0][0];
+              lat = geom.coordinates[0][1];
+            }
+          }
+          const defaultSite = DEFAULT_LANDING_SITES.find(s => s.id === props.id);
+          return {
+            id: props.id,
+            name: props.name,
+            status: props.status || 'Active',
+            type: props.type || (geom.type === 'Point' ? 'lander' : 'rover_traverse'),
+            site: props.landing_site || defaultSite?.site || '',
+            lat: Number(lat || 0),
+            lon: Number(lon || 0),
+            elevation_m: props.elevation_m !== undefined ? props.elevation_m : (defaultSite?.elevation_m || 0),
+            agency: defaultSite?.agency || props.agency || '',
+            year: defaultSite?.year || props.year || '',
+            total_odometry_km: props.total_odometry_km || props.total_distance_km,
+            description: props.description || defaultSite?.description || ''
+          };
+        });
+      } else if (Array.isArray(inputData)) {
+        items = [...inputData];
+      }
+
+      // Sort order: 1. Active, 2. Completed, 3. Failed
+      const statusOrder = { 'Active': 1, 'Completed': 2, 'Failed': 3 };
+      items.sort((a, b) => {
+        const orderA = statusOrder[a.status] || 99;
+        const orderB = statusOrder[b.status] || 99;
+        return orderA - orderB;
+      });
+
+      let lastStatus = null;
+      items.forEach(item => {
+        if (item.status !== lastStatus) {
+          lastStatus = item.status;
+          const grpHeader = document.createElement('div');
+          grpHeader.className = 'landing-group-header';
+          const headerHex = getStatusColorHexStr(item.status);
+          grpHeader.style.cssText = `font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:${headerHex}; margin:8px 0 2px 4px; display:flex; align-items:center; gap:5px;`;
+          grpHeader.innerHTML = `<span style="font-size:8px;">●</span> <span>${item.status} Missions</span>`;
+          listContainer.appendChild(grpHeader);
+        }
+
         const card = document.createElement('div');
         card.className = 'landing-card';
+        card.dataset.missionId = item.id;
         const statusClass = item.status === 'Active' ? 'active' : (item.status === 'Failed' ? 'failed' : 'completed');
+        const statusHex = getStatusColorHexStr(item.status);
+        const isChecked = featureVisibility[item.id] !== false;
+
+        let subParts = [];
+        if (item.site) subParts.push(item.site);
+        if (item.total_odometry_km) subParts.push(`${item.total_odometry_km} km`);
+        subParts.push(`${Number(item.lat).toFixed(2)}°, ${Number(item.lon).toFixed(2)}°`);
+        if (item.elevation_m !== undefined) subParts.push(`${Number(item.elevation_m).toLocaleString()} m`);
+        const subtext = subParts.join(' • ');
+
         card.innerHTML = `
-          <div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span class="dest-name">${item.name}</span>
-              <span class="status-pill ${statusClass}">${item.status}</span>
+          <div style="display:flex; align-items:center; gap:8px; width:100%; min-width:0;">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} data-feature-id="${item.id}" class="landing-vis-chk" title="Toggle visibility" style="cursor:pointer; accent-color:${statusHex}; flex-shrink:0;">
+            <div class="legend-color-dot" style="background:${statusHex}; flex-shrink:0;"></div>
+            <div style="flex:1; min-width:0; cursor:pointer;" class="landing-info-action" title="Click to fly to site">
+              <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
+                <span class="dest-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px;" title="${item.name}">${item.name}</span>
+                <span class="status-pill ${statusClass}" style="flex-shrink:0;">${item.status}</span>
+              </div>
+              <div class="dest-sub" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${subtext}">${subtext}</div>
             </div>
-            <div class="dest-sub">${item.site} • ${item.lat.toFixed(2)}°, ${item.lon.toFixed(2)}° • ${Number(item.elevation_m).toLocaleString()} m</div>
+            <button class="pill-btn landing-fly-btn" style="padding:2px 8px; font-size:10px; flex-shrink:0;" title="Fly to location">Fly</button>
           </div>
-          <span style="font-size:14px; color:${getStatusColorHexStr(item.status)};">➔</span>
         `;
-        card.onclick = () => {
+
+        // Checkbox visibility toggle
+        const chk = card.querySelector('.landing-vis-chk');
+        chk.onchange = (e) => {
+          e.stopPropagation();
+          const visible = e.target.checked;
+          featureVisibility[item.id] = visible;
+
+          // Toggle 3D astroPathsGroup
+          if (window.astroPathsGroup) {
+            astroPathsGroup.children.forEach(child => {
+              if (child.userData?.missionId === item.id || child.userData?.feature?.properties?.id === item.id) {
+                child.visible = visible;
+              }
+            });
+          }
+
+          // Toggle 3D landingSiteMarkersGroup
+          if (window.landingSiteMarkersGroup) {
+            landingSiteMarkersGroup.children.forEach(child => {
+              if (child.userData?.id === item.id || child.userData?.site === item.id) {
+                child.visible = visible;
+              }
+            });
+          }
+
+          // Clear corridor highlight if active for this mission
+          if (!visible && hoveredMissionId === item.id) {
+            clearCorridorHighlight();
+          }
+
+          // Update 2D flat canvas if active
+          if (appMode === '2D') {
+            draw2DFlat();
+          }
+        };
+
+        // Fly action
+        const flyAction = (e) => {
+          if (e) e.stopPropagation();
           flyToCoordinate(item.lat, item.lon, 1.85);
-          currentElevation = item.elevation_m;
+          if (item.elevation_m !== undefined) currentElevation = item.elevation_m;
           updateStatusHUD();
         };
+
+        card.querySelector('.landing-info-action').onclick = flyAction;
+        card.querySelector('.landing-fly-btn').onclick = flyAction;
+
+        // Hover corridor highlight
+        card.onmouseenter = () => {
+          if (featureVisibility[item.id] !== false) {
+            highlightMissionCorridor(item.id, item.status);
+          }
+        };
+        card.onmouseleave = () => {
+          clearCorridorHighlight();
+        };
+
         listContainer.appendChild(card);
       });
     }
@@ -1511,6 +1575,7 @@
         if (resp.ok) {
           astroPathsData = await resp.json();
           renderAstroPaths(astroPathsData);
+          renderDrawerLandings(astroPathsData);
           populateAstroPathsLegend(astroPathsData);
         }
       } catch (err) {
@@ -1647,54 +1712,8 @@
     }
 
     function populateAstroPathsLegend(data) {
-      const legendList = document.getElementById('legend-list');
-      if (!legendList || !data || !data.features) return;
-      legendList.innerHTML = '';
-
-      data.features.forEach(feature => {
-        const props = feature.properties || {};
-        const geom = feature.geometry || {};
-        const item = document.createElement('div');
-        item.className = 'legend-item';
-
-        const statusHex = getStatusColorHexStr(props.status);
-        const coords = (geom.type === 'Point')
-          ? [geom.coordinates[1], geom.coordinates[0]]
-          : (geom.coordinates && geom.coordinates[0] ? [geom.coordinates[0][1], geom.coordinates[0][0]] : [props.lat || 0, props.lon || 0]);
-
-        item.innerHTML = `
-          <div class="legend-item-left">
-            <input type="checkbox" checked data-feature-id="${props.id}" style="cursor:pointer; accent-color:${statusHex};">
-            <div class="legend-color-dot" style="background:${statusHex};"></div>
-            <div style="cursor:pointer;" title="Click to fly to mission site">
-              <div style="font-weight:600; color:#fff;">${props.name}</div>
-              <div style="font-size:10px; color:#94a3b8;">${props.status} • ${props.type.replace('_', ' ')}</div>
-            </div>
-          </div>
-          <button class="pill-btn" style="padding:2px 8px; font-size:10px;" title="Fly to location">Fly</button>
-        `;
-
-        const chk = item.querySelector('input[type="checkbox"]');
-        chk.onchange = (e) => {
-          const visible = e.target.checked;
-          astroPathsGroup.children.forEach(child => {
-            if (child.userData?.missionId === props.id || child.userData?.feature?.properties?.id === props.id) {
-              child.visible = visible;
-            }
-          });
-        };
-
-        const flyAction = () => {
-          flyToCoordinate(coords[0], coords[1], 1.85);
-          if (props.elevation_m) currentElevation = props.elevation_m;
-          updateStatusHUD();
-        };
-
-        item.querySelector('.legend-item-left div:last-child').onclick = flyAction;
-        item.querySelector('button').onclick = flyAction;
-
-        legendList.appendChild(item);
-      });
+      // Exploration paths & landers are now merged into the Landings tab under Exploration Sites
+      renderDrawerLandings(data);
     }
 
     // --- Dynamic Corridor Highlighting on Hover ---
@@ -2281,6 +2300,37 @@
         const drawX = (flatCanvas.width - drawW) / 2 + flatPanX;
         const drawY = (flatCanvas.height - drawH) / 2 + flatPanY;
         ctx.drawImage(flatImg, drawX, drawY, drawW, drawH);
+
+        // Render visible exploration paths & landing sites on 2D map
+        if (astroPathsData && Array.isArray(astroPathsData.features)) {
+          const to2D = (lon, lat) => ({
+            x: drawX + ((lon + 180.0) / 360.0) * drawW,
+            y: drawY + ((90.0 - lat) / 180.0) * drawH
+          });
+
+          astroPathsData.features.forEach(feat => {
+            const fid = feat.properties?.id;
+            if (featureVisibility[fid] === false) return;
+
+            const geom = feat.geometry;
+            const statusHex = getStatusColorHexStr(feat.properties?.status);
+
+            if (geom && geom.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 1) {
+              ctx.beginPath();
+              ctx.strokeStyle = statusHex;
+              ctx.lineWidth = 2.5;
+              ctx.shadowColor = statusHex;
+              ctx.shadowBlur = 4;
+              geom.coordinates.forEach((coord, idx) => {
+                const pt = to2D(coord[0], coord[1]);
+                if (idx === 0) ctx.moveTo(pt.x, pt.y);
+                else ctx.lineTo(pt.x, pt.y);
+              });
+              ctx.stroke();
+              ctx.shadowBlur = 0;
+            }
+          });
+        }
       }
     }
 
@@ -2483,24 +2533,16 @@
       }
     }
 
-    // Toggle Legend Panel ('L' key or button)
-    function toggleLegend() {
-      const p = document.getElementById('legend-panel');
-      const isVisible = p.style.display === 'flex';
-      p.style.display = isVisible ? 'none' : 'flex';
-      document.getElementById('btn-toggle-legend').classList.toggle('active', !isVisible);
-    }
-
-    document.getElementById('btn-toggle-legend').onclick = toggleLegend;
-    document.getElementById('close-legend').onclick = () => {
-      document.getElementById('legend-panel').style.display = 'none';
-      document.getElementById('btn-toggle-legend').classList.remove('active');
-    };
-
+    // Shortcut: 'L' key switches to Landings tab in left drawer
     window.addEventListener('keydown', (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.key === 'l' || e.key === 'L') {
-        toggleLegend();
+        const drawer = document.getElementById('left-drawer');
+        if (drawer.classList.contains('collapsed')) {
+          drawer.classList.remove('collapsed');
+          document.getElementById('btn-toggle-drawer').classList.add('active');
+        }
+        document.getElementById('tab-landings').click();
       }
     });
 

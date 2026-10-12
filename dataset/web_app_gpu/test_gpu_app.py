@@ -100,10 +100,15 @@ def run_tests():
     assert "geom.coordinates" in html, "Point coordinate extraction from geometry missing"
     assert "interactivePins" in html, "Raycaster interactivePins collection missing"
 
-    # UI controls
-    assert "legend-panel" in html, "Legend panel container missing"
-    assert "btn-toggle-legend" in html, "Legend toggle button missing"
+    # UI controls (Legend panel removed & integrated into Landings tab)
+    assert "legend-panel" not in html, "Legend panel container should be removed"
+    assert "btn-toggle-legend" not in html, "Legend toggle button should be removed"
     assert "tab-landings" in html, "Landing sites drawer tab missing"
+    assert "landings-list" in html, "Landings list container missing"
+    assert "landing-vis-chk" in html, "Landings visibility toggle checkboxes missing"
+    assert "landing-fly-btn" in html, "Landings fly action buttons missing"
+    assert "statusOrder" in html, "Status ordering (Active -> Completed -> Failed) missing"
+    assert "landing-group-header" in html, "Landing status group headers missing"
     print("  PASS: 3D paths, landing markers, status colors, corridor pulse, and hover detection verified.")
 
     # Test 5: Validate 2D Leaflet Viewer in web_app/index.html
