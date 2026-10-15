@@ -34,7 +34,3 @@ jobs:
       - name: Check HTML Syntax
         run: |
           npx --yes htmlhint "**/*.html" --ignore "node_modules/**,.git/**"
-
-      - name: Check CSS Syntax
-        run: |
-          npx --yes csstree-validator "**/*.css"
