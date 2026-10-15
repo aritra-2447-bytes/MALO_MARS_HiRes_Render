@@ -1,0 +1,40 @@
+name: Syntax Checks
+
+on:
+  push:
+  pull_request:
+    branches: [ official/dev ]
+
+jobs:
+  syntax-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check Python Syntax
+        run: |
+          python -m compileall -q .
+
+      - name: Check JavaScript Syntax
+        run: |
+          find . -name "*.js" -not -path "*/node_modules/*" -not -path "*/.git/*" -exec node --check {} +
+
+      - name: Check HTML Syntax
+        run: |
+          npx --yes htmlhint "**/*.html" --ignore "node_modules/**,.git/**"
+
+      - name: Check CSS Syntax
+        run: |
+          npx --yes csstree-validator "**/*.css"
