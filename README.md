@@ -160,25 +160,11 @@ y_start = row * 256
 
 ### 2. Launching the Applications
 
-#### Option A: Unified 3D GPU Planetary Explorer (Recommended)
+#### Unified 3D GPU Planetary Explorer (Recommended)
 ```bash
 python3 server.py 8083
 ```
 Open your browser at: **`http://localhost:8083`**
-
-#### Option B: Launch from the GPU Application Directory
-```bash
-cd dataset/web_app_gpu
-python3 serve.py 8083
-```
-Open your browser at: **`http://localhost:8083`**
-
-#### Option C: Reference 2D Leaflet Viewer
-```bash
-cd dataset/web_app
-python3 serve.py 8082
-```
-Open your browser at: **`http://localhost:8082`**
 
 ### 3. Running Automated Test Suites
 Confirm file integrity, 3D WebGL scenes, GeoJSON schemas, and server routes:
@@ -189,29 +175,6 @@ python3 dataset/web_app_gpu/test_gpu_app.py
 # Verify 2D Level 5 mosaic artifacts (requires GDAL & NumPy)
 python3 dataset/web_app/test_webapp.py
 ```
-
----
-
-## ☁️ Deployment on Render.com
-
-The application includes native deployment configuration for [Render.com](https://render.com) via [`render.yaml`](file:///home/arnabdinda/Projects/MALO_MARS_HiRes_Render/render.yaml):
-
-```yaml
-services:
-  - type: web
-    name: mars-gpu-viewer
-    runtime: python3
-    startCommand: "python3 server.py $PORT"
-    envVars:
-      - key: PYTHON_VERSION
-        value: "3.11.0"
-    healthCheckPath: /
-    autoDeploy: true
-```
-
-1. Connect your repository to Render.
-2. Select **Blueprint** deployment (Render will automatically detect `render.yaml`).
-3. Deploy! The unified server will auto-detect directories and serve the complete 3D explorer with all NASA APIs active.
 
 ---
 
@@ -264,5 +227,3 @@ services:
 - **NASA Planetary Data System (PDS)** & **Mars Trek**: Mars Global Surveyor (MGS) MOLA altimetry and Mars Express (MEX) HRSC color hillshade blend.
 - **NASA / JPL-Caltech**: Mars 2020 (Perseverance), Mars Science Laboratory (Curiosity), Mars Exploration Rovers (Spirit & Opportunity), and MMGIS telemetry.
 - **Washington University in St. Louis (WUSTL)**: PDS Geosciences Node Orbital Data Explorer (ODE) and Geosciences Data Services (GDS).
-- **Allison, M., & McEwen, M. (2000)**: *A post-Pathfinder evaluation of aerocentric solar coordinates with improved timing recipes for Mars seasonal/diurnal climate studies*. Geophysical Research Letters, 27(15), 2153-2156.
-- **Minetti, A. E. et al. (2002)**: *Energy cost of walking and running at extreme uphill and downhill slopes*. Journal of Applied Physiology.
