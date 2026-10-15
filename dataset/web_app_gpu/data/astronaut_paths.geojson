@@ -1,0 +1,374 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "m20_perseverance",
+        "name": "Perseverance (Mars 2020)",
+        "type": "rover_traverse",
+        "status": "Active",
+        "color": "#22c55e",
+        "total_odometry_km": 28.4,
+        "landing_site": "Jezero Crater (Octavia E. Butler Landing)",
+        "sol_range": "Sol 0 – Sol 1,120+",
+        "elevation_m": -2540,
+        "lat": 18.380,
+        "lon": 77.580,
+        "description": "AutoNav visual odometry traverse across Jezero ancient delta and Belva Crater rim.",
+        "waypoints": [
+          {"lat": 18.380, "lon": 77.580, "sol": 0, "elev_m": -2540, "hazard": "SAFE", "label": "Sol 0: Octavia E. Butler Landing"},
+          {"lat": 18.405, "lon": 77.545, "sol": 180, "elev_m": -2520, "hazard": "SAFE", "label": "Sol 180: Séítah Dunes Margin"},
+          {"lat": 18.420, "lon": 77.510, "sol": 350, "elev_m": -2480, "hazard": "SAFE", "label": "Sol 350: Kodiak Delta Remnant Butte"},
+          {"lat": 18.445, "lon": 77.450, "sol": 510, "elev_m": -2420, "hazard": "CAUTION_STEEP", "label": "Sol 510: Hawksbill Gap Scarp"},
+          {"lat": 18.470, "lon": 77.410, "sol": 740, "elev_m": -2380, "hazard": "SAFE", "label": "Sol 740: Neretva Vallis Inlet Channel"},
+          {"lat": 18.510, "lon": 77.350, "sol": 1050, "elev_m": -2310, "hazard": "CAUTION_STEEP", "label": "Sol 1050: Belva Impact Crater Rim"}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.580, 18.380, -2540],
+          [77.545, 18.405, -2520],
+          [77.510, 18.420, -2480],
+          [77.450, 18.445, -2420],
+          [77.410, 18.470, -2380],
+          [77.350, 18.510, -2310]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "msl_curiosity",
+        "name": "Curiosity (MSL)",
+        "type": "rover_traverse",
+        "status": "Active",
+        "color": "#22c55e",
+        "total_odometry_km": 32.8,
+        "landing_site": "Gale Crater (Bradbury Landing)",
+        "sol_range": "Sol 0 – Sol 4,100+",
+        "elevation_m": -4450,
+        "lat": -4.589,
+        "lon": 137.441,
+        "description": "Mount Sharp sedimentary sequence exploring Gale Crater ancient habitability.",
+        "waypoints": [
+          {"lat": -4.589, "lon": 137.441, "sol": 0, "elev_m": -4450, "hazard": "SAFE", "label": "Sol 0: Bradbury Landing Point"},
+          {"lat": -4.640, "lon": 137.400, "sol": 300, "elev_m": -4520, "hazard": "SAFE", "label": "Sol 300: Yellowknife Bay Mudstone"},
+          {"lat": -4.665, "lon": 137.380, "sol": 750, "elev_m": -4460, "hazard": "CAUTION_STEEP", "label": "Sol 750: Bagnold Dunes Sand Crossing"},
+          {"lat": -4.690, "lon": 137.360, "sol": 1800, "elev_m": -4150, "hazard": "CAUTION_STEEP", "label": "Sol 1800: Vera Rubin Ridge Scarp"},
+          {"lat": -4.730, "lon": 137.330, "sol": 2700, "elev_m": -3900, "hazard": "SAFE", "label": "Sol 2700: Sulfate-Bearing Transition Valley"},
+          {"lat": -4.780, "lon": 137.300, "sol": 3950, "elev_m": -3680, "hazard": "CRITICAL_SLOPE", "label": "Sol 3950: Gediz Vallis Debris Flow"}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [137.441, -4.589, -4450],
+          [137.400, -4.640, -4520],
+          [137.380, -4.665, -4460],
+          [137.360, -4.690, -4150],
+          [137.330, -4.730, -3900],
+          [137.300, -4.780, -3680]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "mer_opportunity",
+        "name": "Opportunity (MER-B)",
+        "type": "rover_traverse",
+        "status": "Completed",
+        "color": "#94a3b8",
+        "total_odometry_km": 45.16,
+        "landing_site": "Meridiani Planum (Challenger Memorial)",
+        "sol_range": "Sol 0 – Sol 5,111",
+        "elevation_m": -1400,
+        "lat": -1.946,
+        "lon": -5.530,
+        "description": "Historic 45.16 km marathon rover traverse across Meridiani Planum crater fields.",
+        "waypoints": [
+          {"lat": -1.946, "lon": -5.530, "sol": 0, "elev_m": -1400, "hazard": "SAFE", "label": "Sol 0: Eagle Crater Landing"},
+          {"lat": -1.950, "lon": -5.510, "sol": 100, "elev_m": -1390, "hazard": "SAFE", "label": "Sol 100: Fram Crater Outcrop"},
+          {"lat": -1.960, "lon": -5.480, "sol": 450, "elev_m": -1380, "hazard": "CRITICAL_SLOPE", "label": "Sol 450: Purgatory Dune"},
+          {"lat": -1.980, "lon": -5.440, "sol": 950, "elev_m": -1350, "hazard": "CAUTION_STEEP", "label": "Sol 950: Victoria Crater"},
+          {"lat": -2.280, "lon": -5.230, "sol": 2800, "elev_m": -1310, "hazard": "SAFE", "label": "Sol 2800: Endeavour Crater Rim"},
+          {"lat": -2.330, "lon": -5.190, "sol": 5111, "elev_m": -1280, "hazard": "SAFE", "label": "Sol 5111: Perseverance Valley"}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-5.530, -1.946, -1400],
+          [-5.510, -1.950, -1390],
+          [-5.480, -1.960, -1380],
+          [-5.440, -1.980, -1350],
+          [-5.230, -2.280, -1310],
+          [-5.190, -2.330, -1280]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "mer_spirit",
+        "name": "Spirit (MER-A)",
+        "type": "rover_traverse",
+        "status": "Completed",
+        "color": "#94a3b8",
+        "total_odometry_km": 7.73,
+        "landing_site": "Gusev Crater (Columbia Memorial)",
+        "sol_range": "Sol 0 – Sol 2,210",
+        "elevation_m": -1930,
+        "lat": -14.568,
+        "lon": 175.473,
+        "description": "Columbia Hills ascent and hydrothermal silica deposits discovery at Home Plate.",
+        "waypoints": [
+          {"lat": -14.568, "lon": 175.473, "sol": 0, "elev_m": -1930, "hazard": "SAFE", "label": "Sol 0: Columbia Memorial Station"},
+          {"lat": -14.580, "lon": 175.495, "sol": 85, "elev_m": -1920, "hazard": "SAFE", "label": "Sol 85: Bonneville Crater Rim"},
+          {"lat": -14.610, "lon": 175.520, "sol": 300, "elev_m": -1880, "hazard": "CAUTION_STEEP", "label": "Sol 300: West Spur (Columbia Hills)"},
+          {"lat": -14.630, "lon": 175.540, "sol": 580, "elev_m": -1810, "hazard": "CRITICAL_SLOPE", "label": "Sol 580: Husband Hill Summit"},
+          {"lat": -14.645, "lon": 175.550, "sol": 1300, "elev_m": -1850, "hazard": "SAFE", "label": "Sol 1300: Home Plate Plateau"},
+          {"lat": -14.655, "lon": 175.560, "sol": 2210, "elev_m": -1865, "hazard": "CRITICAL_SLOPE", "label": "Sol 2210: Troy Silica Sands"}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [175.473, -14.568, -1930],
+          [175.495, -14.580, -1920],
+          [175.520, -14.610, -1880],
+          [175.540, -14.630, -1810],
+          [175.550, -14.645, -1850],
+          [175.560, -14.655, -1865]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "cnsa_zhurong",
+        "name": "Zhurong (Tianwen-1)",
+        "type": "rover_traverse",
+        "status": "Completed",
+        "color": "#94a3b8",
+        "total_odometry_km": 1.92,
+        "landing_site": "Southern Utopia Planitia",
+        "sol_range": "Sol 0 – Sol 358",
+        "elevation_m": -4100,
+        "lat": 25.066,
+        "lon": 109.925,
+        "description": "First Chinese Mars rover exploring Utopia Planitia dunes and buried water ice features.",
+        "waypoints": [
+          {"lat": 25.066, "lon": 109.925, "sol": 0, "elev_m": -4100, "hazard": "SAFE", "label": "Sol 0: Utopia Planitia Landing Site"},
+          {"lat": 25.075, "lon": 109.920, "sol": 100, "elev_m": -4095, "hazard": "SAFE", "label": "Sol 100: Transverse Aeolian Ridges"},
+          {"lat": 25.088, "lon": 109.912, "sol": 240, "elev_m": -4090, "hazard": "SAFE", "label": "Sol 240: Polygonal Feature Science Stop"},
+          {"lat": 25.100, "lon": 109.905, "sol": 358, "elev_m": -4085, "hazard": "SAFE", "label": "Sol 358: Final Hibernation Location"}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [109.925, 25.066, -4100],
+          [109.920, 25.075, -4095],
+          [109.912, 25.088, -4090],
+          [109.905, 25.100, -4085]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "jezero_delta_traverse",
+        "name": "Jezero Western Delta & Belva Crater Traverse",
+        "type": "human_eva",
+        "status": "Active",
+        "color": "#38bdf8",
+        "total_odometry_km": 14.2,
+        "landing_site": "Octavia E. Butler Landing Site",
+        "sol_range": "EVA Day 1 – Day 5",
+        "elevation_m": -2540,
+        "lat": 18.380,
+        "lon": 77.580,
+        "description": "Perseverance delta scarp ascent to ancient clay deposits and sample caches.",
+        "waypoints": [
+          {"lat": 18.380, "lon": 77.580, "label": "Octavia E. Butler Landing Site", "elev_m": -2540},
+          {"lat": 18.420, "lon": 77.510, "label": "Kodiak Delta Remnant Butte", "elev_m": -2480},
+          {"lat": 18.445, "lon": 77.450, "label": "Western Fan Delta Scarp", "elev_m": -2420},
+          {"lat": 18.470, "lon": 77.410, "label": "Neretva Vallis River Inlet Channel", "elev_m": -2380},
+          {"lat": 18.510, "lon": 77.350, "label": "Belva Crater Rim Observation Point", "elev_m": -2310}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [77.580, 18.380, -2540],
+          [77.510, 18.420, -2480],
+          [77.450, 18.445, -2420],
+          [77.410, 18.470, -2380],
+          [77.350, 18.510, -2310]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "mount_sharp_ascent",
+        "name": "Gale Crater: Mount Sharp (Aeolis Mons) Expedition",
+        "type": "human_eva",
+        "status": "Active",
+        "color": "#38bdf8",
+        "total_odometry_km": 18.5,
+        "landing_site": "Bradbury Landing Point",
+        "sol_range": "EVA Day 1 – Day 7",
+        "elevation_m": -4450,
+        "lat": -4.589,
+        "lon": 137.441,
+        "description": "Curiosity ascent corridor through Vera Rubin Ridge to sulfate-bearing units.",
+        "waypoints": [
+          {"lat": -4.589, "lon": 137.441, "label": "Bradbury Landing Point", "elev_m": -4450},
+          {"lat": -4.640, "lon": 137.400, "label": "Yellowknife Bay Mudstone", "elev_m": -4520},
+          {"lat": -4.690, "lon": 137.360, "label": "Vera Rubin Ridge (Hematite)", "elev_m": -4150},
+          {"lat": -4.730, "lon": 137.330, "label": "Sulfate-Bearing Canyon Entry", "elev_m": -3900},
+          {"lat": -4.780, "lon": 137.300, "label": "Gediz Vallis Debris Ridge", "elev_m": -3680}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [137.441, -4.589, -4450],
+          [137.400, -4.640, -4520],
+          [137.360, -4.690, -4150],
+          [137.330, -4.730, -3900],
+          [137.300, -4.780, -3680]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "valles_marineris_rim_descent",
+        "name": "Valles Marineris: Melas Chasma Rim to Floor EVA",
+        "type": "human_eva",
+        "status": "Active",
+        "color": "#38bdf8",
+        "total_odometry_km": 26.0,
+        "landing_site": "North Plateau Habitat Site",
+        "sol_range": "EVA Day 1 – Day 10",
+        "elevation_m": -2500,
+        "lat": -9.200,
+        "lon": -76.800,
+        "description": "Deep canyon descent investigating layered sulfate deposits and recurring slope lineae.",
+        "waypoints": [
+          {"lat": -9.200, "lon": -76.800, "label": "North Plateau Habitat Site", "elev_m": -2500},
+          {"lat": -9.500, "lon": -76.650, "label": "Melas Chasma Upper Canyon Terraces", "elev_m": -5400},
+          {"lat": -9.800, "lon": -76.500, "label": "Melas Chasma Central Deep Basin (-8,200m)", "elev_m": -8200}
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-76.800, -9.200, -2500],
+          [-76.650, -9.500, -5400],
+          [-76.500, -9.800, -8200]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "insight_lander",
+        "name": "InSight (Mars Discovery)",
+        "type": "lander",
+        "status": "Completed",
+        "color": "#94a3b8",
+        "landing_site": "Elysium Planitia (Homestead Hollow)",
+        "elevation_m": -2613,
+        "lat": 4.502,
+        "lon": 135.623,
+        "description": "Geophysics stationary lander recording interior seismic marsquakes and thermal flux."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [135.623, 4.502, -2613]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "phoenix_landing_site",
+        "name": "Phoenix (Mars Scout)",
+        "type": "lander",
+        "status": "Completed",
+        "color": "#94a3b8",
+        "landing_site": "Vastitas Borealis (Green Valley)",
+        "elevation_m": -3500,
+        "lat": 68.219,
+        "lon": -125.750,
+        "description": "Northern polar permafrost excavator detecting subsurface water ice and perchlorates."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-125.750, 68.219, -3500]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "viking1_lander",
+        "name": "Viking 1 Lander",
+        "type": "lander",
+        "status": "Completed",
+        "color": "#94a3b8",
+        "landing_site": "Chryse Planitia (Thomas Mutch Memorial)",
+        "elevation_m": -2690,
+        "lat": 22.480,
+        "lon": -47.970,
+        "description": "First successful US Mars lander returning initial surface imagery and biology tests."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-47.970, 22.480, -2690]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "viking2_lander",
+        "name": "Viking 2 Lander",
+        "type": "lander",
+        "status": "Completed",
+        "color": "#94a3b8",
+        "landing_site": "Utopia Planitia",
+        "elevation_m": -4230,
+        "lat": 48.269,
+        "lon": 134.010,
+        "description": "Lander in boulder-strewn volcanic plains of Utopia Planitia."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [134.010, 48.269, -4230]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "beagle2_lander",
+        "name": "Beagle 2 (Mars Express)",
+        "type": "lander",
+        "status": "Failed",
+        "color": "#ef4444",
+        "landing_site": "Isidis Planitia",
+        "elevation_m": -3600,
+        "lat": 11.530,
+        "lon": 90.430,
+        "description": "UK astrobiology lander which touched down but failed to fully deploy solar arrays."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [90.430, 11.530, -3600]
+      }
+    }
+  ]
+}

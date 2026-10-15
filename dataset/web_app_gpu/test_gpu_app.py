@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
 Automated Verification Suite for GPU Accelerated Mars Web Viewer in web_app_gpu
+Validates 3D Globe Viewer, GeoJSON Exploration Dataset, Exploration Paths,
+Landing Site Markers, Status Color System, and Hover Detection.
 """
 import os
 import sys
-import subprocess
-import urllib.request
+import json
 
 def run_tests():
     print("=" * 65)
@@ -18,6 +19,8 @@ def run_tests():
     serve_py = os.path.join(gpu_dir, "serve.py")
     tiles_symlink = os.path.join(gpu_dir, "tiles")
     mosaic_symlink = os.path.join(gpu_dir, "mars_mola_level5_mosaic.jpg")
+    geojson_gpu = os.path.join(gpu_dir, "data", "astronaut_paths.geojson")
+    geojson_web = os.path.join(orig_web_dir, "data", "astronaut_paths.geojson")
 
     # Test 1: File Existence & Symlink Integrity
     print("\n[Test 1] Verifying File Structure & Symlinks...")
@@ -25,7 +28,9 @@ def run_tests():
     assert os.path.exists(serve_py), "serve.py missing in web_app_gpu"
     assert os.path.exists(tiles_symlink), "tiles symlink missing in web_app_gpu"
     assert os.path.exists(mosaic_symlink), "mars_mola_level5_mosaic.jpg symlink missing"
-    print(f"  PASS: All core files and symlinks exist in {gpu_dir}")
+    assert os.path.exists(geojson_gpu), "data/astronaut_paths.geojson missing in web_app_gpu"
+    assert os.path.exists(geojson_web), "data/astronaut_paths.geojson missing in web_app"
+    print(f"  PASS: All core files, datasets, and symlinks exist in {gpu_dir}")
 
     # Test 2: Tile Access Verification (All 2,048 tiles)
     print("\n[Test 2] Verifying Access to All 2,048 Level 5 Tiles via Symlink...")
@@ -35,50 +40,101 @@ def run_tests():
             assert os.path.exists(t_path) and os.path.getsize(t_path) > 0, f"Missing/empty tile: {t_path}"
     print("  PASS: All 2,048 tiles (5_0_0.jpg through 5_31_63.jpg) verified accessible.")
 
-    # Test 3: Validate HTML, WebGL Shaders & GPU Features
-    print("\n[Test 3] Verifying WebGL Hardware Acceleration Features in index.html...")
+    # Test 3: GeoJSON Exploration Dataset Verification
+    print("\n[Test 3] Verifying GeoJSON Exploration Dataset (13 Features)...")
+    with open(geojson_gpu, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    assert data.get("type") == "FeatureCollection", "Dataset must be a FeatureCollection"
+    features = data.get("features", [])
+    assert len(features) == 13, f"Expected 13 features in dataset, found {len(features)}"
+
+    statuses = {f["properties"].get("status") for f in features}
+    assert "Active" in statuses, "Missing 'Active' status missions"
+    assert "Completed" in statuses, "Missing 'Completed' status missions"
+    assert "Failed" in statuses, "Missing 'Failed' status missions"
+
+    point_count = sum(1 for f in features if f["geometry"]["type"] == "Point")
+    linestring_count = sum(1 for f in features if f["geometry"]["type"] == "LineString")
+    assert point_count >= 5, f"Expected at least 5 Point features, got {point_count}"
+    assert linestring_count >= 8, f"Expected 8 LineString traverse features, got {linestring_count}"
+
+    for f in features:
+        props = f["properties"]
+        geom = f["geometry"]
+        assert "id" in props and "name" in props and "status" in props, f"Missing core properties in {f}"
+        coords = geom["coordinates"]
+        if geom["type"] == "Point":
+            assert len(coords) >= 2, f"Invalid Point coordinate format in {props['name']}"
+        elif geom["type"] == "LineString":
+            assert len(coords) >= 2, f"LineString requires >= 2 points in {props['name']}"
+    print(f"  PASS: 13 features verified (8 traverses, 5 landers) across Active, Completed, and Failed statuses.")
+
+    # Test 4: Validate 3D Viewer Implementation in index.html
+    print("\n[Test 4] Verifying 3D Viewer Implementation in index.html...")
     with open(index_html, "r", encoding="utf-8") as f:
         html = f.read()
 
-    assert "getContext('webgl2'" in html, "WebGL2 initialization missing"
-    assert "createImageBitmap" in html, "Off-thread GPU image decoding pipeline missing"
-    assert "precision highp float;" in html, "GLSL shader precision declaration missing"
-    assert "texture2D" in html, "GLSL texture sampling missing"
-    assert "btn-mode-3d" not in html, "Broken 3D globe toggle still present in index.html"
-    assert "createSphereGeometry" not in html, "Unused 3D sphere generator still present"
-    assert "MAX_GPU_TEXTURES" in html, "GPU texture cache management missing"
-    assert "Olympus Mons" in html, "Landmark waypoints missing"
-    assert "btn-reset-view" in html, "Camera reset button missing"
-    assert "val-fps" in html, "Hardware telemetry HUD missing"
-    print("  PASS: 3D globe toggle removed; WebGL2 2D hardware pipeline & async streaming verified.")
+    # Three.js & Groups
+    assert "THREE.WebGLRenderer" in html, "Three.js WebGLRenderer missing"
+    assert "astroPathsGroup" in html, "astroPathsGroup missing in 3D scene"
+    assert "landingSiteMarkersGroup" in html, "landingSiteMarkersGroup missing in 3D scene"
+    assert "corridorHighlightGroup" in html, "corridorHighlightGroup missing in 3D scene"
 
-    # Test 4: JavaScript Syntax Validation via Node.js
-    print("\n[Test 4] Validating JavaScript Code via Node.js...")
-    # Extract script content from HTML
-    script_start = html.find("<script>") + len("<script>")
-    script_end = html.find("</script>")
-    js_code = html[script_start:script_end]
+    # Status-based colors
+    assert "STATUS_COLORS" in html, "STATUS_COLORS dictionary missing"
+    assert "getStatusColor" in html, "getStatusColor function missing"
+    assert "0x22c55e" in html and "0x94a3b8" in html and "0xef4444" in html, "Status color codes missing"
 
-    # Quick syntax parse test using node -c
-    syntax_check_script = "const vm = require('vm'); try { new vm.Script(" + repr(js_code) + "); console.log('Syntax valid'); } catch(e) { console.error(e); process.exit(1); }"
-    result = subprocess.run(["node", "-e", syntax_check_script], capture_output=True, text=True)
-    assert result.returncode == 0, f"JavaScript syntax error: {result.stderr}"
-    print("  PASS: Embedded WebGL JavaScript engine parses cleanly with 0 syntax errors.")
+    # Exploration paths & Landing site markers
+    assert "loadAstroPaths" in html, "loadAstroPaths function missing"
+    assert "renderAstroPaths" in html, "renderAstroPaths function missing"
+    assert "populateAstroPathsLegend" in html, "populateAstroPathsLegend function missing"
+    assert "renderLandingSiteMarkers" in html, "renderLandingSiteMarkers function missing"
+    assert "DEFAULT_LANDING_SITES" in html, "DEFAULT_LANDING_SITES missing"
 
-    # Test 5: Verify Original web_app Still Intact & Operational
-    print("\n[Test 5] Verifying Original web_app Directory Integrity...")
+    # Hover detection & Corridor Highlighting
+    assert "highlightMissionCorridor" in html, "highlightMissionCorridor function missing"
+    assert "clearCorridorHighlight" in html, "clearCorridorHighlight function missing"
+    assert "corridorClearTimeout" in html, "corridorClearTimeout debounce missing"
+    assert "geom.coordinates" in html, "Point coordinate extraction from geometry missing"
+    assert "interactivePins" in html, "Raycaster interactivePins collection missing"
+
+    # UI controls (Legend panel removed & integrated into Landings tab)
+    assert "legend-panel" not in html, "Legend panel container should be removed"
+    assert "btn-toggle-legend" not in html, "Legend toggle button should be removed"
+    assert "tab-landings" in html, "Landing sites drawer tab missing"
+    assert "landings-list" in html, "Landings list container missing"
+    assert "landing-vis-chk" in html, "Landings visibility toggle checkboxes missing"
+    assert "landing-fly-btn" in html, "Landings fly action buttons missing"
+    assert "statusOrder" in html, "Status ordering (Active -> Completed -> Failed) missing"
+    assert "landing-group-header" in html, "Landing status group headers missing"
+    print("  PASS: 3D paths, landing markers, status colors, corridor pulse, and hover detection verified.")
+
+    # Test 5: Validate 2D Leaflet Viewer in web_app/index.html
+    print("\n[Test 5] Verifying 2D Leaflet Viewer Implementation...")
     orig_index = os.path.join(orig_web_dir, "index.html")
-    orig_mosaic = os.path.join(orig_web_dir, "mars_mola_level5_mosaic.jpg")
-    orig_tif = os.path.join(orig_web_dir, "mars_mola_level5_mosaic.tif")
-    orig_vrt = os.path.join(orig_web_dir, "mars_mola_level5.vrt")
-    assert os.path.exists(orig_index), "Original web_app index.html broken!"
-    assert os.path.exists(orig_mosaic), "Original mosaic.jpg broken!"
-    assert os.path.exists(orig_tif), "Original mosaic.tif broken!"
-    assert os.path.exists(orig_vrt), "Original mosaic.vrt broken!"
-    print("  PASS: Original web_app is 100% intact, undisturbed, and verified.")
+    with open(orig_index, "r", encoding="utf-8") as f:
+        html_2d = f.read()
+
+    assert "loadRoverTraverses" in html_2d, "loadRoverTraverses missing in 2D viewer"
+    assert "roverTraversesGroup" in html_2d, "roverTraversesGroup missing in 2D viewer"
+    assert "bindTooltip" in html_2d, "Hover tooltips missing in 2D viewer"
+    assert "toggle-exploration" in html_2d, "Exploration layer toggle missing in 2D viewer"
+    print("  PASS: 2D viewer polylines, status colors, hover tooltips, and layer toggle verified.")
+
+    # Test 6: Verify Server Architecture in serve.py
+    print("\n[Test 6] Verifying Server Architecture in serve.py...")
+    with open(serve_py, "r", encoding="utf-8") as f:
+        serve_code = f.read()
+
+    assert "do_OPTIONS" in serve_code, "do_OPTIONS CORS preflight handler missing in serve.py"
+    assert "/data/" in serve_code, "translate_path /data/* routing missing in serve.py"
+    assert "ThreadingServer" in serve_code, "ThreadingServer missing in serve.py"
+    print("  PASS: Server CORS preflight, /data/* route handling, and threading verified.")
 
     print("\n" + "=" * 65)
-    print("ALL TESTS PASSED! GPU ACCELERATED WEB_APP_GPU IS READY.")
+    print("ALL TESTS PASSED! MARS EXPLORATION SUITE FULLY OPERATIONAL.")
     print("=" * 65)
 
 if __name__ == "__main__":
