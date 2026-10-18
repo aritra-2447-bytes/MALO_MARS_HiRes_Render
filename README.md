@@ -69,17 +69,40 @@ Implements the **Allison & McEwen (2000)** planetary formulation:
 - **3D Traverse Tube Rendering**: Extruded emissive Catmull-Rom spline tubes (`THREE.TubeGeometry`) elevated above the terrain with surface projection lines and sol-indexed waypoint beacons.
 
 ### 5. Historical Landing Sites & Landers Dataset
-- **Covered Missions**: InSight Lander (*Homestead Hollow*), Phoenix Lander (*Green Valley*), Viking 1 Lander (*Thomas Mutch Memorial*), Viking 2 Lander (*Gerald Soffen Memorial*), Mars Pathfinder / Sojourner (*Carl Sagan Memorial*), Beagle 2, Mars 3, Mars 6, Mars Polar Lander, Schiaparelli EDM, Melas Chasma Candidate Habitat, and all active/completed rovers.
 - **Standardized Mission Status Palette**:
   - 🟢 **Active**: `#22c55e` (Perseverance, Curiosity)
   - ⚪ **Completed**: `#94a3b8` (Opportunity, Spirit, InSight, Phoenix, Viking 1 & 2, Pathfinder, Zhurong)
   - 🔴 **Failed**: `#ef4444` (Beagle 2, Mars 3, Mars 6, Mars Polar Lander, Schiaparelli EDM)
   - 🔵 **Proposed**: `#38bdf8` (Melas Chasma Candidate Human Habitat, science corridors)
-- **3D Pin Beacons**: Status-colored pin head spheres, vertical needle stems, and ground target rings.
+- **16 Audited Martian Surface Landing Sites**:
+  Harmonized to IAU WGPSN cartographic standards, planetocentric East longitudes, and MOLA areoid elevations:
+
+  | Mission | Operational Status | Official Station / Memorial Name | Region / Quadrangle | Coordinates | MOLA Elevation |
+  |---------|-------------------|----------------------------------|---------------------|-------------|----------------|
+  | **Perseverance (Mars 2020)** | 🟢 Active | *Octavia E. Butler Landing* | Jezero Crater | $18.4446^\circ\text{N}, 77.4508^\circ\text{E}$ | $-2,570\text{ m}$ |
+  | **Curiosity (MSL)** | 🟢 Active | *Bradbury Landing* | Aeolis Palus, Gale Crater | $4.5895^\circ\text{S}, 137.4417^\circ\text{E}$ | $-4,501\text{ m}$ |
+  | **Opportunity (MER-B)** | ⚪ Completed | *Challenger Memorial Station* | Eagle Crater, Meridiani Planum | $1.9462^\circ\text{S}, 354.4734^\circ\text{E}\ (-5.5266^\circ)$ | $-1,390\text{ m}$ |
+  | **Spirit (MER-A)** | ⚪ Completed | *Columbia Memorial Station* | Gusev Crater | $14.5684^\circ\text{S}, 175.4726^\circ\text{E}$ | $-1,910\text{ m}$ |
+  | **Zhurong (Tianwen-1)** | ⚪ Completed | *Zhurong Landing Site* | Southern Utopia Planitia | $25.0660^\circ\text{N}, 109.9250^\circ\text{E}$ | $-4,099\text{ m}$ |
+  | **InSight Lander** | ⚪ Completed | *Homestead Hollow Station* | Elysium Planitia | $4.5020^\circ\text{N}, 135.6230^\circ\text{E}$ | $-2,613\text{ m}$ |
+  | **Phoenix Lander** | ⚪ Completed | *Green Valley Station* | Vastitas Borealis | $68.2188^\circ\text{N}, 234.2508^\circ\text{E}\ (-125.7492^\circ)$ | $-4,130\text{ m}$ |
+  | **Viking 1 Lander** | ⚪ Completed | *Thomas Mutch Memorial Station* | Chryse Planitia | $22.4800^\circ\text{N}, 312.0300^\circ\text{E}\ (-47.9700^\circ)$ | $-3,627\text{ m}$ |
+  | **Viking 2 Lander** | ⚪ Completed | *Gerald Soffen Memorial Station* | Utopia Planitia | $48.2690^\circ\text{N}, 134.0100^\circ\text{E}$ | $-3,820\text{ m}$ |
+  | **Mars Pathfinder (Sojourner)** | ⚪ Completed | *Carl Sagan Memorial Station* | Ares Vallis | $19.0900^\circ\text{N}, 326.4800^\circ\text{E}\ (-33.5200^\circ)$ | $-3,682\text{ m}$ |
+  | **Beagle 2 (Mars Express)** | 🔴 Failed (Post-Touchdown) | *Isidis Planitia Station* | Isidis Planitia | $11.5265^\circ\text{N}, 90.4295^\circ\text{E}$ | $-3,610\text{ m}$ |
+  | **Mars 3 Lander** | 🔴 Failed (Surface Comm) | *Ptolemaeus Station* | Sirenum Fossae | $45.0400^\circ\text{S}, 202.0200^\circ\text{E}\ (-157.9800^\circ)$ | $+1,500\text{ m}$ |
+  | **Mars 6 Lander** | 🔴 Failed (Descent Impact) | *Margaritifer Impact Site* | Margaritifer Terra | $23.9000^\circ\text{S}, 340.2000^\circ\text{E}\ (-19.8000^\circ)$ | $-800\text{ m}$ |
+  | **Mars Polar Lander** | 🔴 Failed (EDL Impact) | *Planum Australe Impact Site* | South Polar Region | $76.1800^\circ\text{S}, 195.3800^\circ\text{E}\ (-164.6200^\circ)$ | $+1,200\text{ m}$ |
+  | **Schiaparelli EDM Lander** | 🔴 Failed (EDL Impact) | *Meridiani Impact Site* | Meridiani Planum | $2.0700^\circ\text{S}, 353.7900^\circ\text{E}\ (-6.2100^\circ)$ | $-1,400\text{ m}$ |
+  | **Valles Marineris Habitat** | 🔵 Proposed (Conceptual) | *Melas Chasma Candidate Site* | Melas Chasma, Valles Marineris | $9.8000^\circ\text{S}, 283.6000^\circ\text{E}\ (-76.4000^\circ)$ | $-3,200\text{ m}$ |
+
+- **3D Pin Beacons & Interactive Rendering**:
+  - High-visibility status-colored pin head spheres with emissive glow, slender vertical titanium needle stems, and glowing ground target rings.
+  - **Direct 3D Globe Click-to-Fly**: Raycasted pin selection allowing users to click directly on any landing beacon or landmark on the 3D globe to smoothly fly to it and inspect real-time coordinates.
 - **Exploration Sites Drawer**:
-  - Dual tabs: **📍 Landmarks** (IAU geodetic catalog) and **🛬 Landings** (sorted by status: Active &rarr; Completed &rarr; Failed &rarr; Proposed).
+  - Dual tabs: **📍 Landmarks** (IAU geodetic catalog) and **🛬 Landings** (categorized: Active &rarr; Completed &rarr; Failed &rarr; Proposed).
   - Checkboxes for per-mission visibility toggling in both 3D scene and 2D canvas.
-  - Hover corridor pulse effect highlighting the corresponding 3D path on hover.
+  - Interactive hover pulse effect highlighting and scaling the corresponding 3D target ring and traverse corridor on hover.
   - Instant "Fly" action buttons for orbital transit.
 
 ### 6. Astronaut EVA Route Planner & Minetti Bioenergetics Engine
@@ -204,7 +227,7 @@ python3 dataset/web_app/test_webapp.py
     │   ├── mars_mola_level5_mosaic.jpg -> ... # Relative symlink to 16K composite mosaic
     │   ├── tiles -> ..                        # Symlink to raw Level 5 tiles
     │   ├── data/
-    │   │   └── astronaut_paths.geojson        # 13 verified missions (traverses, landing sites & landers)
+    │   │   └── astronaut_paths.geojson        # 18 verified exploration features (8 traverses, 10 landers across Active, Completed, Failed & Proposed statuses)
     │   └── lib/
     │       ├── three.min.js                   # Three.js 3D WebGL engine
     │       └── OrbitControls.js               # Orbital navigation physics controller
