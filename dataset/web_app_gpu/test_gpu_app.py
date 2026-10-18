@@ -41,22 +41,23 @@ def run_tests():
     print("  PASS: All 2,048 tiles (5_0_0.jpg through 5_31_63.jpg) verified accessible.")
 
     # Test 3: GeoJSON Exploration Dataset Verification
-    print("\n[Test 3] Verifying GeoJSON Exploration Dataset (13 Features)...")
+    print("\n[Test 3] Verifying GeoJSON Exploration Dataset (18 Features)...")
     with open(geojson_gpu, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     assert data.get("type") == "FeatureCollection", "Dataset must be a FeatureCollection"
     features = data.get("features", [])
-    assert len(features) == 13, f"Expected 13 features in dataset, found {len(features)}"
+    assert len(features) == 18, f"Expected 18 features in dataset, found {len(features)}"
 
     statuses = {f["properties"].get("status") for f in features}
     assert "Active" in statuses, "Missing 'Active' status missions"
     assert "Completed" in statuses, "Missing 'Completed' status missions"
     assert "Failed" in statuses, "Missing 'Failed' status missions"
+    assert "Proposed" in statuses, "Missing 'Proposed' status missions"
 
     point_count = sum(1 for f in features if f["geometry"]["type"] == "Point")
     linestring_count = sum(1 for f in features if f["geometry"]["type"] == "LineString")
-    assert point_count >= 5, f"Expected at least 5 Point features, got {point_count}"
+    assert point_count >= 10, f"Expected at least 10 Point features, got {point_count}"
     assert linestring_count >= 8, f"Expected 8 LineString traverse features, got {linestring_count}"
 
     for f in features:
@@ -68,7 +69,7 @@ def run_tests():
             assert len(coords) >= 2, f"Invalid Point coordinate format in {props['name']}"
         elif geom["type"] == "LineString":
             assert len(coords) >= 2, f"LineString requires >= 2 points in {props['name']}"
-    print(f"  PASS: 13 features verified (8 traverses, 5 landers) across Active, Completed, and Failed statuses.")
+    print(f"  PASS: 18 features verified (8 traverses, 10 landers) across Active, Completed, Failed, and Proposed statuses.")
 
     # Test 4: Validate 3D Viewer Implementation in index.html
     print("\n[Test 4] Verifying 3D Viewer Implementation in index.html...")

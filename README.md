@@ -20,9 +20,9 @@ Compared to the base repository ([`aritra-2447-bytes/MALO_MARS_HiRes_Render`](ht
 | **Mars Telemetry & Time** | None | **Live Mars Sol Date (MSD)**, Coordinated Mars Time (MTC), Solar Longitude ($L_s$), and Solar Irradiance |
 | **Rover Traverses** | None | **Real-time & historical waypoints** for Perseverance, Curiosity, Opportunity, Spirit & Zhurong |
 | **NASA Live MMGIS Feed** | None | **Live JPL MMGIS API streaming** (`M20_waypoints.json`, `MSL_waypoints.json`) with continuous drive polylines |
-| **Landing Sites & Landers** | None | **9 historical & active landing sites** with 3D pin beacons, needle stems, and ground target rings |
+| **Landing Sites & Landers** | None | **16 audited active, completed, failed & proposed landing sites** with 3D pin beacons, needle stems, and ground target rings |
 | **Exploration Sites Drawer** | Simple waypoint list | **Dual-tab drawer (📍 Landmarks / 🛬 Landings)** with status grouping, visibility toggles & hover corridor pulse |
-| **Status Standardization** | Inconsistent | **Standardized color system**: 🟢 Active (`#22c55e`), ⚪ Completed (`#94a3b8`), 🔴 Failed (`#ef4444`) |
+| **Status Standardization** | Inconsistent | **Standardized 4-tier color system**: 🟢 Active (`#22c55e`), ⚪ Completed (`#94a3b8`), 🔴 Failed (`#ef4444`), 🔵 Proposed (`#38bdf8`) |
 | **Astronaut EVA Route Planner** | None | **Great-Circle spherical router** with MOLA laser altimetry elevation profiling and hazard detection |
 | **Bioenergetics Engine** | None | **Minetti Metabolic Cost Model** adapted for Mars 0.38g gravity, suit mass & walkback envelope |
 | **NASA PDS API Integration** | None | **Direct proxy to NASA PDS ODE REST API** (CTX, HiRISE, CRISM) and **GDS MOLA altimetry** |
@@ -60,23 +60,24 @@ Implements the **Allison & McEwen (2000)** planetary formulation:
 - **Authoritative Waypoint History**: Full traverse profiles with sol counters, elevation, and odometry:
   - **Perseverance (Mars 2020)**: Jezero Crater (Octavia E. Butler Landing, Séítah Dunes, Kodiak Butte, Hawksbill Gap, Neretva Vallis, Belva Crater Rim)
   - **Curiosity (MSL)**: Gale Crater (Bradbury Landing, Yellowknife Bay, Bagnold Dunes, Vera Rubin Ridge, Sulfate-Bearing Valley, Gediz Vallis)
-  - **Opportunity (MER-B)**: Meridiani Planum (Eagle Crater, Fram Crater, Purgatory Dune, Victoria Crater, Cape York, Perseverance Valley)
-  - **Spirit (MER-A)**: Gusev Crater (Columbia Memorial, Bonneville Crater, West Spur, Husband Hill Summit, Home Plate, Troy Silica Sands)
-  - **Zhurong (Tianwen-1)**: Utopia Planitia
+  - **Opportunity (MER-B)**: Meridiani Planum (Challenger Memorial Station, Eagle Crater, Fram Crater, Purgatory Dune, Victoria Crater, Cape York, Perseverance Valley)
+  - **Spirit (MER-A)**: Gusev Crater (Columbia Memorial Station, Bonneville Crater, West Spur, Husband Hill Summit, Home Plate, Troy Silica Sands)
+  - **Zhurong (Tianwen-1)**: Southern Utopia Planitia
 - **Live NASA JPL MMGIS Feed Integration**:
   - Automatically queries live GeoJSON feeds (`M20_waypoints.json`, `M20_traverse.json`, `MSL_waypoints.json`, `MSL_traverse.json`).
   - Downsamples 36,000+ continuous drive vertices into smooth 3D paths with automatic fallback to verified PDS baselines when offline.
 - **3D Traverse Tube Rendering**: Extruded emissive Catmull-Rom spline tubes (`THREE.TubeGeometry`) elevated above the terrain with surface projection lines and sol-indexed waypoint beacons.
 
 ### 5. Historical Landing Sites & Landers Dataset
-- **Covered Missions**: InSight Lander, Phoenix Lander, Viking 1 Lander, Viking 2 Lander, Beagle 2, and all rovers.
+- **Covered Missions**: InSight Lander (*Homestead Hollow*), Phoenix Lander (*Green Valley*), Viking 1 Lander (*Thomas Mutch Memorial*), Viking 2 Lander (*Gerald Soffen Memorial*), Mars Pathfinder / Sojourner (*Carl Sagan Memorial*), Beagle 2, Mars 3, Mars 6, Mars Polar Lander, Schiaparelli EDM, Melas Chasma Candidate Habitat, and all active/completed rovers.
 - **Standardized Mission Status Palette**:
   - 🟢 **Active**: `#22c55e` (Perseverance, Curiosity)
-  - ⚪ **Completed**: `#94a3b8` (Opportunity, Spirit, InSight, Phoenix, Viking 1 & 2, Zhurong)
-  - 🔴 **Failed**: `#ef4444` (Beagle 2)
+  - ⚪ **Completed**: `#94a3b8` (Opportunity, Spirit, InSight, Phoenix, Viking 1 & 2, Pathfinder, Zhurong)
+  - 🔴 **Failed**: `#ef4444` (Beagle 2, Mars 3, Mars 6, Mars Polar Lander, Schiaparelli EDM)
+  - 🔵 **Proposed**: `#38bdf8` (Melas Chasma Candidate Human Habitat, science corridors)
 - **3D Pin Beacons**: Status-colored pin head spheres, vertical needle stems, and ground target rings.
 - **Exploration Sites Drawer**:
-  - Dual tabs: **📍 Landmarks** (IAU geodetic catalog) and **🛬 Landings** (sorted by status: Active &rarr; Completed &rarr; Failed).
+  - Dual tabs: **📍 Landmarks** (IAU geodetic catalog) and **🛬 Landings** (sorted by status: Active &rarr; Completed &rarr; Failed &rarr; Proposed).
   - Checkboxes for per-mission visibility toggling in both 3D scene and 2D canvas.
   - Hover corridor pulse effect highlighting the corresponding 3D path on hover.
   - Instant "Fly" action buttons for orbital transit.
