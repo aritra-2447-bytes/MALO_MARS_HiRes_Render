@@ -441,6 +441,12 @@
       border: 1px solid rgba(239, 68, 68, 0.4);
     }
 
+    .status-pill.proposed {
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
     .legend-color-dot {
       width: 8px;
       height: 8px;
@@ -1139,21 +1145,23 @@
       },
       {
         "id": "jezero_crater",
-        "name": "Jezero Crater (Perseverance / Ingenuity)",
-        "lat": 18.38,
-        "lon": 77.58,
-        "elevation_m": -2540,
+        "name": "Jezero Crater (Octavia E. Butler Landing)",
+        "lat": 18.4446,
+        "lon": 77.4508,
+        "elevation_m": -2570,
         "category": "landing_site",
-        "description": "Paleolake river delta. Site of Mars 2020 rover and sample caching."
+        "station_name": "Octavia E. Butler Landing",
+        "description": "Paleolake river delta. Touchdown site: Octavia E. Butler Landing (Mars 2020)."
       },
       {
         "id": "gale_crater",
-        "name": "Gale Crater (Curiosity Rover)",
-        "lat": -4.59,
-        "lon": 137.44,
-        "elevation_m": -4450,
+        "name": "Gale Crater (Bradbury Landing)",
+        "lat": -4.5895,
+        "lon": 137.4417,
+        "elevation_m": -4501,
         "category": "landing_site",
-        "description": "Mount Sharp (Aeolis Mons) sedimentary sequence exploring past habitability."
+        "station_name": "Bradbury Landing",
+        "description": "Bradbury Landing touchdown site in Aeolis Palus, Mount Sharp sedimentary sequence."
       },
       {
         "id": "planum_boreum",
@@ -1193,21 +1201,23 @@
       },
       {
         "id": "meridiani_planum",
-        "name": "Meridiani Planum (Opportunity Rover)",
-        "lat": -1.95,
-        "lon": -5.53,
-        "elevation_m": -1400,
+        "name": "Meridiani Planum (Challenger Memorial Station)",
+        "lat": -1.9462,
+        "lon": -5.5266,
+        "elevation_m": -1390,
         "category": "landing_site",
-        "description": "Hematite-rich plain revealing past surface water in sedimentary rocks."
+        "station_name": "Challenger Memorial Station",
+        "description": "Challenger Memorial Station at Eagle Crater; hematite-rich plain revealing past surface water."
       },
       {
         "id": "gusev_crater",
-        "name": "Gusev Crater (Spirit Rover)",
-        "lat": -14.57,
-        "lon": 175.47,
-        "elevation_m": -1930,
+        "name": "Gusev Crater (Columbia Memorial Station)",
+        "lat": -14.5684,
+        "lon": 175.4726,
+        "elevation_m": -1910,
         "category": "landing_site",
-        "description": "Columbia Hills exploration site connected to ancient Ma'adim Vallis."
+        "station_name": "Columbia Memorial Station",
+        "description": "Columbia Memorial Station exploration site connected to ancient Ma'adim Vallis."
       }
     ];
 
@@ -1314,7 +1324,8 @@
     const STATUS_COLORS = {
       'Active': 0x22c55e,      // Emerald green
       'Completed': 0x94a3b8,   // Slate gray
-      'Failed': 0xef4444       // Red
+      'Failed': 0xef4444,      // Red
+      'Proposed': 0x38bdf8     // Cyan
     };
 
     function getStatusColor(status) {
@@ -1324,20 +1335,28 @@
     function getStatusColorHexStr(status) {
       if (status === 'Active') return '#22c55e';
       if (status === 'Failed') return '#ef4444';
+      if (status === 'Proposed') return '#38bdf8';
       return '#94a3b8';
     }
 
-    // --- Landing Site Markers (9 Historical / Active Missions) ---
+    // --- Landing Site Markers (Audited Active, Completed, Failed & Proposed Missions) ---
     const DEFAULT_LANDING_SITES = [
-      { id: "m20_perseverance", name: "Perseverance (Mars 2020)", site: "Jezero Crater", lat: 18.380, lon: 77.580, elevation_m: -2540, status: "Active", type: "rover", year: 2021, agency: "NASA" },
-      { id: "msl_curiosity", name: "Curiosity (MSL)", site: "Gale Crater", lat: -4.589, lon: 137.441, elevation_m: -4450, status: "Active", type: "rover", year: 2012, agency: "NASA" },
-      { id: "mer_opportunity", name: "Opportunity (MER-B)", site: "Meridiani Planum", lat: -1.946, lon: -5.530, elevation_m: -1400, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
-      { id: "mer_spirit", name: "Spirit (MER-A)", site: "Gusev Crater", lat: -14.568, lon: 175.473, elevation_m: -1930, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
-      { id: "cnsa_zhurong", name: "Zhurong (Tianwen-1)", site: "Utopia Planitia", lat: 25.066, lon: 109.925, elevation_m: -4100, status: "Completed", type: "rover", year: 2021, agency: "CNSA" },
-      { id: "insight_lander", name: "InSight Lander", site: "Elysium Planitia", lat: 4.502, lon: 135.623, elevation_m: -2613, status: "Completed", type: "lander", year: 2018, agency: "NASA" },
-      { id: "phoenix_landing_site", name: "Phoenix Lander", site: "Vastitas Borealis", lat: 68.219, lon: -125.750, elevation_m: -3500, status: "Completed", type: "lander", year: 2008, agency: "NASA" },
-      { id: "viking1_lander", name: "Viking 1 Lander", site: "Chryse Planitia", lat: 22.480, lon: -47.970, elevation_m: -2690, status: "Completed", type: "lander", year: 1976, agency: "NASA" },
-      { id: "viking2_lander", name: "Viking 2 Lander", site: "Utopia Planitia", lat: 48.269, lon: 134.010, elevation_m: -4230, status: "Completed", type: "lander", year: 1976, agency: "NASA" }
+      { id: "m20_perseverance", name: "Perseverance (Mars 2020)", station: "Octavia E. Butler Landing", site: "Octavia E. Butler Landing, Jezero Crater", lat: 18.4446, lon: 77.4508, elevation_m: -2570, status: "Active", type: "rover", year: 2021, agency: "NASA" },
+      { id: "msl_curiosity", name: "Curiosity (MSL)", station: "Bradbury Landing", site: "Bradbury Landing, Aeolis Palus, Gale Crater", lat: -4.5895, lon: 137.4417, elevation_m: -4501, status: "Active", type: "rover", year: 2012, agency: "NASA" },
+      { id: "mer_opportunity", name: "Opportunity (MER-B)", station: "Challenger Memorial Station", site: "Challenger Memorial Station, Eagle Crater, Meridiani Planum", lat: -1.9462, lon: -5.5266, elevation_m: -1390, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
+      { id: "mer_spirit", name: "Spirit (MER-A)", station: "Columbia Memorial Station", site: "Columbia Memorial Station, Gusev Crater", lat: -14.5684, lon: 175.4726, elevation_m: -1910, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
+      { id: "cnsa_zhurong", name: "Zhurong (Tianwen-1)", station: "Zhurong Landing Site", site: "Southern Utopia Planitia", lat: 25.0660, lon: 109.9250, elevation_m: -4099, status: "Completed", type: "rover", year: 2021, agency: "CNSA" },
+      { id: "insight_lander", name: "InSight Lander", station: "Homestead Hollow Station", site: "Homestead Hollow Station, Elysium Planitia", lat: 4.5020, lon: 135.6230, elevation_m: -2613, status: "Completed", type: "lander", year: 2018, agency: "NASA" },
+      { id: "phoenix_landing_site", name: "Phoenix Lander", station: "Green Valley Station", site: "Green Valley Station, Vastitas Borealis", lat: 68.2188, lon: -125.7492, elevation_m: -4130, status: "Completed", type: "lander", year: 2008, agency: "NASA" },
+      { id: "viking1_lander", name: "Viking 1 Lander", station: "Thomas Mutch Memorial Station", site: "Thomas Mutch Memorial Station, Chryse Planitia", lat: 22.4800, lon: -47.9700, elevation_m: -3627, status: "Completed", type: "lander", year: 1976, agency: "NASA" },
+      { id: "viking2_lander", name: "Viking 2 Lander", station: "Gerald Soffen Memorial Station", site: "Gerald Soffen Memorial Station, Utopia Planitia", lat: 48.2690, lon: 134.0100, elevation_m: -3820, status: "Completed", type: "lander", year: 1976, agency: "NASA" },
+      { id: "pathfinder_sojourner", name: "Mars Pathfinder (Sojourner)", station: "Carl Sagan Memorial Station", site: "Carl Sagan Memorial Station, Ares Vallis", lat: 19.0900, lon: -33.5200, elevation_m: -3682, status: "Completed", type: "lander", year: 1997, agency: "NASA" },
+      { id: "beagle2_lander", name: "Beagle 2 (Mars Express)", station: "Isidis Planitia Station", site: "Isidis Planitia Station, Isidis Planitia", lat: 11.5265, lon: 90.4295, elevation_m: -3610, status: "Failed", type: "lander", year: 2003, agency: "ESA" },
+      { id: "mars_3_lander", name: "Mars 3 Lander", station: "Ptolemaeus Station", site: "Ptolemaeus Station, Sirenum Fossae", lat: -45.0400, lon: -157.9800, elevation_m: 1500, status: "Failed", type: "lander", year: 1971, agency: "USSR" },
+      { id: "mars_6_lander", name: "Mars 6 Lander", station: "Margaritifer Impact Site", site: "Margaritifer Impact Site, Margaritifer Terra", lat: -23.9000, lon: -19.8000, elevation_m: -800, status: "Failed", type: "lander", year: 1974, agency: "USSR" },
+      { id: "mars_polar_lander", name: "Mars Polar Lander", station: "Planum Australe Impact Site", site: "Planum Australe Impact Site, South Polar Region", lat: -76.1800, lon: -164.6200, elevation_m: 1200, status: "Failed", type: "lander", year: 1999, agency: "NASA" },
+      { id: "schiaparelli_edm", name: "Schiaparelli EDM Lander", station: "Meridiani Impact Site", site: "Meridiani Impact Site, Meridiani Planum", lat: -2.0700, lon: -6.2100, elevation_m: -1400, status: "Failed", type: "lander", year: 2016, agency: "ESA" },
+      { id: "valles_marineris_habitat", name: "Valles Marineris Human Habitat", station: "Melas Chasma Candidate Site", site: "Melas Chasma Candidate Site, Valles Marineris", lat: -9.8000, lon: -76.4000, elevation_m: -3200, status: "Proposed", type: "concept", year: 2035, agency: "NASA/Concept" }
     ];
 
     function renderLandingSiteMarkers(sites) {
@@ -1358,34 +1377,35 @@
 
         const beaconGroup = new THREE.Group();
 
-        // 1. Pin Head (Status-colored)
-        const headGeo = new THREE.SphereGeometry(0.0022, 16, 16);
+        // 1. High-Fidelity Status-Colored Pin Head Sphere
+        const headGeo = new THREE.SphereGeometry(0.0055, 16, 16);
         const headMat = new THREE.MeshStandardMaterial({
           color: colorHex,
           emissive: colorHex,
-          emissiveIntensity: 0.5,
-          roughness: 0.3
+          emissiveIntensity: 0.75,
+          roughness: 0.25,
+          metalness: 0.2
         });
         const pinHead = new THREE.Mesh(headGeo, headMat);
-        const pinHeight = 0.007;
+        const pinHeight = 0.014;
         pinHead.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
         beaconGroup.add(pinHead);
 
-        // 2. Needle Stem
-        const stemGeo = new THREE.CylinderGeometry(0.0002, 0.0002, pinHeight, 8);
+        // 2. High-Contrast Slender White Stem
+        const stemGeo = new THREE.CylinderGeometry(0.00045, 0.00045, pinHeight, 8);
         const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const stem = new THREE.Mesh(stemGeo, stemMat);
         stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
         stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
         beaconGroup.add(stem);
 
-        // 3. Ground Target Ring (Status-colored)
-        const ringGeo = new THREE.RingGeometry(0.0035, 0.006, 32);
+        // 3. Ground Target Ring
+        const ringGeo = new THREE.RingGeometry(0.005, 0.009, 32);
         const ringMat = new THREE.MeshBasicMaterial({
           color: colorHex,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.75
+          opacity: 0.85
         });
         const ring = new THREE.Mesh(ringGeo, ringMat);
         ring.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
@@ -1394,70 +1414,83 @@
 
         const siteData = {
           type: 'lander',
+          id: site.id,
           missionId: site.id,
           name: site.name,
+          station_name: site.station,
           site: site.site,
           lat: site.lat,
           lon: site.lon,
           elevation_m: site.elevation_m || 0,
           status: site.status,
-          category: 'LANDING SITE',
-          description: `${site.site} • ${site.agency || 'NASA'} (${site.year || ''}) • Status: ${site.status}`
+          category: site.type === 'concept' ? 'CONCEPTUAL HUMAN SITE' : (site.type === 'rover' ? 'ROVER LANDING SITE' : 'LANDER TOUCHDOWN SITE'),
+          description: `${site.station ? site.station + ' • ' : ''}${site.site} • ${site.agency || 'NASA'} (${site.year || ''}) • Status: ${site.status}`
         };
 
         beaconGroup.userData = siteData;
         pinHead.userData = siteData;
         ring.userData = siteData;
 
+        beaconGroup.visible = featureVisibility[site.id] !== false;
         window.landingSiteMarkersGroup.add(beaconGroup);
       });
     }
 
     const featureVisibility = {};
 
+    function highlightLandingMarker(missionId) {
+      if (!window.landingSiteMarkersGroup) return;
+      window.landingSiteMarkersGroup.children.forEach(group => {
+        if (group.userData?.missionId === missionId || group.userData?.id === missionId) {
+          group.children.forEach(mesh => {
+            if (mesh.geometry instanceof THREE.RingGeometry) {
+              mesh.scale.set(1.5, 1.5, 1.5);
+            } else if (mesh.geometry instanceof THREE.SphereGeometry) {
+              mesh.scale.set(1.3, 1.3, 1.3);
+            }
+          });
+        }
+      });
+    }
+
+    function resetLandingMarkersScale() {
+      if (!window.landingSiteMarkersGroup) return;
+      window.landingSiteMarkersGroup.children.forEach(group => {
+        group.children.forEach(mesh => {
+          mesh.scale.set(1.0, 1.0, 1.0);
+        });
+      });
+    }
+
     function renderDrawerLandings(inputData) {
       const listContainer = document.getElementById('landings-list');
-      if (!listContainer || !inputData) return;
+      if (!listContainer) return;
       listContainer.innerHTML = '';
 
-      let items = [];
-      if (inputData.features) {
-        items = inputData.features.map(f => {
+      // Always maintain the complete audited 16 landing sites from DEFAULT_LANDING_SITES
+      let items = DEFAULT_LANDING_SITES.map(s => ({ ...s }));
+
+      // If GeoJSON exploration dataset or live telemetry is provided, enrich rover odometry and durations
+      if (inputData && inputData.features) {
+        inputData.features.forEach(f => {
           const props = f.properties || {};
-          const geom = f.geometry || {};
-          let lat = props.lat;
-          let lon = props.lon;
-          if (lat === undefined || lon === undefined) {
-            if (geom.type === 'Point' && Array.isArray(geom.coordinates)) {
-              lon = geom.coordinates[0];
-              lat = geom.coordinates[1];
-            } else if (geom.coordinates && geom.coordinates[0]) {
-              lon = geom.coordinates[0][0];
-              lat = geom.coordinates[0][1];
-            }
+          const matched = items.find(it => it.id === props.id);
+          if (matched) {
+            if (props.total_odometry_km) matched.total_odometry_km = props.total_odometry_km;
+            else if (props.total_distance_km) matched.total_odometry_km = props.total_distance_km;
+            if (props.sol_range) matched.sol_range = props.sol_range;
+            if (props.description) matched.description = props.description;
           }
-          const defaultSite = DEFAULT_LANDING_SITES.find(s => s.id === props.id);
-          return {
-            id: props.id,
-            name: props.name,
-            status: props.status || 'Active',
-            type: props.type || (geom.type === 'Point' ? 'lander' : 'rover_traverse'),
-            site: props.landing_site || defaultSite?.site || '',
-            lat: Number(lat || 0),
-            lon: Number(lon || 0),
-            elevation_m: props.elevation_m !== undefined ? props.elevation_m : (defaultSite?.elevation_m || 0),
-            agency: defaultSite?.agency || props.agency || '',
-            year: defaultSite?.year || props.year || '',
-            total_odometry_km: props.total_odometry_km || props.total_distance_km,
-            description: props.description || defaultSite?.description || ''
-          };
         });
       } else if (Array.isArray(inputData)) {
-        items = [...inputData];
+        inputData.forEach(entry => {
+          const matched = items.find(it => it.id === entry.id);
+          if (matched) Object.assign(matched, entry);
+        });
       }
 
-      // Sort order: 1. Active, 2. Completed, 3. Failed
-      const statusOrder = { 'Active': 1, 'Completed': 2, 'Failed': 3 };
+      // Sort order: 1. Active, 2. Completed, 3. Failed, 4. Proposed
+      const statusOrder = { 'Active': 1, 'Completed': 2, 'Failed': 3, 'Proposed': 4 };
       items.sort((a, b) => {
         const orderA = statusOrder[a.status] || 99;
         const orderB = statusOrder[b.status] || 99;
@@ -1479,12 +1512,13 @@
         const card = document.createElement('div');
         card.className = 'landing-card';
         card.dataset.missionId = item.id;
-        const statusClass = item.status === 'Active' ? 'active' : (item.status === 'Failed' ? 'failed' : 'completed');
+        const statusClass = item.status === 'Active' ? 'active' : (item.status === 'Failed' ? 'failed' : (item.status === 'Proposed' ? 'proposed' : 'completed'));
         const statusHex = getStatusColorHexStr(item.status);
         const isChecked = featureVisibility[item.id] !== false;
 
         let subParts = [];
-        if (item.site) subParts.push(item.site);
+        if (item.station) subParts.push(item.station);
+        else if (item.site) subParts.push(item.site);
         if (item.total_odometry_km) subParts.push(`${item.total_odometry_km} km`);
         subParts.push(`${Number(item.lat).toFixed(2)}°, ${Number(item.lon).toFixed(2)}°`);
         if (item.elevation_m !== undefined) subParts.push(`${Number(item.elevation_m).toLocaleString()} m`);
@@ -1512,19 +1546,19 @@
           const visible = e.target.checked;
           featureVisibility[item.id] = visible;
 
-          // Toggle 3D astroPathsGroup
+          // Toggle 3D astroPathsGroup (tubes & paths)
           if (window.astroPathsGroup) {
             astroPathsGroup.children.forEach(child => {
-              if (child.userData?.missionId === item.id || child.userData?.feature?.properties?.id === item.id) {
+              if (child.userData?.missionId === item.id || child.userData?.id === item.id || child.userData?.feature?.properties?.id === item.id) {
                 child.visible = visible;
               }
             });
           }
 
-          // Toggle 3D landingSiteMarkersGroup
+          // Toggle 3D landingSiteMarkersGroup (beacons)
           if (window.landingSiteMarkersGroup) {
             landingSiteMarkersGroup.children.forEach(child => {
-              if (child.userData?.id === item.id || child.userData?.site === item.id) {
+              if (child.userData?.missionId === item.id || child.userData?.id === item.id) {
                 child.visible = visible;
               }
             });
@@ -1552,14 +1586,16 @@
         card.querySelector('.landing-info-action').onclick = flyAction;
         card.querySelector('.landing-fly-btn').onclick = flyAction;
 
-        // Hover corridor highlight
+        // Hover corridor & marker highlight
         card.onmouseenter = () => {
           if (featureVisibility[item.id] !== false) {
             highlightMissionCorridor(item.id, item.status);
+            highlightLandingMarker(item.id);
           }
         };
         card.onmouseleave = () => {
           clearCorridorHighlight();
+          resetLandingMarkersScale();
         };
 
         listContainer.appendChild(card);
@@ -1648,65 +1684,10 @@
             astroPathsGroup.add(lineMesh);
           }
         } else if (geom.type === 'Point' && Array.isArray(geom.coordinates) && geom.coordinates.length >= 2) {
-          // Lander marker (pin + stem + ring) using status color
+          // Point coordinates extracted from geometry; authoritative 3D beacons are rendered by renderLandingSiteMarkers(DEFAULT_LANDING_SITES)
           const lon = geom.coordinates[0];
           const lat = geom.coordinates[1];
           const elev = geom.coordinates.length >= 3 ? geom.coordinates[2] : (props.elevation_m || 0);
-          const pos = latLonToVector3(lat, lon, MARS_RADIUS * 1.0015);
-          const normal = pos.clone().normalize();
-          const markerColor = getStatusColor(props.status);
-
-          const landerGroup = new THREE.Group();
-
-          const headGeo = new THREE.SphereGeometry(0.0022, 16, 16);
-          const headMat = new THREE.MeshStandardMaterial({
-            color: markerColor,
-            emissive: markerColor,
-            emissiveIntensity: 0.5,
-            roughness: 0.3
-          });
-          const pinHead = new THREE.Mesh(headGeo, headMat);
-          const pinHeight = 0.007;
-          pinHead.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
-          landerGroup.add(pinHead);
-
-          const stemGeo = new THREE.CylinderGeometry(0.0002, 0.0002, pinHeight, 8);
-          const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-          const stem = new THREE.Mesh(stemGeo, stemMat);
-          stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
-          stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
-          landerGroup.add(stem);
-
-          const ringGeo = new THREE.RingGeometry(0.003, 0.005, 32);
-          const ringMat = new THREE.MeshBasicMaterial({
-            color: markerColor,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: 0.75
-          });
-          const ring = new THREE.Mesh(ringGeo, ringMat);
-          ring.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
-          ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
-          landerGroup.add(ring);
-
-          const dataObj = {
-            feature,
-            type: 'lander',
-            missionId: props.id,
-            name: props.name,
-            status: props.status,
-            lat: lat,
-            lon: lon,
-            elevation_m: elev,
-            category: props.type ? props.type.toUpperCase() : 'LANDER',
-            description: props.description || (props.landing_site ? `Landing Site: ${props.landing_site}` : `${props.name} Landing Site`)
-          };
-
-          landerGroup.userData = dataObj;
-          pinHead.userData = dataObj;
-          ring.userData = dataObj;
-
-          astroPathsGroup.add(landerGroup);
         }
       });
     }
@@ -1720,6 +1701,7 @@
     let hoveredMissionId = null;
 
     function clearCorridorHighlight() {
+      resetLandingMarkersScale();
       while (corridorHighlightGroup.children.length > 0) {
         const mesh = corridorHighlightGroup.children[0];
         if (mesh.geometry) mesh.geometry.dispose();
@@ -2146,7 +2128,7 @@
           tooltip.style.display = 'block';
           renderer.domElement.style.cursor = 'pointer';
 
-          // Trigger dynamic corridor highlighting on hover
+          // Trigger dynamic corridor & marker highlighting on hover
           const mId = displayData.missionId || (userData.feature ? userData.feature.properties?.id : null);
           if (mId) {
             if (window.corridorClearTimeout) {
@@ -2156,6 +2138,7 @@
             if (hoveredMissionId !== mId) {
               hoveredMissionId = mId;
               highlightMissionCorridor(mId, displayData.status);
+              highlightLandingMarker(mId);
             }
           }
         }
@@ -2170,6 +2153,59 @@
             clearCorridorHighlight();
             hoveredMissionId = null;
           }, 300);
+        }
+      }
+    });
+
+    // --- Click to Select & Fly to 3D Pin (Landmark or Landing Site) ---
+    let pointerDownPos = { x: 0, y: 0 };
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      pointerDownPos.x = e.clientX;
+      pointerDownPos.y = e.clientY;
+    });
+
+    renderer.domElement.addEventListener('pointerup', (e) => {
+      if (appMode !== '3D') return;
+      // Do not trigger click if user dragged to rotate the globe
+      const dragDist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+      if (dragDist > 6) return;
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+
+      const clickablePins = [];
+      markersGroup.traverse(child => {
+        if (child.isMesh && child.userData && child.userData.name) clickablePins.push(child);
+      });
+      if (window.landingSiteMarkersGroup) {
+        window.landingSiteMarkersGroup.traverse(child => {
+          if (child.isMesh && (child.userData?.type === 'lander' || child.userData?.name)) clickablePins.push(child);
+        });
+      }
+      if (astroPathsGroup) {
+        astroPathsGroup.traverse(child => {
+          if (child.isMesh && (child.userData?.type === 'traverse_tube' || child.userData?.feature)) clickablePins.push(child);
+        });
+      }
+
+      const hits = raycaster.intersectObjects(clickablePins);
+      if (hits.length > 0) {
+        const hitObj = hits[0].object;
+        const u = hitObj.userData || {};
+        let lat = u.lat, lon = u.lon, elev = u.elevation_m;
+        if (u.feature) {
+          const p = u.feature.properties || {};
+          const g = u.feature.geometry || {};
+          lat = p.lat !== undefined ? p.lat : (g.coordinates ? g.coordinates[1] : 0);
+          lon = p.lon !== undefined ? p.lon : (g.coordinates ? g.coordinates[0] : 0);
+          elev = p.elevation_m !== undefined ? p.elevation_m : (g.coordinates && g.coordinates[2] ? g.coordinates[2] : 0);
+        }
+        if (lat !== undefined && lon !== undefined) {
+          flyToCoordinate(lat, lon, 1.85);
+          if (elev !== undefined) currentElevation = elev;
+          updateStatusHUD();
         }
       }
     });

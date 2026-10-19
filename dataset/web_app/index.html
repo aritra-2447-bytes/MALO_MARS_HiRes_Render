@@ -688,16 +688,16 @@
       },
       {
         name: "Gale Crater",
-        lat: -5.37,
-        lon: 137.44,
-        desc: "Ancient impact crater containing Aeolis Mons (Mount Sharp); landing site of NASA's Curiosity rover.",
+        lat: -4.5895,
+        lon: 137.4417,
+        desc: "Ancient impact crater containing Aeolis Mons (Mount Sharp); Bradbury Landing site of NASA's Curiosity rover.",
         tile: "Row 16, Col 56 (5_16_56.jpg)"
       },
       {
         name: "Jezero Crater",
-        lat: 18.38,
-        lon: 77.58,
-        desc: "Paleolake basin with preserved river delta; landing site of NASA's Perseverance rover and Ingenuity helicopter.",
+        lat: 18.4446,
+        lon: 77.4508,
+        desc: "Paleolake basin with preserved river delta; Octavia E. Butler Landing site of NASA's Perseverance rover and Ingenuity helicopter.",
         tile: "Row 12, Col 45 (5_12_45.jpg)"
       },
       {
@@ -776,7 +776,8 @@
 
     function getStatusColor(status) {
       return status === 'Active' ? '#22c55e' :
-             status === 'Failed' ? '#ef4444' : '#94a3b8';
+             status === 'Failed' ? '#ef4444' :
+             status === 'Proposed' ? '#38bdf8' : '#94a3b8';
     }
 
     async function loadRoverTraverses() {
@@ -848,6 +849,31 @@
           polyline.on('mouseout', () => polyline.unbindTooltip());
 
           roverTraversesGroup.addLayer(polyline);
+        } else if (geom.type === 'Point' && Array.isArray(geom.coordinates)) {
+          const latLng = [geom.coordinates[1], geom.coordinates[0]];
+          const marker = L.circleMarker(latLng, {
+            radius: 5,
+            color: color,
+            fillColor: color,
+            fillOpacity: 0.85,
+            weight: 2
+          });
+
+          const tooltipContent = `
+            <div style="font-family:sans-serif; font-size:12px; line-height:1.4;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <strong style="color:${color}; font-size:13px;">${props.name}</strong>
+                <span style="font-size:10px; font-weight:700; padding:1px 5px; border-radius:3px; background:${color}22; color:${color}; border:1px solid ${color}55;">${props.status.toUpperCase()}</span>
+              </div>
+              <div style="color:#cbd5e1; margin-top:3px;">${props.station_name ? 'Station: ' + props.station_name + '<br>' : ''}${props.landing_site ? 'Region: ' + props.landing_site : ''}</div>
+              <div style="color:#94a3b8; font-size:11px; margin-top:2px;">
+                Lat: ${geom.coordinates[1]}°, Lon: ${geom.coordinates[0]}° • Elev: ${props.elevation_m || 0} m
+              </div>
+            </div>
+          `;
+
+          marker.bindTooltip(tooltipContent, { direction: 'top', sticky: true });
+          roverTraversesGroup.addLayer(marker);
         }
       });
     }

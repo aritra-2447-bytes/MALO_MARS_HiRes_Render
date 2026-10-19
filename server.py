@@ -76,21 +76,23 @@ MARS_LANDMARKS = [
     },
     {
         "id": "jezero_crater",
-        "name": "Jezero Crater (Perseverance / Ingenuity)",
-        "lat": 18.38,
-        "lon": 77.58,
-        "elevation_m": -2540,
+        "name": "Jezero Crater (Octavia E. Butler Landing)",
+        "lat": 18.4446,
+        "lon": 77.4508,
+        "elevation_m": -2570,
         "category": "landing_site",
-        "description": "Paleolake river delta. Site of Mars 2020 rover and sample caching."
+        "station_name": "Octavia E. Butler Landing",
+        "description": "Paleolake river delta. Touchdown site: Octavia E. Butler Landing (Mars 2020)."
     },
     {
         "id": "gale_crater",
-        "name": "Gale Crater (Curiosity Rover)",
-        "lat": -4.59,
-        "lon": 137.44,
-        "elevation_m": -4450,
+        "name": "Gale Crater (Bradbury Landing)",
+        "lat": -4.5895,
+        "lon": 137.4417,
+        "elevation_m": -4501,
         "category": "landing_site",
-        "description": "Mount Sharp (Aeolis Mons) sedimentary sequence exploring past habitability."
+        "station_name": "Bradbury Landing",
+        "description": "Bradbury Landing touchdown site in Aeolis Palus, Mount Sharp sedimentary sequence."
     },
     {
         "id": "planum_boreum",
@@ -130,21 +132,23 @@ MARS_LANDMARKS = [
     },
     {
         "id": "meridiani_planum",
-        "name": "Meridiani Planum (Opportunity Rover)",
-        "lat": -1.95,
-        "lon": -5.53,
-        "elevation_m": -1400,
+        "name": "Meridiani Planum (Challenger Memorial Station)",
+        "lat": -1.9462,
+        "lon": -5.5266,
+        "elevation_m": -1390,
         "category": "landing_site",
-        "description": "Hematite-rich plain revealing past surface water in sedimentary rocks."
+        "station_name": "Challenger Memorial Station",
+        "description": "Challenger Memorial Station at Eagle Crater; hematite-rich plain revealing past surface water."
     },
     {
         "id": "gusev_crater",
-        "name": "Gusev Crater (Spirit Rover)",
-        "lat": -14.57,
-        "lon": 175.47,
-        "elevation_m": -1930,
+        "name": "Gusev Crater (Columbia Memorial Station)",
+        "lat": -14.5684,
+        "lon": 175.4726,
+        "elevation_m": -1910,
         "category": "landing_site",
-        "description": "Columbia Hills exploration site connected to ancient Ma'adim Vallis."
+        "station_name": "Columbia Memorial Station",
+        "description": "Columbia Memorial Station exploration site connected to ancient Ma'adim Vallis."
     }
 ]
 
@@ -158,7 +162,7 @@ HISTORICAL_ROVER_MISSIONS = [
         "total_odometry_km": 28.4,
         "hazard_strategy": "AutoNav visual odometry with slope-limiting scarp traversal and sample tube caching.",
         "waypoints": [
-            {"lat": 18.380, "lon": 77.580, "sol": 0, "elev_m": -2540, "hazard": "SAFE", "label": "Sol 0: Octavia E. Butler Landing"},
+            {"lat": 18.4446, "lon": 77.4508, "sol": 0, "elev_m": -2570, "hazard": "SAFE", "label": "Sol 0: Octavia E. Butler Landing"},
             {"lat": 18.405, "lon": 77.545, "sol": 180, "elev_m": -2520, "hazard": "SAFE", "label": "Sol 180: Séítah Dunes Margin (Wheel slip caution)"},
             {"lat": 18.420, "lon": 77.510, "sol": 350, "elev_m": -2480, "hazard": "SAFE", "label": "Sol 350: Kodiak Delta Remnant Butte"},
             {"lat": 18.445, "lon": 77.450, "sol": 510, "elev_m": -2420, "hazard": "CAUTION_STEEP", "label": "Sol 510: Hawksbill Gap (Western Delta Scarp)"},
@@ -174,7 +178,7 @@ HISTORICAL_ROVER_MISSIONS = [
         "total_odometry_km": 32.8,
         "hazard_strategy": "Wheel puncture mitigation avoidance on wind-carved ventifacts; switchback climbs on Vera Rubin Ridge.",
         "waypoints": [
-            {"lat": -4.589, "lon": 137.441, "sol": 0, "elev_m": -4450, "hazard": "SAFE", "label": "Sol 0: Bradbury Landing Point"},
+            {"lat": -4.5895, "lon": 137.4417, "sol": 0, "elev_m": -4501, "hazard": "SAFE", "label": "Sol 0: Bradbury Landing Point"},
             {"lat": -4.640, "lon": 137.400, "sol": 300, "elev_m": -4520, "hazard": "SAFE", "label": "Sol 300: Yellowknife Bay (Lacustrine Mudstone)"},
             {"lat": -4.665, "lon": 137.380, "sol": 750, "elev_m": -4460, "hazard": "CAUTION_STEEP", "label": "Sol 750: Bagnold Dunes Sand Crossing (Slip risk)"},
             {"lat": -4.690, "lon": 137.360, "sol": 1800, "elev_m": -4150, "hazard": "CAUTION_STEEP", "label": "Sol 1800: Vera Rubin Ridge Scarp (Hematite Unit)"},
@@ -185,12 +189,12 @@ HISTORICAL_ROVER_MISSIONS = [
     {
         "id": "mer_opportunity",
         "rover": "Opportunity (MER-B)",
-        "landing_site": "Meridiani Planum (Challenger Memorial)",
+        "landing_site": "Meridiani Planum (Challenger Memorial Station)",
         "sol_range": "Sol 0 – Sol 5,111",
         "total_odometry_km": 45.16,
         "hazard_strategy": "Purgatory Dune extraction lessons; rim traversal avoidance of soft drift sands.",
         "waypoints": [
-            {"lat": -1.946, "lon": -5.530, "sol": 0, "elev_m": -1400, "hazard": "SAFE", "label": "Sol 0: Eagle Crater (Hole-in-One Landing)"},
+            {"lat": -1.9462, "lon": -5.5266, "sol": 0, "elev_m": -1390, "hazard": "SAFE", "label": "Sol 0: Challenger Memorial Station (Eagle Crater)"},
             {"lat": -1.950, "lon": -5.510, "sol": 100, "elev_m": -1390, "hazard": "SAFE", "label": "Sol 100: Fram Crater Outcrop"},
             {"lat": -1.960, "lon": -5.480, "sol": 450, "elev_m": -1380, "hazard": "CRITICAL_SLOPE", "label": "Sol 450: Purgatory Dune (High wheel entrapment)"},
             {"lat": -1.980, "lon": -5.440, "sol": 950, "elev_m": -1350, "hazard": "CAUTION_STEEP", "label": "Sol 950: Victoria Crater (Duck Bay Descent)"},
@@ -201,12 +205,12 @@ HISTORICAL_ROVER_MISSIONS = [
     {
         "id": "mer_spirit",
         "rover": "Spirit (MER-A)",
-        "landing_site": "Gusev Crater (Columbia Memorial)",
+        "landing_site": "Gusev Crater (Columbia Memorial Station)",
         "sol_range": "Sol 0 – Sol 2,210",
         "total_odometry_km": 7.73,
         "hazard_strategy": "Right front wheel failure reverse driving; avoided basaltic boulder fields and soft Troy sand deposits.",
         "waypoints": [
-            {"lat": -14.568, "lon": 175.473, "sol": 0, "elev_m": -1930, "hazard": "SAFE", "label": "Sol 0: Columbia Memorial Station"},
+            {"lat": -14.5684, "lon": 175.4726, "sol": 0, "elev_m": -1910, "hazard": "SAFE", "label": "Sol 0: Columbia Memorial Station"},
             {"lat": -14.580, "lon": 175.495, "sol": 85, "elev_m": -1920, "hazard": "SAFE", "label": "Sol 85: Bonneville Crater Rim"},
             {"lat": -14.610, "lon": 175.520, "sol": 300, "elev_m": -1880, "hazard": "CAUTION_STEEP", "label": "Sol 300: West Spur (Columbia Hills Base)"},
             {"lat": -14.630, "lon": 175.540, "sol": 580, "elev_m": -1810, "hazard": "CRITICAL_SLOPE", "label": "Sol 580: Husband Hill Summit (107m Climb)"},
@@ -240,7 +244,7 @@ EVA_PRESET_ROUTES = [
         "name": "Jezero Western Delta & Belva Crater Traverse",
         "description": "Perseverance delta scarp ascent to ancient clay deposits and sample caches.",
         "waypoints": [
-            {"lat": 18.380, "lon": 77.580, "label": "Octavia E. Butler Landing Site"},
+            {"lat": 18.4446, "lon": 77.4508, "label": "Octavia E. Butler Landing Site"},
             {"lat": 18.420, "lon": 77.510, "label": "Kodiak Delta Remnant Butte"},
             {"lat": 18.445, "lon": 77.450, "label": "Western Fan Delta Scarp"},
             {"lat": 18.470, "lon": 77.410, "label": "Neretva Vallis River Inlet Channel"},
@@ -252,7 +256,7 @@ EVA_PRESET_ROUTES = [
         "name": "Gale Crater: Mount Sharp (Aeolis Mons) Expedition",
         "description": "Curiosity ascent corridor through Vera Rubin Ridge to sulfate-bearing units.",
         "waypoints": [
-            {"lat": -4.589, "lon": 137.441, "label": "Bradbury Landing Point"},
+            {"lat": -4.5895, "lon": 137.4417, "label": "Bradbury Landing Point"},
             {"lat": -4.640, "lon": 137.400, "label": "Yellowknife Bay Mudstone"},
             {"lat": -4.690, "lon": 137.360, "label": "Vera Rubin Ridge (Hematite)"},
             {"lat": -4.730, "lon": 137.330, "label": "Sulfate-Bearing Canyon Entry"},
@@ -266,7 +270,7 @@ EVA_PRESET_ROUTES = [
         "waypoints": [
             {"lat": -9.200, "lon": -76.800, "label": "North Plateau Habitat Site"},
             {"lat": -9.500, "lon": -76.650, "label": "Melas Chasma Upper Canyon Terraces"},
-            {"lat": -9.800, "lon": -76.500, "label": "Melas Chasma Central Deep Basin (-8,200m)"}
+            {"lat": -9.800, "lon": -76.400, "label": "Melas Chasma Central Deep Basin (-8,200m)"}
         ]
     }
 ]
