@@ -217,6 +217,35 @@ HISTORICAL_ROVER_MISSIONS = [
             {"lat": -14.645, "lon": 175.550, "sol": 1300, "elev_m": -1850, "hazard": "SAFE", "label": "Sol 1300: Home Plate Hydrothermal Plateau"},
             {"lat": -14.655, "lon": 175.560, "sol": 2210, "elev_m": -1865, "hazard": "CRITICAL_SLOPE", "label": "Sol 2210: Troy Silica Sands (Entrapment Site)"}
         ]
+    },
+    {
+        "id": "cnsa_zhurong",
+        "rover": "Zhurong (Tianwen-1)",
+        "landing_site": "Southern Utopia Planitia",
+        "sol_range": "Sol 0 – Sol 358",
+        "total_odometry_km": 1.92,
+        "hazard_strategy": "Autonomous hazard avoidance cameras navigating transverse aeolian dune ridges and boulder fields.",
+        "waypoints": [
+            {"lat": 25.0833, "lon": 109.9084, "sol": 0, "elev_m": -4099, "hazard": "SAFE", "label": "Sol 0: Tianwen-1 Touchdown Platform"},
+            {"lat": 25.0832, "lon": 109.9084, "sol": 20, "elev_m": -4099, "hazard": "SAFE", "label": "Sol 20: Ramp Roll-off to Surface"},
+            {"lat": 25.0750, "lon": 109.9200, "sol": 100, "elev_m": -4095, "hazard": "SAFE", "label": "Sol 100: Transverse Aeolian Ridges"},
+            {"lat": 25.0680, "lon": 109.9140, "sol": 240, "elev_m": -4090, "hazard": "SAFE", "label": "Sol 240: Polygonal Feature Science Stop"},
+            {"lat": 25.0605, "lon": 109.9124, "sol": 358, "elev_m": -4085, "hazard": "SAFE", "label": "Sol 358: Final Hibernation Site"}
+        ]
+    },
+    {
+        "id": "pathfinder_sojourner",
+        "rover": "Mars Pathfinder (Sojourner)",
+        "landing_site": "Carl Sagan Memorial Station (Ares Vallis)",
+        "sol_range": "Sol 0 – Sol 83",
+        "total_odometry_km": 0.13,
+        "hazard_strategy": "Micro-rover rocker-bogie mobility navigating local andesitic boulder field around lander.",
+        "waypoints": [
+            {"lat": 19.1300, "lon": -33.2200, "sol": 0, "elev_m": -3682, "hazard": "SAFE", "label": "Sol 0: Carl Sagan Memorial Station"},
+            {"lat": 19.1300, "lon": -33.2200, "sol": 3, "elev_m": -3682, "hazard": "SAFE", "label": "Sol 3: Barnacle Bill Rock (APXS)"},
+            {"lat": 19.1300, "lon": -33.2200, "sol": 8, "elev_m": -3682, "hazard": "SAFE", "label": "Sol 8: Yogi Rock Exploration"},
+            {"lat": 19.1299, "lon": -33.2200, "sol": 78, "elev_m": -3682, "hazard": "SAFE", "label": "Sol 78: Final Communication Location"}
+        ]
     }
 ]
 
@@ -316,6 +345,11 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         # Real Historical & Live NASA Rover Traverses (Perseverance, Curiosity, Opportunity, Spirit)
         if path == "/api/rover/missions":
             self.handle_rover_missions(query)
+            return
+
+        # Continuous Rover Traverses & Lander Coverage Zones (Hover overlay telemetry)
+        if path == "/api/rover/traverses":
+            self.handle_rover_traverses(query)
             return
 
         # Live NASA ODE Proxy
@@ -662,6 +696,21 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         except Exception:
             pass
 
+        # Enrich completed historical rovers with high-density continuous drive paths from rover_traverses.json
+        try:
+            rt_file = os.path.join(GPU_DIR, "data", "rover_traverses.json")
+            if not os.path.exists(rt_file):
+                rt_file = os.path.join(WEB_APP_DIR, "data", "rover_traverses.json")
+            if os.path.exists(rt_file):
+                with open(rt_file, "r", encoding="utf-8") as f_rt:
+                    rt_data = json.load(f_rt)
+                for m in missions:
+                    mid = m.get("id")
+                    if mid in rt_data and "track" in rt_data[mid] and not m.get("actual_path"):
+                        m["actual_path"] = rt_data[mid]["track"]
+        except Exception:
+            pass
+
         response_payload = {
             "status": "success",
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
@@ -669,6 +718,21 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         }
         CACHE[cache_key] = (now, response_payload)
         self.send_json_response(response_payload)
+
+    def handle_rover_traverses(self, query):
+        rover_id = query.get("rover", [None])[0]
+        json_path = os.path.join(GPU_DIR, "data", "rover_traverses.json")
+        if not os.path.exists(json_path):
+            json_path = os.path.join(WEB_APP_DIR, "data", "rover_traverses.json")
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if rover_id and rover_id in data:
+                self.send_json_response({"status": "success", "mission": data[rover_id]})
+            else:
+                self.send_json_response({"status": "success", "missions": data})
+        except Exception as e:
+            self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
 
     def handle_mola_proxy(self, query):
         try:
