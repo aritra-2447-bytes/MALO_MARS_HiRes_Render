@@ -42,9 +42,19 @@ for c in candidate_gpu_dirs:
         GPU_DIR = os.path.abspath(c)
         break
 
-DATASET_DIR = os.path.abspath(os.path.join(GPU_DIR, ".."))
-WEB_APP_DIR = os.path.abspath(os.path.join(DATASET_DIR, "web_app"))
-ROOT_DIR = os.path.abspath(os.path.join(DATASET_DIR, ".."))
+if os.path.exists(os.path.join(CURRENT_FILE_DIR, "dataset")):
+    DATASET_DIR = os.path.abspath(os.path.join(CURRENT_FILE_DIR, "dataset"))
+else:
+    DATASET_DIR = os.path.abspath(os.path.join(GPU_DIR, ".."))
+WEB_APP_DIR = os.path.abspath(os.path.join(DATASET_DIR, "web_app")) if os.path.exists(os.path.join(DATASET_DIR, "web_app")) else CURRENT_FILE_DIR
+ROOT_DIR = CURRENT_FILE_DIR
+NASA_DOCS_DIRS = [
+    os.path.abspath(os.path.join(ROOT_DIR, "..")),
+    os.path.abspath(os.path.join(CURRENT_FILE_DIR, "..")),
+    os.path.abspath(os.path.join(CURRENT_FILE_DIR, "..", "..")),
+    CURRENT_FILE_DIR,
+    ROOT_DIR
+]
 
 CACHE = {}
 CACHE_TTL = 3600  # 1 hour
@@ -343,6 +353,16 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_mars_ephemeris(query)
             return
 
+        # USGS SIM 3292 Geologic & Spectral Atlas API
+        if path in ("/api/sim3292/data", "/api/geology", "/api/sim3292"):
+            self.handle_sim3292_data(query)
+            return
+
+        # USGS SIM 3292 72-Tile Manifest API
+        if path in ("/api/sim3292/tiles", "/api/sim3292/manifest"):
+            self.handle_sim3292_tiles_manifest(query)
+            return
+
         super().do_GET()
 
     def translate_path(self, path):
@@ -351,6 +371,43 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
 
         if clean_path in ("/", "\\"):
             return os.path.join(GPU_DIR, "index.html")
+
+        # Route to USGS SIM 3292 & Mineral Spectral Atlas
+        if clean_path in ("/geology_atlas.html", "\\geology_atlas.html", "/atlas", "\\atlas", "/geology", "\\geology", "/usgs", "\\usgs"):
+            for d in [CURRENT_FILE_DIR, GPU_DIR, ROOT_DIR, os.path.join(CURRENT_FILE_DIR, "dataset", "web_app_gpu")]:
+                cand = os.path.join(d, "geology_atlas.html")
+                if os.path.exists(cand):
+                    return cand
+
+        # Route to 2D Flat Engine
+        if clean_path in ("/index_2d_backup.html", "\\index_2d_backup.html", "/2d", "\\2d", "/flat", "\\flat"):
+            for d in [CURRENT_FILE_DIR, GPU_DIR, ROOT_DIR, os.path.join(CURRENT_FILE_DIR, "dataset", "web_app_gpu")]:
+                cand = os.path.join(d, "index_2d_backup.html")
+                if os.path.exists(cand):
+                    return cand
+
+        # Check documentation files (README.txt, Metadata.txt, Table.pdf, sim3292_map.pdf, sim3292_pamphlet.pdf)
+        basename = os.path.basename(clean_path)
+        if basename in ("README.txt", "Metadata.txt", "Table.pdf", "sim3292_map.pdf", "sim3292_pamphlet.pdf"):
+            for d in NASA_DOCS_DIRS:
+                cand = os.path.join(d, basename)
+                if os.path.exists(cand):
+                    return cand
+
+        # Check sim3292_database paths
+        if clean_path.startswith("/sim3292_database/") or clean_path.startswith("\\sim3292_database\\"):
+            rel = clean_path.lstrip("/\\")
+            for d in NASA_DOCS_DIRS:
+                cand = os.path.join(d, rel)
+                if os.path.exists(cand):
+                    return cand
+
+        if clean_path.startswith("/lib/") or clean_path.startswith("\\lib\\"):
+            rel = clean_path[len("/lib/"):].lstrip("/\\")
+            for d in [os.path.join(CURRENT_FILE_DIR, "lib"), os.path.join(CURRENT_FILE_DIR, "dataset", "web_app_gpu", "lib")]:
+                cand = os.path.join(d, rel)
+                if os.path.exists(cand):
+                    return cand
 
         if clean_path.startswith("/data/") or clean_path.startswith("\\data\\"):
             rel = clean_path[len("/data/"):].lstrip("/\\")
@@ -369,22 +426,32 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             rel = clean_path[len("/web_app/"):].lstrip("/\\")
             return os.path.join(WEB_APP_DIR, rel)
 
+        if clean_path.startswith("/sim3292_tiles/") or clean_path.startswith("\\sim3292_tiles\\"):
+            rel = clean_path[len("/sim3292_tiles/"):].lstrip("/\\")
+            for d in [os.path.join(CURRENT_FILE_DIR, "sim3292_tiles"), os.path.join(CURRENT_FILE_DIR, "dataset", "web_app_gpu", "sim3292_tiles")]:
+                cand = os.path.join(d, rel)
+                if os.path.exists(cand):
+                    return cand
+
         if clean_path.startswith("/tiles/") or clean_path.startswith("\\tiles\\"):
             rel = clean_path[len("/tiles/"):].lstrip("/\\")
-            candidate = os.path.join(DATASET_DIR, rel)
-            if os.path.exists(candidate):
-                return candidate
+            for d in [DATASET_DIR, os.path.join(CURRENT_FILE_DIR, "dataset"), CURRENT_FILE_DIR]:
+                candidate = os.path.join(d, rel)
+                if os.path.exists(candidate):
+                    return candidate
 
         basename = os.path.basename(clean_path)
         if basename.startswith("5_") and basename.endswith(".jpg"):
-            t_path = os.path.join(DATASET_DIR, basename)
-            if os.path.exists(t_path):
-                return t_path
+            for d in [DATASET_DIR, os.path.join(CURRENT_FILE_DIR, "dataset"), CURRENT_FILE_DIR]:
+                t_path = os.path.join(d, basename)
+                if os.path.exists(t_path):
+                    return t_path
 
-        if basename == "mars_mola_level5_mosaic.jpg":
-            f = os.path.join(WEB_APP_DIR, "mars_mola_level5_mosaic.jpg")
-            if os.path.exists(f):
-                return f
+        if basename in ("mars_sim3292_geology_4k.jpg", "mars_sim3292_geology_2k.jpg", "mars_sim3292_geology_fast.jpg", "mars_mola_level5_mosaic.jpg", "mars_mola_base_2k.jpg", "mars_mola_4k.jpg", "mars_mola_8k.jpg"):
+            for d in [CURRENT_FILE_DIR, DATASET_DIR, WEB_APP_DIR, os.path.join(CURRENT_FILE_DIR, "dataset", "web_app_gpu")]:
+                f = os.path.join(d, basename)
+                if os.path.exists(f):
+                    return f
 
         candidate = os.path.join(GPU_DIR, clean_path.lstrip("/\\"))
         if os.path.exists(candidate):
@@ -509,165 +576,53 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             self.send_error(502, f"Failed streaming ODE browse image: {e}")
 
+    def handle_sim3292_data(self, query):
+        candidates = [
+            os.path.join(GPU_DIR, "data", "sim3292_full_analysis.json"),
+            os.path.join(ROOT_DIR, "data", "sim3292_full_analysis.json"),
+            os.path.join(WEB_APP_DIR, "data", "sim3292_full_analysis.json"),
+        ]
+        for c in candidates:
+            if os.path.exists(c):
+                try:
+                    with open(c, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    self.send_json_response(data)
+                    return
+                except Exception as e:
+                    self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
+                    return
+        self.send_json_response({"status": "error", "message": "SIM3292 dataset not found"}, status_code=404)
+
+    def handle_sim3292_tiles_manifest(self, query=None):
+        candidates = [
+            os.path.join(CURRENT_FILE_DIR, "sim3292_tiles", "manifest.json"),
+            os.path.join(GPU_DIR, "sim3292_tiles", "manifest.json"),
+            os.path.join(ROOT_DIR, "sim3292_tiles", "manifest.json"),
+        ]
+        for c in candidates:
+            if os.path.exists(c):
+                try:
+                    with open(c, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    self.send_json_response(data)
+                    return
+                except Exception as e:
+                    self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
+                    return
+        self.send_json_response({"status": "error", "message": "SIM3292 tiles manifest not found"}, status_code=404)
+
     def handle_rover_missions(self, query):
         """
-        Returns real historical and live NASA MMGIS rover telemetry waypoints.
-        Queries live NASA JPL MMGIS GeoJSON feeds for active rovers (Perseverance, Curiosity)
-        with automatic fallback to authoritative ground-truth PDS waypoints.
+        Returns real historical and authoritative NASA MMGIS rover telemetry waypoints.
+        Instantly serves authoritative ground-truth PDS waypoints to guarantee zero-latency response.
         """
-        now = time.time()
-        cache_key = "nasa_live_rover_missions"
-        if cache_key in CACHE and (now - CACHE[cache_key][0]) < 1800:
-            self.send_json_response(CACHE[cache_key][1])
-            return
-
         missions = list(HISTORICAL_ROVER_MISSIONS)
-
-        # Attempt to stream live NASA MMGIS waypoints for Perseverance (Mars 2020)
-        try:
-            m20_url = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json"
-            req = urllib.request.Request(m20_url, headers={"User-Agent": "Mozilla/5.0 (NASA Mars Explorer)"})
-            with urllib.request.urlopen(req, timeout=8) as resp:
-                m20_data = json.loads(resp.read().decode("utf-8"))
-                feats = m20_data.get("features", [])
-                if feats and len(feats) > 10:
-                    # Sample down from 700+ to key scientific sol stops
-                    stride = max(1, len(feats) // 12)
-                    sampled_feats = feats[::stride]
-                    if feats[-1] not in sampled_feats:
-                        sampled_feats.append(feats[-1])
-
-                    live_wps = []
-                    for f in sampled_feats:
-                        props = f.get("properties", {})
-                        geom = f.get("geometry", {})
-                        coords = geom.get("coordinates", [props.get("lon", 77.45), props.get("lat", 18.44), -2500])
-                        sol_num = props.get("sol", 0)
-                        dist_km = round(props.get("dist_km", 0.0), 2)
-                        elev = round(coords[2] if len(coords) > 2 else props.get("elev_geoid", -2500), 1)
-                        live_wps.append({
-                            "lat": round(coords[1], 4),
-                            "lon": round(coords[0], 4),
-                            "sol": sol_num,
-                            "elev_m": elev,
-                            "hazard": "CAUTION_STEEP" if abs(props.get("tilt", 0)) > 12.0 else "SAFE",
-                            "label": f"Sol {sol_num}: Site {props.get('site', 0)} ({dist_km} km odometry)"
-                        })
-
-                    last_p = feats[-1].get("properties", {})
-                    # Update Perseverance entry with live NASA JPL MMGIS telemetry
-                    for m in missions:
-                        if m["id"] == "m20_perseverance":
-                            m["waypoints"] = live_wps
-                            m["sol_range"] = f"Sol 0 – Sol {last_p.get('sol', 1980)}+ [LIVE NASA MMGIS]"
-                            m["total_odometry_km"] = round(last_p.get("dist_km", 45.13), 2)
-                            m["data_source"] = "LIVE_NASA_MMGIS_FEED"
-        except Exception:
-            pass  # Retains verified PDS historical baseline
-
-        # Attempt to stream full actual continuous drive path polyline for Perseverance
-        try:
-            m20_trav_url = "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json"
-            req_t = urllib.request.Request(m20_trav_url, headers={"User-Agent": "Mozilla/5.0 (NASA Mars Explorer)"})
-            with urllib.request.urlopen(req_t, timeout=10) as resp:
-                t_data = json.loads(resp.read().decode("utf-8"))
-                coords = []
-                for f in t_data.get("features", []):
-                    geom = f.get("geometry", {})
-                    if geom.get("type") == "LineString":
-                        coords.extend(geom.get("coordinates", []))
-                    elif geom.get("type") == "MultiLineString":
-                        for line in geom.get("coordinates", []):
-                            coords.extend(line)
-                if coords:
-                    # Evenly downsample 36,000+ continuous drive vertices to ~240 high-density path nodes
-                    stride = max(1, len(coords) // 240)
-                    sampled = coords[::stride]
-                    if coords[-1] not in sampled:
-                        sampled.append(coords[-1])
-                    for m in missions:
-                        if m["id"] == "m20_perseverance":
-                            m["actual_path"] = [
-                                {"lon": round(c[0], 5), "lat": round(c[1], 5), "elev_m": round(c[2], 1) if len(c) > 2 else -2500}
-                                for c in sampled
-                            ]
-        except Exception:
-            pass
-
-        # Attempt to stream live NASA MMGIS waypoints for Curiosity (MSL)
-        try:
-            msl_url = "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json"
-            req = urllib.request.Request(msl_url, headers={"User-Agent": "Mozilla/5.0 (NASA Mars Explorer)"})
-            with urllib.request.urlopen(req, timeout=8) as resp:
-                msl_data = json.loads(resp.read().decode("utf-8"))
-                feats = msl_data.get("features", [])
-                if feats and len(feats) > 10:
-                    stride = max(1, len(feats) // 12)
-                    sampled_feats = feats[::stride]
-                    if feats[-1] not in sampled_feats:
-                        sampled_feats.append(feats[-1])
-
-                    live_wps = []
-                    for f in sampled_feats:
-                        props = f.get("properties", {})
-                        geom = f.get("geometry", {})
-                        coords = geom.get("coordinates", [props.get("lon", 137.4), props.get("lat", -4.6), -4400])
-                        sol_num = props.get("sol", 0)
-                        dist_km = round(props.get("dist_km", 0.0), 2)
-                        elev = round(coords[2] if len(coords) > 2 else props.get("elev_geoid", -4400), 1)
-                        live_wps.append({
-                            "lat": round(coords[1], 4),
-                            "lon": round(coords[0], 4),
-                            "sol": sol_num,
-                            "elev_m": elev,
-                            "hazard": "CAUTION_STEEP" if abs(props.get("tilt", 0)) > 12.0 else "SAFE",
-                            "label": f"Sol {sol_num}: Site {props.get('site', 0)} ({dist_km} km odometry)"
-                        })
-
-                    last_p = feats[-1].get("properties", {})
-                    for m in missions:
-                        if m["id"] == "msl_curiosity":
-                            m["waypoints"] = live_wps
-                            m["sol_range"] = f"Sol 0 – Sol {last_p.get('sol', 5021)}+ [LIVE NASA MMGIS]"
-                            m["total_odometry_km"] = round(last_p.get("dist_km", 38.07), 2)
-                            m["data_source"] = "LIVE_NASA_MMGIS_FEED"
-        except Exception:
-            pass
-
-        # Attempt to stream full actual continuous drive path polyline for Curiosity (MSL)
-        try:
-            msl_trav_url = "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_traverse.json"
-            req_t2 = urllib.request.Request(msl_trav_url, headers={"User-Agent": "Mozilla/5.0 (NASA Mars Explorer)"})
-            with urllib.request.urlopen(req_t2, timeout=10) as resp:
-                t_data2 = json.loads(resp.read().decode("utf-8"))
-                coords = []
-                for f in t_data2.get("features", []):
-                    geom = f.get("geometry", {})
-                    if geom.get("type") == "LineString":
-                        coords.extend(geom.get("coordinates", []))
-                    elif geom.get("type") == "MultiLineString":
-                        for line in geom.get("coordinates", []):
-                            coords.extend(line)
-                if coords:
-                    stride = max(1, len(coords) // 240)
-                    sampled = coords[::stride]
-                    if coords[-1] not in sampled:
-                        sampled.append(coords[-1])
-                    for m in missions:
-                        if m["id"] == "msl_curiosity":
-                            m["actual_path"] = [
-                                {"lon": round(c[0], 5), "lat": round(c[1], 5), "elev_m": round(c[2], 1) if len(c) > 2 else -4400}
-                                for c in sampled
-                            ]
-        except Exception:
-            pass
-
         response_payload = {
             "status": "success",
-            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+            "count": len(missions),
             "missions": missions
         }
-        CACHE[cache_key] = (now, response_payload)
         self.send_json_response(response_payload)
 
     def handle_mola_proxy(self, query):

@@ -205,6 +205,20 @@
       color: white;
     }
 
+    .pill-btn.highlight-btn {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.4), rgba(168, 85, 247, 0.4));
+      border: 1px solid rgba(255, 94, 54, 0.7);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(255, 94, 54, 0.35);
+    }
+
+    .pill-btn.highlight-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.7), rgba(168, 85, 247, 0.7));
+      border-color: #ff5e36;
+      box-shadow: 0 0 22px rgba(255, 94, 54, 0.55);
+      transform: translateY(-1px);
+    }
+
     /* Fullscreen Viewport */
     #viewport-container {
       position: relative;
@@ -641,8 +655,21 @@
       color: #fff;
     }
   </style>
+  <!-- Three.js & OrbitControls 3D Planetary Engine -->
   <script src="/lib/three.min.js"></script>
   <script src="/lib/OrbitControls.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      const s = document.createElement('script');
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      document.head.appendChild(s);
+    }
+    if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
+      const s = document.createElement('script');
+      s.src = "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js";
+      document.head.appendChild(s);
+    }
+  </script>
 </head>
 <body>
 
@@ -668,6 +695,8 @@
       <button class="pill-btn" id="btn-toggle-drawer">📍 Destinations</button>
       <button class="pill-btn active" id="btn-toggle-solar" title="Toggle Real-Time Astronomical Sun Position & Surface Shadows">☀️ Live Sun Shadows</button>
       <button class="pill-btn" id="btn-scan-nasa">🛰️ Scan NASA Orbiters</button>
+      <button class="pill-btn" id="btn-toggle-geology" title="Switch 3D Globe Texture between MOLA Altimetry & USGS SIM 3292 4K Geologic Map">🎨 Geology 4K Map</button>
+      <button class="pill-btn highlight-btn" id="btn-geology-atlas" onclick="window.location.href='/geology_atlas.html'" title="USGS SIM 3292 Geologic Map of Mars & Aqueous Mineral Spectral Atlas">🪐 USGS Geologic &amp; Mineral Atlas</button>
     </div>
   </header>
 
@@ -1019,6 +1048,9 @@
 
     // Progressive Texture: 2K Fast -> 8K Master
     const textureLoader = new THREE.TextureLoader();
+    let molaMasterTexture = null;
+    let isGeologyTextureActive = false;
+    let geoTexture4k = null;
     textureLoader.load('/mars_mola_base_2k.jpg', (tex2k) => {
       marsMaterial.map = tex2k;
       marsMaterial.needsUpdate = true;
@@ -1026,8 +1058,11 @@
         tex8k.generateMipmaps = true;
         tex8k.minFilter = THREE.LinearMipmapLinearFilter;
         tex8k.magFilter = THREE.LinearFilter;
-        marsMaterial.map = tex8k;
-        marsMaterial.needsUpdate = true;
+        molaMasterTexture = tex8k;
+        if (!isGeologyTextureActive) {
+          marsMaterial.map = tex8k;
+          marsMaterial.needsUpdate = true;
+        }
       });
     });
 
@@ -2523,6 +2558,40 @@
         statusEl.style.color = decontourActive ? "var(--accent-green)" : "var(--text-dim)";
       }
     };
+
+    // Toggle USGS SIM 3292 4K Geologic Map Texture
+    const btnToggleGeo = document.getElementById('btn-toggle-geology');
+    if (btnToggleGeo) {
+      btnToggleGeo.onclick = () => {
+        isGeologyTextureActive = !isGeologyTextureActive;
+        btnToggleGeo.classList.toggle('active', isGeologyTextureActive);
+        if (isGeologyTextureActive) {
+          if (!geoTexture4k) {
+            btnToggleGeo.textContent = "⏳ Loading 4K...";
+            textureLoader.load('/mars_sim3292_geology_4k.jpg', (tex) => {
+              tex.generateMipmaps = true;
+              tex.minFilter = THREE.LinearMipmapLinearFilter;
+              tex.magFilter = THREE.LinearFilter;
+              tex.anisotropy = 8;
+              geoTexture4k = tex;
+              if (isGeologyTextureActive) {
+                marsMaterial.map = geoTexture4k;
+                marsMaterial.needsUpdate = true;
+                btnToggleGeo.textContent = "🎨 Geology 4K Active";
+              }
+            });
+          } else {
+            marsMaterial.map = geoTexture4k;
+            marsMaterial.needsUpdate = true;
+            btnToggleGeo.textContent = "🎨 Geology 4K Active";
+          }
+        } else {
+          marsMaterial.map = molaMasterTexture || marsMaterial.map;
+          marsMaterial.needsUpdate = true;
+          btnToggleGeo.textContent = "🎨 Geology 4K Map";
+        }
+      };
+    }
 
     // Animation Loop
     let lastRenderTime = performance.now();
