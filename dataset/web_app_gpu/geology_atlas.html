@@ -1,0 +1,3102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USGS SIM 3292 Geologic Map of Mars & Planetary Mineral Spectral Atlas</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-hover: rgba(30, 41, 59, 0.95);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --card-border-glow: rgba(255, 94, 54, 0.4);
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --text-muted: #64748b;
+      --accent-orange: #ff5e36;
+      --accent-coral: #fb7185;
+      --accent-cyan: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-yellow: #facc15;
+      --accent-purple: #c084fc;
+      --accent-blue: #60a5fa;
+      --hazard-red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(255, 94, 54, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(56, 189, 248, 0.06) 0%, transparent 40%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Header Nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(3, 7, 18, 0.94);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .mars-orb {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff7a50, #9f2a08);
+      box-shadow: 0 0 16px rgba(255, 94, 54, 0.6);
+      position: relative;
+    }
+
+    .mars-orb::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 10px;
+      width: 12px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      filter: blur(1px);
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent-orange);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(51, 65, 85, 0.9);
+      border-color: var(--accent-cyan);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .nav-btn.primary {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.35), rgba(168, 85, 247, 0.35));
+      border-color: rgba(255, 94, 54, 0.6);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 94, 54, 0.25);
+    }
+
+    .nav-btn.primary:hover {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.55), rgba(168, 85, 247, 0.55));
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 18px rgba(255, 94, 54, 0.45);
+    }
+
+    /* Container */
+    main {
+      flex: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 24px 28px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.7));
+      border: 1px solid rgba(255, 94, 54, 0.25);
+      border-radius: 20px;
+      padding: 24px 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(255, 94, 54, 0.18) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 60%, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+      color: var(--text-dim);
+      max-width: 950px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: rgba(3, 7, 18, 0.65);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* Tabs Bar */
+    .tabs-bar {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      background: rgba(255, 94, 54, 0.16);
+      border-color: rgba(255, 94, 54, 0.45);
+      box-shadow: 0 4px 16px rgba(255, 94, 54, 0.2);
+    }
+
+    /* Tab Contents */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Section Styling */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* 3D GLOBE SECTION STYLES */
+    .globe-viewport-box {
+      width: 100%;
+      height: 640px;
+      background: #01040a;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+    }
+
+    #geology-three-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    #geology-three-canvas:active {
+      cursor: grabbing;
+    }
+
+    /* 3D Floating HUD */
+    .globe-hud-top {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 100;
+      gap: 12px;
+    }
+
+    .globe-hud-panel {
+      pointer-events: auto;
+      background: rgba(10, 15, 28, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      flex-wrap: wrap;
+    }
+
+    .hud-chip-btn {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .hud-chip-btn:hover {
+      background: rgba(51, 65, 85, 0.95);
+      border-color: var(--accent-cyan);
+      color: #fff;
+    }
+
+    .hud-chip-btn.active {
+      background: rgba(255, 94, 54, 0.25);
+      border-color: var(--accent-orange);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255, 94, 54, 0.3);
+    }
+
+    .globe-hud-bottom {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 100;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .coords-readout-pill {
+      pointer-events: auto;
+      background: rgba(5, 8, 16, 0.9);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-cyan);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    .waypoints-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Mineral Abundance Quick Fly-To Dock */
+    .mineral-abundance-dock {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.92));
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .dock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .dock-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .dock-subtitle {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .mineral-btn-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+    }
+
+    .mineral-nav-btn {
+      background: rgba(10, 15, 29, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      text-align: left;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mineral-nav-btn:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .mineral-nav-btn.active {
+      border-color: var(--accent-orange);
+      background: rgba(255, 94, 54, 0.18);
+      box-shadow: 0 0 14px rgba(255, 94, 54, 0.35);
+    }
+
+    .mineral-nav-btn .min-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .mineral-nav-btn .min-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .mineral-nav-btn .min-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mineral-nav-btn .min-sub {
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Floating Mineral Target HUD */
+    #mineral-target-hud {
+      position: absolute;
+      top: 70px;
+      left: 16px;
+      width: 320px;
+      background: rgba(10, 15, 30, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 94, 54, 0.5);
+      border-radius: 14px;
+      padding: 16px;
+      z-index: 120;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+      animation: fadeInScale 0.25s ease-out;
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.95) translateY(-6px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .target-hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+
+    .target-badge {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 94, 54, 0.2);
+      color: var(--accent-orange);
+      border: 1px solid rgba(255, 94, 54, 0.4);
+    }
+
+    .target-btn-close {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+
+    .target-btn-close:hover {
+      color: #fff;
+    }
+
+    .target-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 11px;
+    }
+
+    .target-row-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .target-row-val {
+      color: #f8fafc;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .target-row-val.mono {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+    }
+
+    /* Geologic Map Color Legend Drawer */
+    #globe-legend-drawer {
+      position: absolute;
+      top: 64px;
+      right: 16px;
+      bottom: 80px;
+      width: 320px;
+      background: rgba(8, 12, 24, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      z-index: 120;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      animation: fadeInRight 0.25s ease-out;
+    }
+
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .legend-drawer-header {
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .legend-drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .legend-group-title {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .legend-unit-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .legend-unit-item:hover {
+      background: rgba(255, 255, 255, 0.09);
+      transform: translateX(2px);
+    }
+
+    .unit-color-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1px solid rgba(0, 0, 0, 0.4);
+    }
+
+    .legend-unit-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+      font-size: 11px;
+    }
+
+    .legend-unit-info .u-sym {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .legend-unit-info .u-name {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    /* Mineral Grid */
+    .mineral-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+    }
+
+    .mineral-card {
+      background: rgba(10, 15, 29, 0.9);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+
+    .mineral-card:hover {
+      border-color: var(--card-border-glow);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(255, 94, 54, 0.12);
+    }
+
+    .mineral-card.clays { border-left: 4px solid var(--accent-green); }
+    .mineral-card.sulfates { border-left: 4px solid var(--accent-yellow); }
+    .mineral-card.silicates { border-left: 4px solid var(--accent-cyan); }
+
+    .mineral-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .mineral-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .mineral-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .mineral-tag.clays { background: rgba(34, 197, 94, 0.18); color: var(--accent-green); border: 1px solid rgba(34, 197, 94, 0.4); }
+    .mineral-tag.sulfates { background: rgba(250, 204, 21, 0.18); color: var(--accent-yellow); border: 1px solid rgba(250, 204, 21, 0.4); }
+    .mineral-tag.silicates { background: rgba(56, 189, 248, 0.18); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.4); }
+
+    .spec-block {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .spec-k {
+      color: var(--text-dim);
+    }
+
+    .spec-v {
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Spectral Chart Canvas Box */
+    .chart-container {
+      background: #020617;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .chart-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .legend-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+
+    #spectral-canvas {
+      width: 100%;
+      height: 280px;
+      display: block;
+      background: #030712;
+      border-radius: 8px;
+    }
+
+    /* Interactive Sliders */
+    .slider-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .slider-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    .slider-input {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #1e293b;
+      outline: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-orange);
+    }
+
+    /* Geology Units Browser */
+    .filters-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .epoch-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .epoch-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .epoch-btn:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .epoch-btn.active {
+      background: rgba(255, 94, 54, 0.2);
+      border-color: var(--accent-orange);
+      color: #fff;
+    }
+
+    .search-units-input {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 6px 16px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      width: 240px;
+      transition: all 0.2s;
+    }
+
+    .search-units-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    .units-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
+      max-height: 720px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .unit-card {
+      background: rgba(10, 14, 26, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .unit-card:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(20, 27, 45, 0.95);
+      transform: translateY(-2px);
+    }
+
+    .unit-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .unit-symbol-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    .unit-epoch-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .unit-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .unit-metric-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .unit-minerals {
+      font-size: 11px;
+      color: var(--accent-cyan);
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* Table Styling */
+    .data-table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: rgba(15, 23, 42, 0.95);
+      padding: 12px 14px;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 0.6px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+    }
+
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* PDF Viewer Area */
+    .doc-viewer-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 20px;
+    }
+
+    .doc-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .doc-menu-item {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .doc-menu-item:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .doc-menu-item.active {
+      background: rgba(255, 94, 54, 0.15);
+      border-color: var(--accent-orange);
+      color: #fff;
+    }
+
+    .doc-menu-title {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .doc-menu-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .doc-display-pane {
+      background: #020617;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .doc-text-pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      max-height: 520px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 14px;
+      border-radius: 8px;
+    }
+
+    /* Workflow formatted sections */
+    .workflow-section {
+      border-left: 3px solid var(--accent-orange);
+      padding-left: 18px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .workflow-h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent-orange);
+    }
+
+    .workflow-p {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .doc-viewer-grid {
+        grid-template-columns: 1fr;
+      }
+      .mineral-grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .globe-viewport-box {
+        height: 480px;
+      }
+    }
+  </style>
+  <!-- Three.js & OrbitControls 3D Planetary Engine -->
+  <script src="/lib/three.min.js"></script>
+  <script src="/lib/OrbitControls.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      const s = document.createElement('script');
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+      document.head.appendChild(s);
+    }
+    if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
+      const s = document.createElement('script');
+      s.src = "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js";
+      document.head.appendChild(s);
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <a href="/" class="brand-wrap">
+      <div class="mars-orb"></div>
+      <div class="brand-title">
+        <span>USGS SIM 3292 & Mineral Spectral Atlas</span>
+        <span class="brand-sub">CRISM • OMEGA • 3D 4K Planetary Render</span>
+      </div>
+    </a>
+
+    <div class="header-actions">
+      <a href="/" class="nav-btn primary">🌐 Return to 3D Globe</a>
+      <a href="/index_2d_backup.html" class="nav-btn">🗺️ 2D Flat Engine</a>
+      <a href="/Table.pdf" target="_blank" class="nav-btn">📊 Chronology (Table.pdf)</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Hero / Summary Banner -->
+    <div class="hero-banner">
+      <h1 class="hero-title">Aqueous Mineral Distribution & Geologic Atlas of Mars</h1>
+      <p class="hero-subtitle">
+        Integration of the USGS Scientific Investigations Map 3292 (Tanaka et al., 2014, 1:20,000,000 Scale) with high-resolution orbital spectral imaging from MRO CRISM and MEX OMEGA. Features an interactive <strong>3D 4K resolution planetary rendering</strong> cut and stitched directly from the official PDF map sheet.
+      </p>
+
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="stat-label">Mapped Surface Area</span>
+          <span class="stat-value" id="val-total-area">144,941,660 km²</span>
+          <span class="stat-sub">100% Global Coverage</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">3D Texture Resolution</span>
+          <span class="stat-value" style="color:var(--accent-orange);">4K (4096 &times; 2048)</span>
+          <span class="stat-sub">Direct PDF Cut &amp; Stitch</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">Geologic Units</span>
+          <span class="stat-value">44 Units</span>
+          <span class="stat-sub">Noachian &bull; Hesperian &bull; Amazonian</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">Structural Features</span>
+          <span class="stat-value">3,593 Mapped</span>
+          <span class="stat-sub">2,142 Ridges &bull; 1,451 Troughs</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">Cartographic Datum</span>
+          <span class="stat-value">Robinson Mars 2000</span>
+          <span class="stat-sub">R = 3,396,190 m &bull; MOLA DEM Base</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="tab-3d-globe">🌐 Interactive 3D Geologic Globe (SIM 3292 4K)</button>
+      <button class="tab-btn" data-tab="tab-spectral">🔬 Aqueous Mineral Mapping &amp; Spectral Workflow</button>
+      <button class="tab-btn" data-tab="tab-units">🪐 44 USGS Geologic Units Explorer</button>
+      <button class="tab-btn" data-tab="tab-structures">⚡ Structures &amp; Contacts Geodatabase</button>
+      <button class="tab-btn" data-tab="tab-rovers">🛬 Rover Ground-Truth &amp; In-Situ Sites</button>
+      <button class="tab-btn" data-tab="tab-docs">📚 USGS SIM 3292 Monograph &amp; PDFs</button>
+    </div>
+
+    <!-- TAB 0: INTERACTIVE 3D GEOLOGIC GLOBE (SIM 3292 4K) -->
+    <div id="tab-3d-globe" class="tab-content active">
+      <div class="section-card" style="padding:16px;">
+        <div class="section-header">
+          <div class="section-title">
+            <span>3D Mars Planetary Sphere: USGS SIM 3292 4K Geologic Render</span>
+            <span class="section-badge" style="background:rgba(255,94,54,0.15); color:var(--accent-orange); border-color:rgba(255,94,54,0.4);">4K Master Texture</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); display:flex; gap:12px; align-items:center;">
+            <span>Method: <strong>Cut &amp; Stitched from sim3292_map.pdf</strong></span>
+            <span>&bull;</span>
+            <span>Zero Generative AI Images</span>
+          </div>
+        </div>
+
+        <!-- Interactive Mineral Abundance Quick Fly-To Dock -->
+        <div class="mineral-abundance-dock">
+          <div class="dock-header">
+            <span class="dock-title">🎯 Mineral Abundance Quick Fly-To (CRISM • OMEGA Spectrometry)</span>
+            <span class="dock-subtitle">Click any mineral to auto-fly the 3D globe directly to its highest global concentration site</span>
+          </div>
+          <div class="mineral-btn-group">
+            <button class="mineral-nav-btn" data-mineral-id="clays">
+              <div class="min-top">
+                <span class="min-bullet" style="background:#22c55e; color:#22c55e;"></span>
+                <span class="min-name">Fe/Mg-Smectites</span>
+              </div>
+              <span class="min-sub">Mawrth Vallis (24°N, 19°W)</span>
+            </button>
+
+            <button class="mineral-nav-btn" data-mineral-id="kaolinite">
+              <div class="min-top">
+                <span class="min-bullet" style="background:#38bdf8; color:#38bdf8;"></span>
+                <span class="min-name">Kaolinite (Al-Clay)</span>
+              </div>
+              <span class="min-sub">Mawrth Upper Stratum (25°N)</span>
+            </button>
+
+            <button class="mineral-nav-btn" data-mineral-id="sulfates">
+              <div class="min-top">
+                <span class="min-bullet" style="background:#facc15; color:#facc15;"></span>
+                <span class="min-name">Gypsum &amp; Mg-Sulfates</span>
+              </div>
+              <span class="min-sub">Candor Chasma (6.5°S, 76°W)</span>
+            </button>
+
+            <button class="mineral-nav-btn" data-mineral-id="jarosite">
+              <div class="min-top">
+                <span class="min-bullet" style="background:#ff5e36; color:#ff5e36;"></span>
+                <span class="min-name">Jarosite (Acid Sulfate)</span>
+              </div>
+              <span class="min-sub">Meridiani Planum (2°S, 5.5°W)</span>
+            </button>
+
+            <button class="mineral-nav-btn" data-mineral-id="carbonates">
+              <div class="min-top">
+                <span class="min-bullet" style="background:#c084fc; color:#c084fc;"></span>
+                <span class="min-name">Magnesite / Carbonates</span>
+              </div>
+              <span class="min-sub">Jezero Delta (18.4°N, 77.5°E)</span>
+            </button>
+
+            <button class="mineral-nav-btn" data-mineral-id="silica">
+              <div class="min-top">
+                <span class="min-bullet" style="background:#60a5fa; color:#60a5fa;"></span>
+                <span class="min-name">Opaline Silica</span>
+              </div>
+              <span class="min-sub">Home Plate, Gusev (15°S)</span>
+            </button>
+
+            <button class="mineral-nav-btn" data-mineral-id="ice">
+              <div class="min-top">
+                <span class="min-bullet" style="background:#e0f2fe; color:#e0f2fe;"></span>
+                <span class="min-name">Perennial Water Ice</span>
+              </div>
+              <span class="min-sub">Planum Boreum (84.5°N)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3D Globe Container -->
+        <div class="globe-viewport-box">
+          <canvas id="geology-three-canvas"></canvas>
+
+          <!-- Top HUD Layer Controls -->
+          <div class="globe-hud-top">
+            <div class="globe-hud-panel">
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--accent-orange);">Layer:</span>
+              <button class="hud-chip-btn active" id="btn-tex-geology-4k">🪐 USGS SIM 3292 4K Master</button>
+              <button class="hud-chip-btn" id="btn-tex-mola-4k">🏔️ MOLA Topo 4K</button>
+              <button class="hud-chip-btn" id="btn-tex-mola-8k">🛰️ MOLA 8K Master</button>
+              <span id="lbl-texture-status" style="font-size:10px; color:#38bdf8; padding:3px 10px; background:rgba(15,23,42,0.85); border-radius:12px; border:1px solid rgba(56,189,248,0.3); display:inline-flex; align-items:center;"><span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#22c55e; margin-right:5px;"></span>USGS SIM 3292 4K Master (Enhanced 16x AF)</span>
+            </div>
+
+            <div class="globe-hud-panel">
+              <button class="hud-chip-btn active" id="btn-toggle-landings" style="border-color:var(--accent-cyan); color:#fff; box-shadow:0 0 10px rgba(56,189,248,0.3);">🛬 Landing Sites (16)</button>
+              <button class="hud-chip-btn" id="btn-toggle-legend" style="border-color:var(--accent-yellow); color:#fff;">🗺️ Geologic Legend</button>
+              <button class="hud-chip-btn active" id="btn-toggle-rotate">🔄 Auto-Rotate</button>
+              <button class="hud-chip-btn" id="btn-toggle-grid">🌐 Lat/Lon Grid</button>
+              <button class="hud-chip-btn" id="btn-toggle-sun">☀️ Solar Sun</button>
+              <button class="hud-chip-btn" id="btn-reset-cam">🎯 Center</button>
+            </div>
+          </div>
+
+          <!-- Floating Mineral Target HUD -->
+          <div id="mineral-target-hud">
+            <div class="target-hud-header">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="target-badge" id="hud-min-badge">TARGET LOCKED</span>
+                <strong id="hud-min-name" style="font-size:13px; color:#fff;">Fe/Mg-Smectites</strong>
+              </div>
+              <button class="target-btn-close" id="hud-min-close">&times;</button>
+            </div>
+            <div class="target-row">
+              <span class="target-row-label">Highest Concentration Site:</span>
+              <span class="target-row-val" id="hud-min-site">Mawrth Vallis (24.00° N, 19.00° W)</span>
+            </div>
+            <div class="target-row">
+              <span class="target-row-label">Diagnostic Spectral Absorptions:</span>
+              <span class="target-row-val mono" id="hud-min-bands">1.91 µm (H2O), 2.30 µm (Fe-OH)</span>
+            </div>
+            <div class="target-row">
+              <span class="target-row-label">USGS SIM 3292 Host Unit:</span>
+              <span class="target-row-val" id="hud-min-unit">eNh (Early Noachian Highland Crust)</span>
+            </div>
+            <div class="target-row">
+              <span class="target-row-label">Orbital Instrument &amp; Abundance:</span>
+              <span class="target-row-val" id="hud-min-inst">CRISM FRT TRDR • 150m continuous stratigraphy</span>
+            </div>
+            <div class="target-row" style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:4px;">
+              <span class="target-row-label">Astrobiology Significance:</span>
+              <span class="target-row-val" id="hud-min-sig" style="color:var(--text-dim); font-size:10px;">Neutral pH aqueous environment</span>
+            </div>
+          </div>
+
+          <!-- Geologic Map Color Legend Drawer -->
+          <div id="globe-legend-drawer">
+            <div class="legend-drawer-header">
+              <span style="font-weight:700; font-size:11px; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">USGS SIM 3292 Color Legend</span>
+              <button class="target-btn-close" id="btn-close-legend">&times;</button>
+            </div>
+            <div class="legend-drawer-body">
+              <!-- Noachian -->
+              <div>
+                <div class="legend-group-title" style="color:#22c55e;">🟢 Noachian Period (4.1 – 3.7 Ga)</div>
+                <div class="legend-items-list">
+                  <div class="legend-unit-item" data-fly-lat="-20.0" data-fly-lon="25.0" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#6d9e31;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">mNh &bull; Middle Noachian Highland</span>
+                      <span class="u-name">Smectite clay crust &bull; 44,917,000 km²</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="24.0" data-fly-lon="-19.0" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#4d7c0f;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">eNh &bull; Early Noachian Highland</span>
+                      <span class="u-name">Mawrth basement clays &bull; 3,595,000 km²</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="24.6" data-fly-lon="-18.5" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#84cc16;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">lNh &bull; Late Noachian Highland</span>
+                      <span class="u-name">Leached Al-clay upper horizon</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="-25.0" data-fly-lon="40.0" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#059669;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">mNf &bull; Noachian Fluvial</span>
+                      <span class="u-name">Valley networks &bull; dendritic channels</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hesperian -->
+              <div>
+                <div class="legend-group-title" style="color:#facc15;">🟤 Hesperian Period (3.7 – 3.0 Ga)</div>
+                <div class="legend-items-list">
+                  <div class="legend-unit-item" data-fly-lat="-15.0" data-fly-lon="175.0" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#d97706;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">eHv &bull; Early Hesperian Volcanic</span>
+                      <span class="u-name">Ridged flood plains &bull; 23,450,000 km²</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="-6.5" data-fly-lon="-75.8" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#b45309;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">lHt &bull; Late Hesperian Transition</span>
+                      <span class="u-name">Valles Marineris sulfate ILDs &bull; 5,888,000 km²</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="-1.95" data-fly-lon="-5.53" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#ca8a04;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">eHt &bull; Early Hesperian Transition</span>
+                      <span class="u-name">Meridiani jarosite evaporite beds</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="-80.0" data-fly-lon="0.0" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#a8825c;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">Hp &bull; Hesperian Polar</span>
+                      <span class="u-name">Southern layered deposits &bull; 2,670,000 km²</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Amazonian -->
+              <div>
+                <div class="legend-group-title" style="color:#fb923c;">🟠 Amazonian Period (3.0 Ga – Present)</div>
+                <div class="legend-items-list">
+                  <div class="legend-unit-item" data-fly-lat="18.65" data-fly-lon="-133.8" data-fly-dist="460">
+                    <span class="unit-color-box" style="background:#e11d48;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">Ave &bull; Amazonian Volcanic</span>
+                      <span class="u-name">Olympus Mons &bull; Tharsis constructs</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="45.0" data-fly-lon="110.0" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#f97316;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">mAl &bull; Middle Amazonian Lowland</span>
+                      <span class="u-name">Vastitas Borealis &bull; 23,246,000 km²</span>
+                    </div>
+                  </div>
+                  <div class="legend-unit-item" data-fly-lat="84.5" data-fly-lon="0.0" data-fly-dist="440">
+                    <span class="unit-color-box" style="background:#e0f2fe;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">lApc &bull; Amazonian Polar Cap</span>
+                      <span class="u-name">North polar water ice dome &bull; 853,000 km²</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Impact -->
+              <div>
+                <div class="legend-group-title" style="color:#38bdf8;">🔵 Impact Materials</div>
+                <div class="legend-items-list">
+                  <div class="legend-unit-item" data-fly-lat="-42.7" data-fly-lon="70.0" data-fly-dist="460">
+                    <span class="unit-color-box" style="background:#38bdf8;"></span>
+                    <div class="legend-unit-info">
+                      <span class="u-sym">AHi &bull; Amazonian/Hesperian Impact</span>
+                      <span class="u-name">Basin ejecta &bull; Hellas, Gale, Jezero</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom HUD Quick Waypoints & Coordinates -->
+          <div class="globe-hud-bottom">
+            <div class="coords-readout-pill" id="globe-coords-pill">
+              <span>📍 Lat: <strong id="lbl-globe-lat">0.00°</strong></span>
+              <span>Lon: <strong id="lbl-globe-lon">0.00°</strong></span>
+              <span>Unit: <strong id="lbl-globe-unit" style="color:var(--accent-yellow);">mNh (Middle Noachian)</strong></span>
+            </div>
+
+            <div class="globe-hud-panel" style="padding:6px 12px;">
+              <span style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-right:4px;">Landmarks:</span>
+              <div class="waypoints-bar">
+                <button class="hud-chip-btn" data-fly-lat="18.65" data-fly-lon="-133.80" data-fly-dist="460">🌋 Olympus Mons</button>
+                <button class="hud-chip-btn" data-fly-lat="-9.80" data-fly-lon="-76.50" data-fly-dist="440">🏜️ Valles Marineris</button>
+                <button class="hud-chip-btn" data-fly-lat="18.44" data-fly-lon="77.45" data-fly-dist="440">🌊 Jezero Crater</button>
+                <button class="hud-chip-btn" data-fly-lat="-4.59" data-fly-lon="137.44" data-fly-dist="440">⛰️ Gale Crater</button>
+                <button class="hud-chip-btn" data-fly-lat="24.00" data-fly-lon="-19.00" data-fly-dist="440">🪨 Mawrth Vallis</button>
+                <button class="hud-chip-btn" data-fly-lat="-42.70" data-fly-lon="70.00" data-fly-dist="460">💥 Hellas Basin</button>
+                <button class="hud-chip-btn" data-fly-lat="84.50" data-fly-lon="0.00" data-fly-dist="440">❄️ North Pole</button>
+                <button class="hud-chip-btn" data-fly-lat="-85.00" data-fly-lon="0.00" data-fly-dist="440">🧊 South Pole</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:8px; font-size:11px; color:var(--text-dim);">
+          <span>🖱️ <strong>Controls:</strong> Left-click &amp; drag to rotate planet &bull; Scroll to zoom &bull; Click any Mineral Button to target high-abundance site</span>
+          <span style="color:var(--accent-green); font-weight:600;">✓ Authentic 4K USGS SIM 3292 Texture &bull; Zero White Margins &bull; Calibrated Planetary Lighting</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: Aqueous Mineral Mapping & Spectral Workflow -->
+    <div id="tab-spectral" class="tab-content">
+
+      <!-- Executive Mapping Workflow Sections -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>Orbital Spectral Imaging Workflow: Aqueous Mineral Detection</span>
+            <span class="section-badge">Planetary Remote Sensing Plan</span>
+          </div>
+          <span style="font-size:12px; color:var(--text-dim);">CRISM (MRO) &bull; OMEGA (Mars Express)</span>
+        </div>
+
+        <!-- Headed Sections as specified in the prompt -->
+        <div class="workflow-section">
+          <div class="workflow-h3">1. Data Selection</div>
+          <div class="workflow-p">
+            <strong>Instruments & Product Types:</strong> We integrate targeted hyperspectral observations from MRO <em>CRISM</em> (Compact Reconnaissance Imaging Spectrometer for Mars) and regional mapping scans from MEX <em>OMEGA</em> (Observatoire pour la Minéralogie, l'Eau, les Glaces et l'Activité).
+            For local outcrop detection, we select CRISM <strong>FRT (Full Resolution Targeted, 18 m/px, 544 channels, 0.36–3.92 µm)</strong> and <strong>HRL (Half Resolution Long, 36 m/px)</strong> products in <strong>TRDR (Targeted Reduced Data Record, I/F reflectance)</strong> format. FRT/HRL products provide the spatial resolving power required to isolate stratified aqueous horizons (e.g., Jezero delta, Mawrth Vallis). For regional-to-global reconnaissance, we utilize CRISM <strong>MSP (Multispectral Survey, ~200 m/px)</strong> and OMEGA <strong>C-channel (1.0–2.7 µm, 300–4800 m/px)</strong> cubes, which provide continuous coverage across the Noachian southern highlands and Valles Marineris.
+          </div>
+        </div>
+
+        <div class="workflow-section">
+          <div class="workflow-h3">2. Preprocessing Steps</div>
+          <div class="workflow-p">
+            <strong>Photometric, Atmospheric & Instrumental Corrections:</strong> 
+            (1) <em>Instrument Calibration:</em> Spatial destriping is executed via column-dependent flat-field ratioing to remove detector column non-uniformity and spike artifacts; wavelength and optical thermal background drift are corrected using CDR calibration files.
+            (2) <em>Atmospheric Correction:</em> Empirical <strong>Volcano-Scan Ratioing</strong> is performed by dividing observed spectra by scaled transmission spectra obtained over Olympus Mons (where atmospheric path length varies with elevation under uniform low dust opacity), normalizing the 2.0 µm gaseous CO2 doublet. For high-dust periods ($\tau > 0.8$), we couple this with <strong>DISORT-based (Discrete Ordinates Radiative Transfer)</strong> aerosol modeling incorporating aerosol optical depth ($\tau$) and Single Scattering Albedo (SSA) derived from the CRISM EPF (Emission Phase Function) sequences.
+            (3) <em>Photometric Normalization:</em> Reflectance values ($I/F$) are normalized to standard geometry ($i=30^\circ$, $e=0^\circ$) using the <strong>Minnaert / Hapke photometric formulation</strong> to eliminate illumination artifacts across steep crater walls and chasmata scarps.
+          </div>
+        </div>
+
+        <div class="workflow-section">
+          <div class="workflow-h3">3. Spectral Analysis</div>
+          <div class="workflow-p">
+            <strong>Continuum Removal, Band Depth Formulations & Parameter Thresholds:</strong>
+            Continuum removal is calculated over isolated NIR windows ($1.0–2.6\ \mu\text{m}$) using convex hull and linear endpoints. Normalized band depths ($BD_\lambda$) are evaluated via:
+            <code style="color:var(--accent-yellow); font-family:'JetBrains Mono'; display:block; margin:6px 0;">BD_&lambda; = 1 - [ R(&lambda;) / (a &bull; R(&lambda;1) + b &bull; R(&lambda;2)) ]</code>
+            Specific summary parameter formulations (Viviano-Beck et al., 2014) and detection thresholds applied across the dataset include:
+            <ul style="margin-left: 20px; margin-top: 6px; display:flex; flex-direction:column; gap:4px;">
+              <li><strong>Clay Minerals (Phyllosilicates):</strong> <code>BD1900 > 0.020</code> (molecular H2O in interlayer smectite sheet), <code>D2300 > 0.015</code> (Fe/Mg-OH octahedral stretch in nontronite/saponite), and <code>BD2210 > 0.015</code> (Al-OH stretch in kaolinite/montmorillonite). Composite Browse: <em>CRISM PHY (R: D2300, G: BD2210, B: BD1900)</em>.</li>
+              <li><strong>Sulfates:</strong> <code>SINDEX2 > 0.020</code> (convex slope parameter between 2.10–2.40 µm indicating polyhydrated sulfates), <code>BD2100 > 0.015</code> (monohydrated sulfate/kieserite OH doublet), <code>BD2400 > 0.020</code>, and <code>BD1750 > 0.015</code> (gypsum doublet). Composite Browse: <em>CRISM SUL (R: BD2100, G: SINDEX2, B: BD1900)</em>.</li>
+              <li><strong>Ancient Water-Altered Rocks (Carbonates & Opaline Silica):</strong> <code>MIN2295_2480 > 0.018</code> and <code>BD2500 > 0.015</code> (CO3 asymmetric vibrational overtones in Mg/Fe carbonates), combined with <code>BD2210 > 0.025</code> accompanied by asymmetric broad spectral shoulder (Si-OH stretching in amorphous hydrated opaline silica). Composite Browse: <em>CRISM CR2 / HYS (R: MIN2295_2480, G: BD2500, B: BD1900)</em>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="workflow-section">
+          <div class="workflow-h3">4. Validation</div>
+          <div class="workflow-p">
+            <strong>Cross-Checking & Ground-Truth Verification:</strong>
+            Detected spectral units are validated against reference laboratory standards from the <strong>USGS Digital Spectral Library</strong> and the <strong>RELAB (Brown University)</strong> database. Primary orbital benchmark control localities include <em>Mawrth Vallis</em> (continuous stratigraphy of Fe/Mg smectite overlain by Al-smectite and kaolinite), <em>Nili Fossae</em> (co-occurring olivine, Fe/Mg smectite, and Mg-carbonate), and <em>Melas Chasma</em> (layered polyhydrated sulfates).
+            Direct in-situ surface ground-truth is confirmed using rover analytical instrumentation:
+            (1) <strong>Jezero Crater (Mars 2020 Perseverance):</strong> PIXL, SuperCam, and SHERLOC spectroscopically confirmed the presence of Fe/Mg smectites in delta bottomsets, Mg-carbonates in the crater margin unit, and hydrated silica in delta topsets.
+            (2) <strong>Gale Crater (MSL Curiosity):</strong> CheMin XRD confirmed saponite, nontronite, bassanite, and jarosite within the Glen Torridon and Mount Sharp sulfate unit.
+            (3) <strong>Meridiani Planum (MER Opportunity):</strong> APXS and Mössbauer confirmed jarosite and Ca-sulfate veins in Eagle and Endurance craters.
+          </div>
+        </div>
+
+        <div class="workflow-section">
+          <div class="workflow-h3">5. Outputs & Astrobiological Relevance</div>
+          <div class="workflow-p">
+            <strong>Georeferenced Mineral Map & Astrobiological Habitability/Preservation Matrix:</strong>
+            The finalized outputs comprise co-registered GIS rasters projected in Robinson projection (Mars 2000 Sphere) with band-depth confidence overlays.
+            From an astrobiological standpoint:
+            (1) <em>Clay Minerals</em> indicate ancient sustained, near-neutral to mildly alkaline aqueous environments (pH 6–8) with high water activity ($a_w \to 1.0$) during the Noachian Era. Their expandable 2:1 and 1:1 aluminosilicate sheets possess exceptional taphonomic preservation potential, entombing amino acids and polycyclic organics between mineral lattices away from solar UV and oxidative oxidants.
+            (2) <em>Sulfates</em> mark the global climatic transition to arid, acidic, sulfur-rich evaporative regimes (pH 2–5) in the Hesperian Era. While hypersalinity and acidity constrain broad habitability, sulfates preserve microfossils through rapid evaporite crystalline entombment (halotolerant/acidophilic niches).
+            (3) <em>Carbonates & Opaline Silica</em> represent Gold Standard biosignature preservation repositories; opaline silica precipitating from epithermal neutral-alkaline hot springs (e.g., Gusev Home Plate) entomb microstructures in microcrystalline silica (chertification).
+          </div>
+        </div>
+
+        <div class="workflow-section" style="border-left-color: var(--hazard-red);">
+          <div class="workflow-h3" style="color:var(--hazard-red);">Flagged Assumptions & Limitations</div>
+          <div class="workflow-p">
+            (1) <strong>Spatial Resolution & Sub-Pixel Mixing:</strong> CRISM (18–36 m/px) and OMEGA (300+ m/px) average surface reflectance over tens to hundreds of square meters; linear unmixing is required to detect small-scale veins.
+            (2) <strong>Atmospheric Dust & Aerosol Obscuration:</strong> Martian atmospheric dust optical depth ($\tau > 1.0$) and nanophase ferric oxide dust mantles frequently attenuate bedrock absorptions; detections require dust cover index (DCI) masking.
+            (3) <strong>Instrumental Cryocooler Aging:</strong> CRISM infrared cryocooler warming after 2010 degraded SNR at wavelengths $> 1.0\ \mu\text{m}$, creating elevated noise near the 2.4–2.5 µm sulfate/carbonate bands.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Interactive Spectral Curves Canvas -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>Interactive Laboratory & Orbital Spectral Profiles (1.0 – 2.6 µm)</span>
+            <span class="section-badge">Continuum-Removed Reflectance</span>
+          </div>
+          <div class="chart-legend" id="chart-legend"></div>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="spectral-canvas"></canvas>
+          <div style="font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between;">
+            <span>&larr; Wavelength: 1.0 µm (Short-Wave Infrared SWIR)</span>
+            <span>Diagnostic Bands: 1.4 µm (OH/H2O) &bull; 1.9 µm (H2O) &bull; 2.2–2.3 µm (Metal-OH) &bull; 2.4–2.5 µm (SO4 / CO3)</span>
+            <span>2.6 µm (Mid-IR Boundary) &rarr;</span>
+          </div>
+        </div>
+
+        <!-- Interactive Band Depth Threshold Engine -->
+        <div class="slider-group">
+          <div class="slider-box">
+            <div class="slider-label">
+              <span>BD1900 Threshold (Hydration H2O)</span>
+              <span id="lbl-bd1900" style="color:var(--accent-orange); font-family:monospace;">0.020</span>
+            </div>
+            <input type="range" min="0.005" max="0.08" step="0.005" value="0.020" class="slider-input" id="slider-bd1900">
+          </div>
+
+          <div class="slider-box">
+            <div class="slider-label">
+              <span>D2300 Threshold (Fe/Mg Smectites)</span>
+              <span id="lbl-d2300" style="color:var(--accent-green); font-family:monospace;">0.015</span>
+            </div>
+            <input type="range" min="0.005" max="0.06" step="0.005" value="0.015" class="slider-input" id="slider-d2300">
+          </div>
+
+          <div class="slider-box">
+            <div class="slider-label">
+              <span>SINDEX2 Threshold (Polyhydrated Sulfates)</span>
+              <span id="lbl-sindex2" style="color:var(--accent-yellow); font-family:monospace;">0.020</span>
+            </div>
+            <input type="range" min="0.005" max="0.07" step="0.005" value="0.020" class="slider-input" id="slider-sindex2">
+          </div>
+
+          <div class="slider-box">
+            <div class="slider-label">
+              <span>MIN2295_2480 Threshold (Carbonates)</span>
+              <span id="lbl-min2295" style="color:var(--accent-cyan); font-family:monospace;">0.018</span>
+            </div>
+            <input type="range" min="0.005" max="0.05" step="0.005" value="0.018" class="slider-input" id="slider-min2295">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 Mineral Groups Deep Dive Cards -->
+      <div class="mineral-grid">
+
+        <!-- Clays Card -->
+        <div class="mineral-card clays">
+          <div class="mineral-card-header">
+            <div>
+              <div class="mineral-name">Clay Minerals (Phyllosilicates)</div>
+              <span style="font-size:11px; color:var(--text-dim);">Fe/Mg-Smectites, Kaolinite, Illite</span>
+            </div>
+            <span class="mineral-tag clays">Noachian Horizon</span>
+          </div>
+
+          <div class="spec-block">
+            <div class="spec-row">
+              <span class="spec-k">Diagnostic Absorption Bands:</span>
+              <span class="spec-v">1.41 µm, 1.92 µm, 2.21 µm, 2.30 µm</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">CRISM Spectral Parameters:</span>
+              <span class="spec-v">BD1900 &gt; 0.02 &bull; D2300 &gt; 0.015</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Primary Martian Localities:</span>
+              <span class="spec-v" style="font-size:10px;">Mawrth Vallis, Nili Fossae, Jezero Delta</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Astrobiological Habitability:</span>
+              <span class="spec-v" style="color:var(--accent-green);">HIGH (pH 6–8, aw &sim; 1.0)</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Preservation Potential:</span>
+              <span class="spec-v" style="color:var(--accent-green);">EXCELLENT (Interlayer Entrapment)</span>
+            </div>
+          </div>
+          <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">
+            Represents sustained liquid water interaction with ancient basaltic crust during the warm, wet Noachian epoch. Clays possess high surface area to volume ratios and low permeability, safeguarding complex organic biomolecules from photolysis and oxidants.
+          </div>
+        </div>
+
+        <!-- Sulfates Card -->
+        <div class="mineral-card sulfates">
+          <div class="mineral-card-header">
+            <div>
+              <div class="mineral-name">Sulfates (Evaporite Deposits)</div>
+              <span style="font-size:11px; color:var(--text-dim);">Gypsum, Mg-Sulfates, Kieserite, Jarosite</span>
+            </div>
+            <span class="mineral-tag sulfates">Hesperian Horizon</span>
+          </div>
+
+          <div class="spec-block">
+            <div class="spec-row">
+              <span class="spec-k">Diagnostic Absorption Bands:</span>
+              <span class="spec-v">1.75 µm, 1.93 µm, 2.12 µm, 2.40 µm</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">CRISM Spectral Parameters:</span>
+              <span class="spec-v">SINDEX2 &gt; 0.02 &bull; BD2100 &gt; 0.015</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Primary Martian Localities:</span>
+              <span class="spec-v" style="font-size:10px;">Valles Marineris, Meridiani, Mt Sharp</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Astrobiological Habitability:</span>
+              <span class="spec-v" style="color:var(--accent-yellow);">MODERATE (Acidic/High Salinity)</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Preservation Potential:</span>
+              <span class="spec-v" style="color:var(--accent-yellow);">HIGH (Rapid Saline Entombment)</span>
+            </div>
+          </div>
+          <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">
+            Formed during the acidic, evaporative drying of Mars in the Hesperian. Gypsum and polyhydrated sulfates trap fluid inclusions and cell remains in crystalline lattices, although jarosite reflects oxidizing, acidic waters (pH 2–4).
+          </div>
+        </div>
+
+        <!-- Altered Rocks Card -->
+        <div class="mineral-card silicates">
+          <div class="mineral-card-header">
+            <div>
+              <div class="mineral-name">Water-Altered Rocks & Carbonates</div>
+              <span style="font-size:11px; color:var(--text-dim);">Mg-Carbonates, Opaline Silica, Zeolites</span>
+            </div>
+            <span class="mineral-tag silicates">Hydrothermal & Lacustrine</span>
+          </div>
+
+          <div class="spec-block">
+            <div class="spec-row">
+              <span class="spec-k">Diagnostic Absorption Bands:</span>
+              <span class="spec-v">2.21–2.26 µm (Si-OH), 2.31 µm &amp; 2.51 µm (CO3)</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">CRISM Spectral Parameters:</span>
+              <span class="spec-v">MIN2295_2480 &gt; 0.018 &bull; BD2500 &gt; 0.015</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Primary Martian Localities:</span>
+              <span class="spec-v" style="font-size:10px;">Nili Fossae, Jezero Rim, Gusev Home Plate</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Astrobiological Habitability:</span>
+              <span class="spec-v" style="color:var(--accent-cyan);">HIGH (Circumneutral, Thermal Energy)</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-k">Preservation Potential:</span>
+              <span class="spec-v" style="color:var(--accent-cyan);">EXCEPTIONAL (Gold Standard Chert)</span>
+            </div>
+          </div>
+          <div style="font-size:12px; color:#cbd5e1; line-height:1.5;">
+            Precipitated from alkaline waters and hydrothermal hot springs. Opaline silica is the highest-rated biosignature preservation medium known on Earth, rapidly mineralizing microfossils and organic cellular walls before decay.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 2: 44 USGS Geologic Units Explorer -->
+    <div id="tab-units" class="tab-content">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>USGS Scientific Investigations Map 3292: 44 Planetary Units</span>
+            <span class="section-badge" id="units-count-badge">44 Units</span>
+          </div>
+          <div class="filters-row">
+            <div class="epoch-pills">
+              <button class="epoch-btn active" data-epoch="all">All (44)</button>
+              <button class="epoch-btn" data-epoch="Noachian">Noachian (10)</button>
+              <button class="epoch-btn" data-epoch="Hesperian">Hesperian (16)</button>
+              <button class="epoch-btn" data-epoch="Amazonian">Amazonian (11)</button>
+              <button class="epoch-btn" data-epoch="Transitional">Transitional (7)</button>
+            </div>
+            <input type="text" class="search-units-input" id="search-units" placeholder="Filter unit symbol or name...">
+          </div>
+        </div>
+
+        <div class="units-grid" id="units-grid-container">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Structures & Contacts Geodatabase -->
+    <div id="tab-structures" class="tab-content">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>Global Structural Linework & Contact Networks (SIM 3292 Database)</span>
+            <span class="section-badge">ArcGIS Geodatabase</span>
+          </div>
+          <span style="font-size:12px; color:var(--text-dim);">Robinson Projection &bull; Mars 2000 Geographic Coordinate System</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+          <!-- Structure Stats -->
+          <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:12px; padding:18px;">
+            <div style="font-size:14px; font-weight:700; color:#fff; margin-bottom:12px;">Global Structural Linework (3,593 Features)</div>
+            <div style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+                <span style="color:var(--text-dim);">Compressive Wrinkle Ridges (Morphology: Ridge):</span>
+                <span style="font-family:monospace; color:var(--accent-orange); font-weight:700;">2,142 Features (59.6%)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+                <span style="color:var(--text-dim);">Extensional Faults &amp; Graben (Morphology: Trough):</span>
+                <span style="font-family:monospace; color:var(--accent-cyan); font-weight:700;">1,451 Features (40.4%)</span>
+              </div>
+              <div style="color:#cbd5e1; line-height:1.5; margin-top:6px;">
+                Wrinkle ridges dominate the volcanic flood plains (Hesperian <code>eHv</code> and <code>lHv</code>) reflecting regional planetary lithospheric cooling and contraction. Troughs and chasmata are concentrated radially around the Tharsis volcanic rise and the Valles Marineris canyon complex.
+              </div>
+            </div>
+          </div>
+
+          <!-- Contacts Stats -->
+          <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:12px; padding:18px;">
+            <div style="font-size:14px; font-weight:700; color:#fff; margin-bottom:12px;">Geologic Unit Contacts (3,800 Segments)</div>
+            <div style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+                <span style="color:var(--text-dim);">Certain Contacts (Sharp boundaries):</span>
+                <span style="font-family:monospace; color:var(--accent-green); font-weight:700;">2,242 Segments (59.0%)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+                <span style="color:var(--text-dim);">Approximate Contacts (Gradational / Mantled):</span>
+                <span style="font-family:monospace; color:var(--accent-yellow); font-weight:700;">1,436 Segments (37.8%)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+                <span style="color:var(--text-dim);">Map Sheet &amp; Polar Borders:</span>
+                <span style="font-family:monospace; color:#cbd5e1; font-weight:700;">94 Segments (2.5%)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px;">
+                <span style="color:var(--text-dim);">Internal Sub-Unit Contacts:</span>
+                <span style="font-family:monospace; color:#cbd5e1; font-weight:700;">28 Segments (0.7%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(15, 23, 42, 0.6); border:1px solid var(--card-border); border-radius:12px; padding:16px; font-size:12px; line-height:1.6; color:#cbd5e1;">
+          <strong>Cartographic GIS Standards (Metadata.txt &amp; README.txt):</strong>
+          Compiled in Robinson projection using the Mars 2000 geographic coordinate system (<code>GCS_Mars_2000_Sphere</code>, radius 3,396,190.0 m, Center Longitude = 0.0°). Drafting was conducted at 1:5,000,000 scale with a 5 km vertex spacing for smoothing. Minimum mapped line feature length is 100 km, and minimum outcrop dimensions are 40 km wide by 100 km long for global legibility.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Rover Ground-Truth & In-Situ Sites -->
+    <div id="tab-rovers" class="tab-content">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>Ground-Truth Cross-Check: Orbital Spectral Detections vs. In-Situ Rover Instruments</span>
+            <span class="section-badge">Surface Validation</span>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Mission &amp; Site</th>
+                <th>Host USGS Unit</th>
+                <th>Coordinates</th>
+                <th>Orbital Spectral Prediction (CRISM/OMEGA)</th>
+                <th>In-Situ Rover Discovery (XRD / XRF / Raman)</th>
+                <th>Validation Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Perseverance (Mars 2020)</strong><br><span style="font-size:10px; color:var(--text-dim);">Jezero Crater</span></td>
+                <td><span class="unit-symbol-pill" style="background:#b3b3e6;">eHt</span> / <span class="unit-symbol-pill" style="background:#ffff99;">AHi</span></td>
+                <td>18.44° N, 77.45° E</td>
+                <td>Fe/Mg-smectites in delta; Mg-carbonates in crater margin; olivine-rich floor unit.</td>
+                <td><strong>SuperCam / PIXL / SHERLOC:</strong> Confirmed trioctahedral smectites, hydrated silica, and sparry Mg-carbonates with organic fluorescence signals.</td>
+                <td><span style="color:var(--accent-green); font-weight:700;">✓ FULLY CONFIRMED</span></td>
+              </tr>
+              <tr>
+                <td><strong>Curiosity (MSL)</strong><br><span style="font-size:10px; color:var(--text-dim);">Gale Crater</span></td>
+                <td><span class="unit-symbol-pill" style="background:#b3b3e6;">eHt</span> / <span class="unit-symbol-pill" style="background:#ffff99;">AHi</span></td>
+                <td>4.59° S, 137.44° E</td>
+                <td>Smectite-bearing mudstones overlain by polyhydrated &amp; monohydrated sulfate sequence on Mt Sharp.</td>
+                <td><strong>CheMin XRD / ChemCam:</strong> Identified nontronite, ferrian saponite, bassanite, anhydrite, and crystalline jarosite in sedimentary mudstones.</td>
+                <td><span style="color:var(--accent-green); font-weight:700;">✓ FULLY CONFIRMED</span></td>
+              </tr>
+              <tr>
+                <td><strong>Opportunity (MER-B)</strong><br><span style="font-size:10px; color:var(--text-dim);">Meridiani Planum</span></td>
+                <td><span class="unit-symbol-pill" style="background:#99cc99;">lHl</span> / <span class="unit-symbol-pill" style="background:#8585ad;">eHh</span></td>
+                <td>1.95° S, 354.47° E</td>
+                <td>Crystalline coarse gray hematite; polyhydrated sulfate plains.</td>
+                <td><strong>Mössbauer / APXS:</strong> Discovered hematite "blueberries" and &gt;25 wt% jarosite and gypsum in sulfate-rich sandstone bedrock.</td>
+                <td><span style="color:var(--accent-green); font-weight:700;">✓ FULLY CONFIRMED</span></td>
+              </tr>
+              <tr>
+                <td><strong>Spirit (MER-A)</strong><br><span style="font-size:10px; color:var(--text-dim);">Gusev Crater</span></td>
+                <td><span class="unit-symbol-pill" style="background:#ffff99;">AHi</span> / <span class="unit-symbol-pill" style="background:#c49a6c;">mNh</span></td>
+                <td>14.57° S, 175.47° E</td>
+                <td>Basaltic floor plains with minor alteration undetected at orbital resolution.</td>
+                <td><strong>APXS / Mini-TES:</strong> Discovered &gt;90 wt% pure opaline silica deposits at Home Plate, revealing ancient hydrothermal fumaroles.</td>
+                <td><span style="color:var(--accent-cyan); font-weight:700;">✓ IN-SITU DISCOVERY</span></td>
+              </tr>
+              <tr>
+                <td><strong>Phoenix Lander</strong><br><span style="font-size:10px; color:var(--text-dim);">Vastitas Borealis</span></td>
+                <td><span class="unit-symbol-pill" style="background:#b3e6b3;">mAl</span></td>
+                <td>68.22° N, 234.25° E</td>
+                <td>Circumpolar water ice beneath thin dry regolith layer; seasonal frost.</td>
+                <td><strong>TEGA / MECA:</strong> Directly excavated subsurface water ice table and detected perchlorate salts (0.5–1 wt%) and calcite.</td>
+                <td><span style="color:var(--accent-green); font-weight:700;">✓ FULLY CONFIRMED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: USGS Documents & Database Explorer (PDFs & Metadata) -->
+    <div id="tab-docs" class="tab-content">
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>Official USGS SIM 3292 Documentation &amp; Data Package Explorer</span>
+            <span class="section-badge">USGS Publications</span>
+          </div>
+          <span style="font-size:12px; color:var(--text-dim);">Ken Tanaka et al., 2014</span>
+        </div>
+
+        <div class="doc-viewer-grid">
+          <div class="doc-menu">
+            <div class="doc-menu-item active" data-doc="readme">
+              <span class="doc-menu-title">📄 README.txt</span>
+              <span class="doc-menu-desc">Database structure, GIS layers, projection</span>
+            </div>
+            <div class="doc-menu-item" data-doc="metadata">
+              <span class="doc-menu-title">📋 Metadata.txt</span>
+              <span class="doc-menu-desc">FGDC standard metadata, spatial lineage</span>
+            </div>
+            <div class="doc-menu-item" data-doc="table">
+              <span class="doc-menu-title">📊 Table.pdf</span>
+              <span class="doc-menu-desc">Crater size-frequency &amp; model ages</span>
+            </div>
+            <div class="doc-menu-item" data-doc="pamphlet">
+              <span class="doc-menu-title">📖 sim3292_pamphlet.pdf</span>
+              <span class="doc-menu-desc">48-page comprehensive scientific monograph</span>
+            </div>
+            <div class="doc-menu-item" data-doc="map">
+              <span class="doc-menu-title">🗺️ sim3292_map.pdf</span>
+              <span class="doc-menu-desc">Official 1:20M Geologic Map Sheet (36 MB)</span>
+            </div>
+          </div>
+
+          <div class="doc-display-pane">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3 id="doc-active-title" style="font-family:'Outfit'; font-size:16px; color:#fff;">README.txt - USGS SIM 3292</h3>
+              <a id="doc-download-link" href="/README.txt" target="_blank" class="nav-btn primary" style="font-size:11px; padding:4px 10px;">Open Raw Document &nearr;</a>
+            </div>
+
+            <div id="doc-active-content" style="flex:1;">
+              <pre class="doc-text-pre" id="doc-text-view">Loading document contents...</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Tab Switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.tab;
+        document.getElementById(target).classList.add('active');
+
+        if (target === 'tab-3d-globe') {
+          onGlobeContainerResize();
+        } else if (target === 'tab-spectral') {
+          drawSpectralChart();
+        }
+      });
+    });
+
+    // Dataset Cache
+    let SIM3292_DATA = null;
+
+    // Load full JSON dataset
+    async function loadDataset() {
+      try {
+        const resp = await fetch('/data/sim3292_full_analysis.json');
+        SIM3292_DATA = await resp.json();
+        renderGeologyUnits(SIM3292_DATA.geologic_units);
+        setupUnitSearch();
+        setupEpochFilters();
+      } catch (err) {
+        console.error('Failed to load dataset:', err);
+      }
+    }
+
+    // Render Geology Units
+    function renderGeologyUnits(units, filterEpoch = 'all', filterSearch = '') {
+      const container = document.getElementById('units-grid-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      let filtered = units.filter(u => {
+        const matchEpoch = filterEpoch === 'all' || u.group.toLowerCase() === filterEpoch.toLowerCase();
+        const searchTerms = filterSearch.toLowerCase().trim();
+        const matchSearch = !searchTerms || 
+          u.symbol.toLowerCase().includes(searchTerms) || 
+          u.name.toLowerCase().includes(searchTerms) ||
+          u.alteration_minerals.toLowerCase().includes(searchTerms);
+        return matchEpoch && matchSearch;
+      });
+
+      document.getElementById('units-count-badge').textContent = `${filtered.length} of ${units.length} Units`;
+
+      filtered.forEach(u => {
+        const card = document.createElement('div');
+        card.className = 'unit-card';
+        card.innerHTML = `
+          <div class="unit-top">
+            <span class="unit-symbol-pill" style="background:${u.color};">${u.symbol}</span>
+            <span class="unit-epoch-badge">${u.epoch}</span>
+          </div>
+          <div class="unit-name">${u.name}</div>
+          <div class="unit-metric-row">
+            <span>Mapped Area:</span>
+            <span style="color:#fff;">${u.total_area_km2.toLocaleString()} km² (${u.percent_surface}%)</span>
+          </div>
+          <div class="unit-metric-row">
+            <span>Polygons:</span>
+            <span style="color:#fff;">${u.polygon_count} mapped</span>
+          </div>
+          <div class="unit-minerals">
+            <strong>Alteration / Lithology:</strong> ${u.alteration_minerals}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function setupEpochFilters() {
+      const epochBtns = document.querySelectorAll('.epoch-btn');
+      epochBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          epochBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const epoch = btn.dataset.epoch;
+          const searchVal = document.getElementById('search-units').value;
+          renderGeologyUnits(SIM3292_DATA.geologic_units, epoch, searchVal);
+        });
+      });
+    }
+
+    function setupUnitSearch() {
+      const input = document.getElementById('search-units');
+      if (!input) return;
+      input.addEventListener('input', (e) => {
+        const activeBtn = document.querySelector('.epoch-btn.active');
+        const epoch = activeBtn ? activeBtn.dataset.epoch : 'all';
+        renderGeologyUnits(SIM3292_DATA.geologic_units, epoch, e.target.value);
+      });
+    }
+
+    // ==========================================
+    // 3D GEOLOGY GLOBE ENGINE (Three.js WebGL)
+    // ==========================================
+    let globeScene, globeCamera, globeRenderer, globeControls;
+    let marsGlobeMesh, atmosphereMesh, gridMesh;
+    let dirLight, ambientLight, fillLight;
+    let isAutoRotating = true;
+    let isGridVisible = false;
+    let isSunLight = false;
+    let areLandingsVisible = true;
+    let loadedTextures = {};
+    let raycaster = null;
+    let mouseVector = null;
+
+    const GLOBE_RADIUS = 200;
+
+    // Authoritative NASA & USGS Mars Exploration Landing Sites
+    const DEFAULT_LANDING_SITES = [
+      { id: "m20_perseverance", name: "Perseverance (Mars 2020)", station: "Octavia E. Butler Landing", site: "Jezero Crater Fan Delta", lat: 18.4446, lon: 77.4508, elevation_m: -2570, status: "Active", agency: "NASA", year: 2021, host_unit: "eHt / AHi (Paleolake Delta)", instruments: "SuperCam, Mastcam-Z, PIXL, SHERLOC" },
+      { id: "msl_curiosity", name: "Curiosity (MSL)", station: "Bradbury Landing", site: "Gale Crater (Mount Sharp)", lat: -4.5895, lon: 137.4417, elevation_m: -4501, status: "Active", agency: "NASA", year: 2012, host_unit: "eHt / AHi (Lacustrine Mudstones)", instruments: "CheMin XRD, ChemCam, SAM, APXS" },
+      { id: "mer_opportunity", name: "Opportunity (MER-B)", station: "Challenger Memorial Station", site: "Meridiani Planum (Eagle Crater)", lat: -1.9462, lon: -5.5266, elevation_m: -1390, status: "Completed", agency: "NASA", year: 2004, host_unit: "lHl (Sulfate Bedrock / Hematite)", instruments: "Mössbauer, APXS, Pancam, MI" },
+      { id: "mer_spirit", name: "Spirit (MER-A)", station: "Columbia Memorial Station", site: "Gusev Crater (Home Plate)", lat: -14.5684, lon: 175.4726, elevation_m: -1910, status: "Completed", agency: "NASA", year: 2004, host_unit: "eHv / eNh (Hydrothermal Silica Sinter)", instruments: "Mini-TES, Mössbauer, APXS" },
+      { id: "cnsa_zhurong", name: "Zhurong (Tianwen-1)", station: "Zhurong Station", site: "Southern Utopia Planitia", lat: 25.0660, lon: 109.9250, elevation_m: -4099, status: "Completed", agency: "CNSA", year: 2021, host_unit: "mAl (Utopia Sedimentary Lowland)", instruments: "RoPeR GPR, MarSCoDe Laser Spectrometer" },
+      { id: "insight_lander", name: "InSight Lander", station: "Homestead Hollow Station", site: "Elysium Planitia", lat: 4.5020, lon: 135.6230, elevation_m: -2613, status: "Completed", agency: "NASA", year: 2018, host_unit: "eHt (Hesperian Volcanic Plain)", instruments: "SEIS Ultra-Sensitive Seismometer, HP3" },
+      { id: "phoenix_landing_site", name: "Phoenix Lander", station: "Green Valley Station", site: "Vastitas Borealis (Circumpolar)", lat: 68.2188, lon: -125.7492, elevation_m: -4130, status: "Completed", agency: "NASA", year: 2008, host_unit: "mAl (Permafrost / Ground Ice)", instruments: "TEGA Mass Spec, MECA Wet Chemistry Lab" },
+      { id: "viking1_lander", name: "Viking 1 Lander", station: "Thomas Mutch Memorial Station", site: "Chryse Planitia Floodplain", lat: 22.4800, lon: -47.9700, elevation_m: -3627, status: "Completed", agency: "NASA", year: 1976, host_unit: "mNh / lHl (Chryse Outflow Plain)", instruments: "GC-MS, Biology Gas Exchange / Labeled Release" },
+      { id: "viking2_lander", name: "Viking 2 Lander", station: "Gerald Soffen Memorial Station", site: "Utopia Planitia", lat: 48.2690, lon: 134.0100, elevation_m: -3820, status: "Completed", agency: "NASA", year: 1976, host_unit: "mAl (Utopia Bouldery Plains)", instruments: "GC-MS, Seismometer, Biology Experiment" },
+      { id: "pathfinder_sojourner", name: "Mars Pathfinder (Sojourner)", station: "Carl Sagan Memorial Station", site: "Ares Vallis Floodplain", lat: 19.0900, lon: -33.5200, elevation_m: -3682, status: "Completed", agency: "NASA", year: 1997, host_unit: "eHt / lNh (Catastrophic Outflow Deposit)", instruments: "Alpha Proton X-Ray Spectrometer (APXS), IMP" },
+      { id: "beagle2_lander", name: "Beagle 2 (Mars Express)", station: "Isidis Planitia Station", site: "Isidis Planitia Basin", lat: 11.5265, lon: 90.4295, elevation_m: -3610, status: "Failed", agency: "ESA", year: 2003, host_unit: "AHi (Isidis Basin Sediment Fill)", instruments: "GAP Gas Analysis Package, Mössbauer" },
+      { id: "mars_2_lander", name: "Mars 2 Lander", station: "Mars 2 Site", site: "Hellas Planitia Basin Rim", lat: -45.0400, lon: -158.0900, elevation_m: 1500, status: "Failed", agency: "USSR", year: 1971, host_unit: "mNh (Noachian Cratered Rim)", instruments: "PrOP-M Micro-Rover" },
+      { id: "mars_3_lander", name: "Mars 3 Lander", station: "Ptolemaeus Station", site: "Sirenum Fossae", lat: -45.0400, lon: -157.9800, elevation_m: 1500, status: "Failed", agency: "USSR", year: 1971, host_unit: "mNh (Noachian Highland Terrain)", instruments: "First successful soft touchdown on Mars" },
+      { id: "mars_6_lander", name: "Mars 6 Lander", station: "Margaritifer Site", site: "Margaritifer Terra", lat: -23.9000, lon: -19.8000, elevation_m: -800, status: "Failed", agency: "USSR", year: 1974, host_unit: "eNh (Ancient Highland Crust)", instruments: "Atmospheric descent entry probe" },
+      { id: "mars_polar_lander", name: "Mars Polar Lander", station: "Planum Australe Site", site: "South Polar Layered Deposits", lat: -76.1800, lon: -164.6200, elevation_m: 1200, status: "Failed", agency: "NASA", year: 1999, host_unit: "Hp (Hesperian Polar Deposits)", instruments: "LIDAR, Descent Imager, Deep Space 2 Probes" },
+      { id: "valles_marineris_habitat", name: "Valles Marineris Base", station: "Melas Chasma Proposed Site", site: "Melas Chasma Deep Floor", lat: -9.8000, lon: -76.4000, elevation_m: -3200, status: "Proposed", agency: "NASA/Concept", year: 2035, host_unit: "lHt / Hto (Layered Sulfate ILD)", instruments: "Subsurface Pressurized Human Habitat Concept" }
+    ];
+
+    function init3DGeologyGlobe() {
+      const canvas = document.getElementById('geology-three-canvas');
+      if (!canvas) return;
+
+      const container = canvas.parentElement;
+      const width = container.clientWidth || 1000;
+      const height = container.clientHeight || 640;
+
+      if (!raycaster) raycaster = new THREE.Raycaster();
+      if (!mouseVector) mouseVector = new THREE.Vector2();
+
+      // 1. Scene & Camera
+      globeScene = new THREE.Scene();
+      globeCamera = new THREE.PerspectiveCamera(40, width / height, 1, 3000);
+      globeCamera.position.set(0, 50, 520);
+
+      // 2. Renderer with photographic tone mapping and sRGB color fidelity
+      globeRenderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+      globeRenderer.setSize(width, height);
+      globeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      globeRenderer.outputEncoding = THREE.sRGBEncoding;
+      globeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      globeRenderer.toneMappingExposure = 0.95;
+
+      // 3. OrbitControls with balanced zoom bounds
+      globeControls = new THREE.OrbitControls(globeCamera, globeRenderer.domElement);
+      globeControls.enableDamping = true;
+      globeControls.dampingFactor = 0.05;
+      globeControls.minDistance = 240;
+      globeControls.maxDistance = 1200;
+      globeControls.rotateSpeed = 0.6;
+      globeControls.zoomSpeed = 0.9;
+
+      // 4. Calibrated Planetary Lighting (avoids saturation/washout, retains rich Martian terrain tones)
+      ambientLight = new THREE.AmbientLight(0xffffff, 0.38);
+      globeScene.add(ambientLight);
+
+      dirLight = new THREE.DirectionalLight(0xfff5e6, 0.58);
+      dirLight.position.set(350, 180, 280);
+      globeScene.add(dirLight);
+
+      // Back-fill light so shadow side retains clear topography & relief without overbrightening
+      fillLight = new THREE.DirectionalLight(0x7da4cf, 0.18);
+      fillLight.position.set(-350, -100, -250);
+      globeScene.add(fillLight);
+
+      // 5. Starfield Background
+      const starGeo = new THREE.BufferGeometry();
+      const starCount = 1800;
+      const starPos = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount * 3; i += 3) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        const r = 1800 + Math.random() * 400;
+        starPos[i] = r * Math.sin(phi) * Math.cos(theta);
+        starPos[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+        starPos[i + 2] = r * Math.cos(phi);
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.5, transparent: true, opacity: 0.8 });
+      const starField = new THREE.Points(starGeo, starMat);
+      globeScene.add(starField);
+
+      // 6. Mars Sphere Mesh
+      const sphereGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 96, 64);
+      const marsMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.92,
+        metalness: 0.0
+      });
+      marsGlobeMesh = new THREE.Mesh(sphereGeo, marsMat);
+      marsGlobeMesh.rotation.y = -Math.PI / 2; // Prime Meridian (0 deg lon) faces front to camera
+      globeScene.add(marsGlobeMesh);
+
+      // 6b. Mineral Target Markers Group (rotates synchronously with planet)
+      window.mineralMarkerGroup = new THREE.Group();
+      marsGlobeMesh.add(window.mineralMarkerGroup);
+
+      // 6c. Authoritative NASA/USGS Landing Sites Group (rotates synchronously with planet)
+      window.landingSitesGroup = new THREE.Group();
+      marsGlobeMesh.add(window.landingSitesGroup);
+      renderGlobeLandingSites(DEFAULT_LANDING_SITES);
+
+      // 7. Atmosphere Rim Mesh
+      const atmosGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.018, 64, 32);
+      const atmosMat = new THREE.ShaderMaterial({
+        vertexShader: `
+          varying vec3 vNormal;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vNormal;
+          void main() {
+            float intensity = pow(0.68 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.2);
+            gl_FragColor = vec4(0.9, 0.45, 0.25, 1.0) * intensity * 0.75;
+          }
+        `,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide,
+        transparent: true
+      });
+      atmosphereMesh = new THREE.Mesh(atmosGeo, atmosMat);
+      globeScene.add(atmosphereMesh);
+
+      // 8. Graticule Lat/Lon Grid (30 deg lines, attached directly to rotating globe)
+      gridMesh = createLatLonGraticule(GLOBE_RADIUS * 1.002);
+      gridMesh.visible = false;
+      marsGlobeMesh.add(gridMesh);
+
+      // 9. Progressive Texture Pipeline: Wrap full sphere with 1K Fast, then enhance to 4K Master
+      loadGlobeTexture('/mars_sim3292_geology_4k.jpg', '/mars_sim3292_geology_fast.jpg', 'USGS SIM 3292');
+
+      // 10. Setup Interaction Events
+      setupGlobeEvents(canvas);
+
+      // 11. Animation Loop
+      animateGlobe();
+    }
+
+    function createLatLonGraticule(radius) {
+      const group = new THREE.Group();
+      const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
+
+      // Parallels (every 30 deg)
+      for (let lat = -60; lat <= 60; lat += 30) {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const r_circle = radius * Math.sin(phi);
+        const y = radius * Math.cos(phi);
+        const pts = [];
+        for (let i = 0; i <= 64; i++) {
+          const theta = (i / 64) * Math.PI * 2;
+          pts.push(new THREE.Vector3(r_circle * Math.cos(theta), y, -r_circle * Math.sin(theta)));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        group.add(new THREE.Line(geo, lineMat));
+      }
+
+      // Meridians (every 30 deg matching IAU Mars Prime Meridian alignment)
+      for (let lon = 0; lon < 360; lon += 30) {
+        const pts = [];
+        const radLon = lon * (Math.PI / 180);
+        for (let i = 0; i <= 64; i++) {
+          const lat = -90 + (i / 64) * 180;
+          const phi = (90 - lat) * (Math.PI / 180);
+          pts.push(new THREE.Vector3(
+            radius * Math.sin(phi) * Math.cos(radLon),
+            radius * Math.cos(phi),
+            -radius * Math.sin(phi) * Math.sin(radLon)
+          ));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        group.add(new THREE.Line(geo, lineMat));
+      }
+
+      return group;
+    }
+
+    function loadGlobeTexture(urlEnhanced, urlFast, labelName = 'USGS Geology') {
+      const loader = new THREE.TextureLoader();
+      const statusPill = document.getElementById('lbl-texture-status');
+
+      // If already enhanced in cache, apply immediately
+      if (loadedTextures[urlEnhanced]) {
+        marsGlobeMesh.material.map = loadedTextures[urlEnhanced];
+        marsGlobeMesh.material.needsUpdate = true;
+        if (statusPill) {
+          statusPill.innerHTML = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#22c55e; margin-right:5px;"></span>${labelName} 4K Master (Enhanced)`;
+        }
+        return;
+      }
+
+      // Step 1: Wrap immediately to full sphere using reduced image size & quality (1K Fast, 112 KB)
+      if (urlFast) {
+        if (statusPill) {
+          statusPill.innerHTML = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#facc15; margin-right:5px;"></span>Wrapping Sphere (1K Fast)...`;
+        }
+        loader.load(urlFast, (texFast) => {
+          texFast.generateMipmaps = true;
+          if (!loadedTextures[urlEnhanced]) {
+            marsGlobeMesh.material.map = texFast;
+            marsGlobeMesh.material.needsUpdate = true;
+            if (statusPill) {
+              statusPill.innerHTML = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#38bdf8; margin-right:5px;"></span>Wrapped! Enhancing to 4K Master...`;
+            }
+          }
+        });
+      }
+
+      // Step 2: After wrapping sphere, load the enhanced high-quality texture (4K Master)
+      loader.load(urlEnhanced, (texEnhanced) => {
+        texEnhanced.generateMipmaps = true;
+        texEnhanced.minFilter = THREE.LinearMipmapLinearFilter;
+        texEnhanced.magFilter = THREE.LinearFilter;
+        const maxAniso = (globeRenderer && globeRenderer.capabilities) ? globeRenderer.capabilities.getMaxAnisotropy() : 16;
+        texEnhanced.anisotropy = Math.min(16, maxAniso);
+        
+        loadedTextures[urlEnhanced] = texEnhanced;
+        marsGlobeMesh.material.map = texEnhanced;
+        marsGlobeMesh.material.needsUpdate = true;
+
+        if (statusPill) {
+          statusPill.innerHTML = `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#22c55e; margin-right:5px;"></span>${labelName} 4K Master (Enhanced 16x AF)`;
+        }
+      });
+    }
+
+    function animateGlobe() {
+      requestAnimationFrame(animateGlobe);
+
+      if (isAutoRotating && marsGlobeMesh) {
+        marsGlobeMesh.rotation.y += 0.0012;
+      }
+
+      if (globeControls) globeControls.update();
+      if (globeRenderer && globeScene && globeCamera) {
+        globeRenderer.render(globeScene, globeCamera);
+      }
+    }
+
+    function onGlobeContainerResize() {
+      if (!globeRenderer || !globeCamera) return;
+      const canvas = document.getElementById('geology-three-canvas');
+      const container = canvas.parentElement;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      globeCamera.aspect = width / height;
+      globeCamera.updateProjectionMatrix();
+      globeRenderer.setSize(width, height);
+    }
+
+    function setupGlobeEvents(canvas) {
+      // Texture Switchers
+      const btnGeo = document.getElementById('btn-tex-geology-4k');
+      const btnMola4k = document.getElementById('btn-tex-mola-4k');
+      const btnMola8k = document.getElementById('btn-tex-mola-8k');
+
+      function setActiveTexBtn(btn) {
+        [btnGeo, btnMola4k, btnMola8k].forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      btnGeo.onclick = () => {
+        setActiveTexBtn(btnGeo);
+        loadGlobeTexture('/mars_sim3292_geology_4k.jpg', '/mars_sim3292_geology_fast.jpg', 'USGS SIM 3292');
+      };
+
+      btnMola4k.onclick = () => {
+        setActiveTexBtn(btnMola4k);
+        loadGlobeTexture('/mars_mola_4k.jpg', '/mars_mola_base_2k.jpg', 'MOLA Topo 4K');
+      };
+
+      btnMola8k.onclick = () => {
+        setActiveTexBtn(btnMola8k);
+        loadGlobeTexture('/mars_mola_8k.jpg', '/mars_mola_4k.jpg', 'MOLA Topo 8K');
+      };
+
+      // Mineral Abundance Database & Ground-Truth Locations
+      // Camera distance calibrated to 440 for clear regional view without excessive zoom
+      const MINERAL_ABUNDANCE_SITES = {
+        clays: {
+          id: "clays",
+          name: "Fe/Mg-Smectite Clays (Nontronite / Saponite)",
+          site: "Mawrth Vallis",
+          lat: 24.0,
+          lon: -19.0,
+          dist: 440,
+          colorHex: 0x22c55e,
+          bands: "1.41 µm (OH), 1.91 µm (H2O), 2.30 µm (Fe-OH)",
+          unit: "eNh (Early Noachian Highland Crust)",
+          inst: "CRISM FRT00003E12 & OMEGA C-channel • 150m stratigraphy",
+          sig: "Neutral-to-alkaline aqueous environment with high prebiotic preservation potential."
+        },
+        kaolinite: {
+          id: "kaolinite",
+          name: "Kaolinite / Halloysite (Al-Phyllosilicates)",
+          site: "Mawrth Vallis (Upper Stratum)",
+          lat: 24.6,
+          lon: -18.5,
+          dist: 440,
+          colorHex: 0x38bdf8,
+          bands: "1.40 µm, 2.16 µm, 2.21 µm (Al-OH doublet)",
+          unit: "lNh (Late Noachian Highland Unit)",
+          inst: "CRISM HRL000040FF • Highest purity Al-clay on Mars",
+          sig: "Intense subaerial pedogenic leaching under early humid climate transition."
+        },
+        sulfates: {
+          id: "sulfates",
+          name: "Polyhydrated Sulfates (Gypsum & Mg-Sulfates)",
+          site: "Candor Chasma (Valles Marineris)",
+          lat: -6.5,
+          lon: -75.8,
+          dist: 440,
+          colorHex: 0xfacc15,
+          bands: "1.44 µm, 1.75 µm, 1.94 µm, 2.42 µm (Polyhydrated SO4)",
+          unit: "lHt / Hto (Interior Layered Deposits)",
+          inst: "OMEGA ORB0442 & CRISM FRT000085C3 • >3,500m sequence",
+          sig: "Major planetary transition from neutral clay waters to acidic sulfate evaporite basins."
+        },
+        jarosite: {
+          id: "jarosite",
+          name: "Jarosite (Acid-Sulfate Hydroxide)",
+          site: "Meridiani Planum (Eagle Crater)",
+          lat: -1.95,
+          lon: -5.53,
+          dist: 440,
+          colorHex: 0xff5e36,
+          bands: "1.48 µm, 1.85 µm, 2.27 µm (Fe3+-OH band), 2.46 µm",
+          unit: "eHt (Early Hesperian Transition Unit)",
+          inst: "Opportunity Rover APXS / CRISM FRT000039AE",
+          sig: "Direct proof of hyper-acidic (pH 2–4), sulfur-rich groundwater upwelling."
+        },
+        carbonates: {
+          id: "carbonates",
+          name: "Magnesite & Fe/Mg-Carbonates",
+          site: "Jezero Crater Western Delta Margin",
+          lat: 18.45,
+          lon: 77.45,
+          dist: 440,
+          colorHex: 0xc084fc,
+          bands: "1.94 µm, 2.31 µm, 2.51 µm (CO3 vibrational overtones)",
+          unit: "eHt / AHi (Paleolake Fan Margin)",
+          inst: "Perseverance Rover SHERLOC/PIXL & CRISM FRT000047FF",
+          sig: "Atmospheric CO2 sequestration; high biosignature preservation potential."
+        },
+        silica: {
+          id: "silica",
+          name: "Hydrated Opaline Silica (Amorphous SiO2·nH2O)",
+          site: "Gusev Crater (Home Plate Hydrothermal Field)",
+          lat: -14.64,
+          lon: 175.55,
+          dist: 440,
+          colorHex: 0x60a5fa,
+          bands: "1.41 µm, 1.92 µm, 2.24 µm (broad Si-OH absorption)",
+          unit: "eHv / eNh (Hydrothermal Sinter Fumarole)",
+          inst: "Spirit Rover Mini-TES & CRISM MSP000062BB • 91 wt% SiO2",
+          sig: "Ancient volcanic hot springs and hydrothermal sinter vents."
+        },
+        ice: {
+          id: "ice",
+          name: "Perennial Water Ice (Planum Boreum Dome)",
+          site: "Planum Boreum (North Polar Cap)",
+          lat: 84.5,
+          lon: 0.0,
+          dist: 440,
+          colorHex: 0xe0f2fe,
+          bands: "1.5 µm, 2.0 µm, 2.8 µm (Deep H2O Ice Absorption Troughs)",
+          unit: "lApc (Late Amazonian Polar Cap Material)",
+          inst: "OMEGA ORB0032 & CRISM MRR00001850 • 1.6M km³ ice",
+          sig: "Modern planetary cryosphere reservoir; records 5 Myr obliquity climate cycles."
+        }
+      };
+
+      // 3D Mineral Target Reticle Beacon Function
+      function placeMineralTargetMarker(lat, lon, colorHex = 0x22c55e, title = "Target") {
+        if (!window.mineralMarkerGroup) return;
+
+        // Clear existing target marker
+        while (window.mineralMarkerGroup.children.length > 0) {
+          const c = window.mineralMarkerGroup.children[0];
+          if (c.geometry) c.geometry.dispose();
+          if (c.material) c.material.dispose();
+          window.mineralMarkerGroup.remove(c);
+        }
+
+        const phi = (90 - lat) * (Math.PI / 180);
+        const radLon = lon * (Math.PI / 180);
+        const r = GLOBE_RADIUS * 1.002;
+        const x = r * Math.sin(phi) * Math.cos(radLon);
+        const y = r * Math.cos(phi);
+        const z = -r * Math.sin(phi) * Math.sin(radLon);
+        const pos = new THREE.Vector3(x, y, z);
+        const normal = pos.clone().normalize();
+
+        // 1. Inner Target Ring
+        const ringGeo1 = new THREE.RingGeometry(2.2, 4.2, 32);
+        const ringMat1 = new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+        const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
+        ring1.position.copy(pos);
+        ring1.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+        window.mineralMarkerGroup.add(ring1);
+
+        // 2. Outer Pulsing Reticle Ring
+        const ringGeo2 = new THREE.RingGeometry(5.5, 7.2, 32);
+        const ringMat2 = new THREE.MeshBasicMaterial({ color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.45 });
+        const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+        ring2.position.copy(pos);
+        ring2.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+        window.mineralMarkerGroup.add(ring2);
+
+        // 3. Vertical Targeting Needle Post
+        const pinGeo = new THREE.CylinderGeometry(0.35, 0.35, 12, 8);
+        const pinMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const pin = new THREE.Mesh(pinGeo, pinMat);
+        pin.position.copy(pos.clone().add(normal.clone().multiplyScalar(6)));
+        pin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+        window.mineralMarkerGroup.add(pin);
+
+        // 4. Glowing Beacon Spherical Head
+        const headGeo = new THREE.SphereGeometry(2.0, 16, 16);
+        const headMat = new THREE.MeshBasicMaterial({ color: colorHex });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.copy(pos.clone().add(normal.clone().multiplyScalar(12)));
+        window.mineralMarkerGroup.add(head);
+      }
+
+      // Wire Up Mineral Abundance Buttons
+      const mineralBtns = document.querySelectorAll('.mineral-nav-btn');
+      mineralBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          mineralBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const minId = btn.dataset.mineralId;
+          const siteData = MINERAL_ABUNDANCE_SITES[minId];
+          if (!siteData) return;
+
+          // 1. Smoothly fly camera to exact high-abundance coordinate
+          flyToLatLon(siteData.lat, siteData.lon, siteData.dist);
+
+          // 2. Place glowing 3D target beacon on planet surface
+          placeMineralTargetMarker(siteData.lat, siteData.lon, siteData.colorHex, siteData.name);
+
+          // 3. Populate and show floating Target HUD
+          document.getElementById('hud-min-name').textContent = siteData.name;
+          document.getElementById('hud-min-site').textContent = `${siteData.site} (${Math.abs(siteData.lat).toFixed(2)}° ${siteData.lat >= 0 ? 'N' : 'S'}, ${Math.abs(siteData.lon).toFixed(2)}° ${siteData.lon >= 0 ? 'E' : 'W'})`;
+          document.getElementById('hud-min-bands').textContent = siteData.bands;
+          document.getElementById('hud-min-unit').textContent = siteData.unit;
+          document.getElementById('hud-min-inst').textContent = siteData.inst;
+          document.getElementById('hud-min-sig').textContent = siteData.sig;
+          document.getElementById('mineral-target-hud').style.display = 'flex';
+
+          // 4. Update coordinates readout pill
+          document.getElementById('lbl-globe-lat').textContent = `${Math.abs(siteData.lat).toFixed(2)}° ${siteData.lat >= 0 ? 'N' : 'S'}`;
+          document.getElementById('lbl-globe-lon').textContent = `${Math.abs(siteData.lon).toFixed(2)}° ${siteData.lon >= 0 ? 'E' : 'W'}`;
+          document.getElementById('lbl-globe-unit').textContent = siteData.unit;
+        });
+      });
+
+      // Target HUD Close Button
+      document.getElementById('hud-min-close').onclick = () => {
+        document.getElementById('mineral-target-hud').style.display = 'none';
+        mineralBtns.forEach(b => b.classList.remove('active'));
+      };
+
+      // Legend Drawer Toggle
+      const legendDrawer = document.getElementById('globe-legend-drawer');
+      const btnToggleLegend = document.getElementById('btn-toggle-legend');
+      btnToggleLegend.onclick = () => {
+        const isShown = legendDrawer.style.display === 'flex';
+        legendDrawer.style.display = isShown ? 'none' : 'flex';
+        btnToggleLegend.classList.toggle('active', !isShown);
+      };
+
+      document.getElementById('btn-close-legend').onclick = () => {
+        legendDrawer.style.display = 'none';
+        btnToggleLegend.classList.remove('active');
+      };
+
+      // Legend Item Clicks -> Fly to representative unit location with calibrated regional distance (440)
+      document.querySelectorAll('.legend-unit-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const lat = parseFloat(item.dataset.flyLat);
+          const lon = parseFloat(item.dataset.flyLon);
+          const dist = parseFloat(item.dataset.flyDist || 440);
+          flyToLatLon(lat, lon, dist);
+        });
+      });
+
+      // Toggles
+      const btnRotate = document.getElementById('btn-toggle-rotate');
+      btnRotate.onclick = () => {
+        isAutoRotating = !isAutoRotating;
+        btnRotate.classList.toggle('active', isAutoRotating);
+      };
+
+      const btnGrid = document.getElementById('btn-toggle-grid');
+      btnGrid.onclick = () => {
+        isGridVisible = !isGridVisible;
+        gridMesh.visible = isGridVisible;
+        btnGrid.classList.toggle('active', isGridVisible);
+      };
+
+      const btnSun = document.getElementById('btn-toggle-sun');
+      btnSun.onclick = () => {
+        isSunLight = !isSunLight;
+        btnSun.classList.toggle('active', isSunLight);
+        if (isSunLight) {
+          ambientLight.intensity = 0.22;
+          dirLight.intensity = 0.85;
+          fillLight.intensity = 0.12;
+        } else {
+          ambientLight.intensity = 0.38;
+          dirLight.intensity = 0.58;
+          fillLight.intensity = 0.18;
+        }
+      };
+
+      // Landing Sites Visibility Toggle
+      const btnLandings = document.getElementById('btn-toggle-landings');
+      if (btnLandings) {
+        btnLandings.onclick = () => {
+          areLandingsVisible = !areLandingsVisible;
+          btnLandings.classList.toggle('active', areLandingsVisible);
+          if (window.landingSitesGroup) {
+            window.landingSitesGroup.visible = areLandingsVisible;
+          }
+        };
+      }
+
+      document.getElementById('btn-reset-cam').onclick = () => {
+        flyToLatLon(0, 0, 520);
+        document.getElementById('mineral-target-hud').style.display = 'none';
+        mineralBtns.forEach(b => b.classList.remove('active'));
+      };
+
+      // Landmark Waypoint Fly-To Buttons
+      document.querySelectorAll('[data-fly-lat]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const lat = parseFloat(btn.dataset.flyLat);
+          const lon = parseFloat(btn.dataset.flyLon);
+          const dist = parseFloat(btn.dataset.flyDist || 440);
+          flyToLatLon(lat, lon, dist);
+        });
+      });
+
+      // Canvas Click Raycaster for Landing Sites
+      canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseVector.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseVector.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouseVector, globeCamera);
+        if (window.landingSitesGroup && window.landingSitesGroup.visible) {
+          const hits = raycaster.intersectObjects(window.landingSitesGroup.children, true);
+          if (hits.length > 0) {
+            let obj = hits[0].object;
+            while (obj && !obj.userData?.id && obj.parent) {
+              obj = obj.parent;
+            }
+            if (obj && obj.userData?.id) {
+              showLandingSiteHUD(obj.userData);
+              flyToLatLon(obj.userData.lat, obj.userData.lon, 400);
+              return;
+            }
+          }
+        }
+      });
+
+      // Mouse Move Coordinates Raycaster
+      canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseVector.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseVector.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouseVector, globeCamera);
+
+        // Check landing site hover cursor
+        if (window.landingSitesGroup && window.landingSitesGroup.visible) {
+          const lHits = raycaster.intersectObjects(window.landingSitesGroup.children, true);
+          canvas.style.cursor = (lHits.length > 0) ? 'pointer' : 'grab';
+        }
+
+        const hits = raycaster.intersectObject(marsGlobeMesh);
+        if (hits.length > 0) {
+          const pt = hits[0].point;
+          // Apply inverse planet rotation to get surface coordinates
+          const localPt = pt.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), -marsGlobeMesh.rotation.y);
+          const lat = Math.asin(localPt.y / GLOBE_RADIUS) * (180 / Math.PI);
+          const lon = Math.atan2(-localPt.z, localPt.x) * (180 / Math.PI);
+
+          document.getElementById('lbl-globe-lat').textContent = `${Math.abs(lat).toFixed(2)}° ${lat >= 0 ? 'N' : 'S'}`;
+          document.getElementById('lbl-globe-lon').textContent = `${Math.abs(lon).toFixed(2)}° ${lon >= 0 ? 'E' : 'W'}`;
+
+          // Precise unit detection based on coordinates
+          let unitName = 'mNh (Middle Noachian Highland)';
+          if (lat > 65) unitName = 'lApc / Apu (North Polar Ice Cap)';
+          else if (lat < -65) unitName = 'Hp / Apu (South Polar Ice)';
+          else if (lat > 35 && (lon > 40 && lon < 140)) unitName = 'mAl (Utopia Lowland Sedimentary)';
+          else if (lon > -140 && lon < -100 && lat > 10 && lat < 30) unitName = 'Ave (Olympus Mons Volcanic Construct)';
+          else if (lat > -15 && lat < 0 && lon > -90 && lon < -60) unitName = 'lHt / Hto (Valles Marineris Sulfate ILDs)';
+          else if (lat < -20 && lon > 50 && lon < 90) unitName = 'AHi (Hellas Basin Impact Ejecta)';
+          else if (lat > 15 && lat < 22 && lon > 70 && lon < 85) unitName = 'eHt / AHi (Jezero Delta / Carbonates)';
+          else if (lat > 20 && lat < 27 && lon > -25 && lon < -15) unitName = 'eNh / lNh (Mawrth Vallis Clays)';
+          else if (lat > -4 && lat < 0 && lon > -8 && lon < -2) unitName = 'eHt (Meridiani Planum Jarosite)';
+          document.getElementById('lbl-globe-unit').textContent = unitName;
+        }
+      });
+    }
+
+    // Render 3D NASA & USGS Landing Site Markers directly onto Mars sphere
+    function renderGlobeLandingSites(sites) {
+      if (!window.landingSitesGroup) return;
+      while (window.landingSitesGroup.children.length > 0) {
+        const c = window.landingSitesGroup.children[0];
+        if (c.geometry) c.geometry.dispose();
+        if (c.material) c.material.dispose();
+        window.landingSitesGroup.remove(c);
+      }
+
+      sites.forEach(site => {
+        const phi = (90 - site.lat) * (Math.PI / 180);
+        const radLon = site.lon * (Math.PI / 180);
+        const r = GLOBE_RADIUS * 1.0015;
+        const x = r * Math.sin(phi) * Math.cos(radLon);
+        const y = r * Math.cos(phi);
+        const z = -r * Math.sin(phi) * Math.sin(radLon);
+        const pos = new THREE.Vector3(x, y, z);
+        const normal = pos.clone().normalize();
+
+        const siteGroup = new THREE.Group();
+        siteGroup.userData = site;
+
+        let colorHex = 0x38bdf8;
+        if (site.status === 'Active') colorHex = 0x22c55e;
+        else if (site.status === 'Failed') colorHex = 0xef4444;
+        else if (site.status === 'Proposed') colorHex = 0xc084fc;
+
+        // 1. High-Contrast Pin Head Sphere
+        const headGeo = new THREE.SphereGeometry(1.8, 16, 16);
+        const headMat = new THREE.MeshStandardMaterial({
+          color: colorHex,
+          emissive: colorHex,
+          emissiveIntensity: 0.85,
+          roughness: 0.25,
+          metalness: 0.2
+        });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.copy(pos.clone().add(normal.clone().multiplyScalar(9)));
+        head.userData = site;
+        siteGroup.add(head);
+
+        // 2. High-Contrast Slender Needle Stem
+        const stemGeo = new THREE.CylinderGeometry(0.25, 0.25, 9, 8);
+        const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const stem = new THREE.Mesh(stemGeo, stemMat);
+        stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(4.5)));
+        stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+        stem.userData = site;
+        siteGroup.add(stem);
+
+        // 3. Ground Target Ring
+        const ringGeo = new THREE.RingGeometry(1.6, 2.8, 32);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: colorHex,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.85
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.2)));
+        ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
+        ring.userData = site;
+        siteGroup.add(ring);
+
+        window.landingSitesGroup.add(siteGroup);
+      });
+    }
+
+    function showLandingSiteHUD(site) {
+      const hud = document.getElementById('mineral-target-hud');
+      if (!hud) return;
+
+      const badge = document.getElementById('hud-min-badge');
+      badge.textContent = `🛬 ${site.agency || 'NASA'} • ${site.status.toUpperCase()}`;
+      badge.style.background = site.status === 'Active' ? 'rgba(34,197,94,0.25)' : (site.status === 'Failed' ? 'rgba(239,68,68,0.25)' : 'rgba(56,189,248,0.25)');
+      badge.style.color = site.status === 'Active' ? 'var(--accent-green)' : (site.status === 'Failed' ? 'var(--hazard-red)' : 'var(--accent-cyan)');
+
+      document.getElementById('hud-min-name').textContent = site.name;
+      document.getElementById('hud-min-site').textContent = `${site.site} (${site.station || 'Landing Station'})`;
+      document.getElementById('hud-min-bands').textContent = `Coordinates: ${Math.abs(site.lat).toFixed(2)}° ${site.lat >= 0 ? 'N' : 'S'}, ${Math.abs(site.lon).toFixed(2)}° ${site.lon >= 0 ? 'E' : 'W'} • Elev: ${site.elevation_m} m`;
+      document.getElementById('hud-min-unit').textContent = site.host_unit || 'Volcanic / Sedimentary Unit';
+      document.getElementById('hud-min-inst').textContent = `${site.agency} (${site.year}) • In-Situ: ${site.instruments || 'Scientific Payload'}`;
+      document.getElementById('hud-min-sig').textContent = `Ground-Truth surface validation target confirmed by orbital spectrometry & planetary rover traverses.`;
+
+      hud.style.display = 'flex';
+    }
+
+    function flyToLatLon(lat, lon, distance = 440) {
+      isAutoRotating = false;
+      document.getElementById('btn-toggle-rotate').classList.remove('active');
+
+      const phi = (90 - lat) * (Math.PI / 180);
+      const radLon = lon * (Math.PI / 180);
+
+      // Account for current globe mesh rotation
+      const currentMeshRot = marsGlobeMesh.rotation.y;
+      const adjLon = radLon + currentMeshRot;
+
+      const targetX = distance * Math.sin(phi) * Math.cos(adjLon);
+      const targetY = distance * Math.cos(phi);
+      const targetZ = -distance * Math.sin(phi) * Math.sin(adjLon);
+
+      flyCameraTo(targetX, targetY, targetZ);
+    }
+
+    function flyCameraTo(targetX, targetY, targetZ) {
+      const startPos = globeCamera.position.clone();
+      const endPos = new THREE.Vector3(targetX, targetY, targetZ);
+      const startTime = performance.now();
+      const duration = 1200; // ms
+
+      function stepFly(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1.0);
+        // Smooth cubic ease out
+        const ease = 1 - Math.pow(1 - progress, 3);
+
+        globeCamera.position.lerpVectors(startPos, endPos, ease);
+        globeControls.target.set(0, 0, 0);
+
+        if (progress < 1.0) {
+          requestAnimationFrame(stepFly);
+        }
+      }
+      requestAnimationFrame(stepFly);
+    }
+
+    // ==========================================
+    // SPECTRAL PROFILE CANVAS
+    // ==========================================
+    const SPECTRAL_PROFILES = [
+      { name: 'Nontronite (Fe-Smectite)', color: '#22c55e', base: 0.65, bands: [{ wl: 1.41, d: 0.12 }, { wl: 1.92, d: 0.28 }, { wl: 2.30, d: 0.22 }] },
+      { name: 'Kaolinite (Al-Clay)', color: '#38bdf8', base: 0.70, bands: [{ wl: 1.40, d: 0.15 }, { wl: 1.91, d: 0.18 }, { wl: 2.16, d: 0.14 }, { wl: 2.21, d: 0.32 }] },
+      { name: 'Gypsum (Hydrated Sulfate)', color: '#facc15', base: 0.60, bands: [{ wl: 1.44, d: 0.20 }, { wl: 1.75, d: 0.18 }, { wl: 1.94, d: 0.35 }, { wl: 2.21, d: 0.12 }, { wl: 2.42, d: 0.22 }] },
+      { name: 'Jarosite (Fe-Sulfate)', color: '#ff5e36', base: 0.50, bands: [{ wl: 1.48, d: 0.16 }, { wl: 1.85, d: 0.14 }, { wl: 2.27, d: 0.28 }, { wl: 2.46, d: 0.15 }] },
+      { name: 'Magnesite (Mg-Carbonate)', color: '#c084fc', base: 0.68, bands: [{ wl: 1.94, d: 0.08 }, { wl: 2.31, d: 0.36 }, { wl: 2.51, d: 0.26 }] },
+      { name: 'Opaline Silica (Hydrated Si-OH)', color: '#60a5fa', base: 0.72, bands: [{ wl: 1.41, d: 0.14 }, { wl: 1.92, d: 0.24 }, { wl: 2.24, d: 0.22, broad: 0.08 }] }
+    ];
+
+    function drawSpectralChart() {
+      const canvas = document.getElementById('spectral-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const padL = 48, padR = 24, padT = 20, padB = 30;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+
+      // X grid (1.0 to 2.6 µm)
+      const wlMin = 1.0, wlMax = 2.6;
+      for (let wl = 1.0; wl <= 2.6; wl += 0.2) {
+        const x = padL + ((wl - wlMin) / (wlMax - wlMin)) * (w - padL - padR);
+        ctx.beginPath();
+        ctx.moveTo(x, padT);
+        ctx.lineTo(x, h - padB);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(wl.toFixed(1) + ' µm', x, h - padB + 16);
+      }
+
+      // Y grid (0.0 to 1.0 reflectance)
+      for (let r = 0.2; r <= 1.0; r += 0.2) {
+        const y = h - padB - (r * (h - padT - padB));
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(w - padR, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(r.toFixed(1), padL - 8, y + 3);
+      }
+
+      // Plot curves
+      SPECTRAL_PROFILES.forEach((prof, idx) => {
+        ctx.strokeStyle = prof.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        const step = 0.01;
+        let first = true;
+        for (let wl = wlMin; wl <= wlMax; wl += step) {
+          let refl = prof.base + Math.sin(wl * 1.5) * 0.05;
+
+          prof.bands.forEach(b => {
+            const width = b.broad || 0.035;
+            const dip = b.d * Math.exp(-Math.pow(wl - b.wl, 2) / (2 * width * width));
+            refl -= dip;
+          });
+
+          refl = refl * 0.75 + (idx * 0.035);
+
+          const x = padL + ((wl - wlMin) / (wlMax - wlMin)) * (w - padL - padR);
+          const y = h - padB - (refl * (h - padT - padB));
+
+          if (first) {
+            ctx.moveTo(x, y);
+            first = false;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+      });
+    }
+
+    function setupLegend() {
+      const leg = document.getElementById('chart-legend');
+      if (!leg) return;
+      leg.innerHTML = '';
+      SPECTRAL_PROFILES.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'legend-item';
+        el.innerHTML = `<span class="legend-color" style="background:${p.color};"></span><span>${p.name}</span>`;
+        leg.appendChild(el);
+      });
+    }
+
+    ['bd1900', 'd2300', 'sindex2', 'min2295'].forEach(id => {
+      const s = document.getElementById(`slider-${id}`);
+      const l = document.getElementById(`lbl-${id}`);
+      if (s && l) {
+        s.addEventListener('input', (e) => {
+          l.textContent = Number(e.target.value).toFixed(3);
+        });
+      }
+    });
+
+    // Document Viewer logic
+    const DOCS_METADATA = {
+      readme: { title: 'README.txt - USGS SIM 3292 Database Description', url: '/README.txt' },
+      metadata: { title: 'Metadata.txt - FGDC Federal Geographic Data Committee Metadata', url: '/Metadata.txt' },
+      table: { title: 'Table.pdf - Tanaka et al. Crater Size-Frequency Distribution & Model Ages', url: '/Table.pdf' },
+      pamphlet: { title: 'sim3292_pamphlet.pdf - 48-Page Geologic Map of Mars Monograph', url: '/sim3292_pamphlet.pdf' },
+      map: { title: 'sim3292_map.pdf - Official 1:20M Geologic Map Sheet (36 MB)', url: '/sim3292_map.pdf' }
+    };
+
+    const docItems = document.querySelectorAll('.doc-menu-item');
+    docItems.forEach(item => {
+      item.addEventListener('click', async () => {
+        docItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        const docKey = item.dataset.doc;
+        const info = DOCS_METADATA[docKey];
+
+        document.getElementById('doc-active-title').textContent = info.title;
+        document.getElementById('doc-download-link').href = info.url;
+
+        const pane = document.getElementById('doc-active-content');
+
+        if (info.url.endsWith('.pdf')) {
+          pane.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:12px; height:520px;">
+              <div style="font-size:12px; color:var(--text-dim);">
+                Viewing PDF: <strong>${info.title}</strong>. If embedded viewer is unsupported by your browser, click "Open Raw Document".
+              </div>
+              <iframe src="${info.url}" style="width:100%; height:100%; border:1px solid var(--card-border); border-radius:8px; background:#1e293b;"></iframe>
+            </div>
+          `;
+        } else {
+          pane.innerHTML = `<pre class="doc-text-pre">Loading text document...</pre>`;
+          try {
+            const resp = await fetch(info.url);
+            const text = await resp.text();
+            pane.innerHTML = `<pre class="doc-text-pre">${escapeHtml(text)}</pre>`;
+          } catch (e) {
+            pane.innerHTML = `<pre class="doc-text-pre" style="color:var(--hazard-red);">Failed loading document: ${e.message}</pre>`;
+          }
+        }
+      });
+    });
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Initial load - Starts immediately without waiting on slow external fonts or assets
+    function startEngine() {
+      if (window._engineStarted) return;
+      window._engineStarted = true;
+
+      // 1. Initialize 3D Geology Globe
+      init3DGeologyGlobe();
+
+      // 2. Setup Spectral Canvas
+      setupLegend();
+      drawSpectralChart();
+
+      // 3. Load Geological Dataset
+      loadDataset();
+
+      // 4. Load initial README text
+      fetch('/README.txt')
+        .then(r => r.text())
+        .then(rText => {
+          const pre = document.getElementById('doc-text-view');
+          if (pre) pre.textContent = rText;
+        })
+        .catch(() => {});
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startEngine);
+      window.addEventListener('load', startEngine);
+    } else {
+      startEngine();
+    }
+
+    window.addEventListener('resize', () => {
+      onGlobeContainerResize();
+      if (document.getElementById('tab-spectral').classList.contains('active')) {
+        drawSpectralChart();
+      }
+    });
+  </script>
+</body>
+</html>

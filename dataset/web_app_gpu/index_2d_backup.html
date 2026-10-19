@@ -351,6 +351,9 @@
       </div>
     </div>
     <div class="nav-actions">
+      <button class="btn" onclick="window.location.href='/'">🌐 3D Globe</button>
+      <button class="btn" onclick="window.location.href='/geology_atlas.html'" style="border-color:var(--accent-orange); color:#fff; background:rgba(255,94,54,0.25);">🪐 USGS Geologic &amp; Mineral Atlas</button>
+      <button class="btn" id="btn-toggle-layer" style="border-color:var(--accent-cyan); color:#fff;">🏔️ Layer: MOLA Topo</button>
       <button class="btn" id="btn-reset-view">Reset Camera</button>
     </div>
   </header>
@@ -645,29 +648,56 @@
       return tex;
     }
 
-    // Load Low-Res Base Composite Mosaic for Instant Fallback
-    async function loadBaseComposite() {
-      const candidates = ['mars_mola_base_2k.jpg', 'mars_mola_level5_mosaic.jpg'];
-      for (const url of candidates) {
+    // Load Base Textures (MOLA Topography & USGS SIM 3292 Geology)
+    let currentLayer = 'mola';
+    let molaTexture = null;
+    let geologyTexture = null;
+
+    async function loadTextureFromFile(url) {
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) return null;
+        const blob = await resp.blob();
+        let bmp;
         try {
-          const resp = await fetch(url);
-          if (!resp.ok) continue;
-          const blob = await resp.blob();
-          let bmp;
-          try {
-            bmp = await createImageBitmap(blob, { resizeWidth: 2048, resizeHeight: 1024 });
-          } catch (_) {
-            bmp = await createImageBitmap(blob);
-          }
-          baseTexture = uploadTexture(bmp);
-          requestRender();
-          break;
-        } catch (err) {
-          console.warn("Could not load base composite texture from", url, err);
+          bmp = await createImageBitmap(blob, { resizeWidth: 2048, resizeHeight: 1024 });
+        } catch (_) {
+          bmp = await createImageBitmap(blob);
         }
+        return uploadTexture(bmp);
+      } catch (err) {
+        console.warn("Could not load texture from", url, err);
+        return null;
       }
     }
-    loadBaseComposite();
+
+    async function initBaseTextures() {
+      molaTexture = await loadTextureFromFile('/mars_mola_base_2k.jpg');
+      if (molaTexture) {
+        baseTexture = molaTexture;
+        requestRender();
+      }
+      geologyTexture = await loadTextureFromFile('/mars_sim3292_geology_4k.jpg');
+
+      const btnLayer = document.getElementById('btn-toggle-layer');
+      if (btnLayer) {
+        btnLayer.onclick = () => {
+          if (currentLayer === 'mola') {
+            currentLayer = 'geology';
+            btnLayer.textContent = '🪐 Layer: USGS Geology';
+            btnLayer.style.borderColor = 'var(--accent-orange)';
+            if (geologyTexture) baseTexture = geologyTexture;
+          } else {
+            currentLayer = 'mola';
+            btnLayer.textContent = '🏔️ Layer: MOLA Topo';
+            btnLayer.style.borderColor = 'var(--accent-cyan)';
+            if (molaTexture) baseTexture = molaTexture;
+          }
+          requestRender();
+        };
+      }
+    }
+    initBaseTextures();
 
     // Stream Level 5 Tile Asynchronously
     async function requestTileAsync(r, c) {
