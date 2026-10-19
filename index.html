@@ -331,6 +331,8 @@
       z-index: 100;
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     #left-drawer.collapsed {
@@ -350,11 +352,33 @@
 
     .destinations-scroll {
       overflow-y: auto;
+      overflow-x: hidden;
       max-height: calc(100vh - 310px);
       min-height: 220px;
       display: flex;
       flex-direction: column;
       gap: 6px;
+      padding-right: 4px;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+    }
+
+    .destinations-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .destinations-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .destinations-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 4px;
+    }
+
+    .destinations-scroll::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-orange);
     }
 
     .dest-card {
@@ -366,24 +390,33 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: all 0.2s;
+      transition: background 0.2s ease, border-color 0.2s ease, padding-left 0.2s ease;
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
     }
 
     .dest-card:hover {
       background: rgba(255, 94, 54, 0.15);
       border-color: var(--accent-orange);
-      transform: translateX(3px);
+      padding-left: 12px;
     }
 
     .dest-name {
       font-size: 12px;
       font-weight: 600;
       color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .dest-sub {
       font-size: 10px;
       color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* Left Drawer Navigation Tabs */
@@ -1284,12 +1317,13 @@
       list.forEach(item => {
         const card = document.createElement('div');
         card.className = 'dest-card';
+        const subtext = `${item.lat.toFixed(2)}°, ${item.lon.toFixed(2)}° • ${item.category}`;
         card.innerHTML = `
-          <div>
-            <div class="dest-name">${item.name}</div>
-            <div class="dest-sub">${item.lat.toFixed(2)}°, ${item.lon.toFixed(2)}° • ${item.category}</div>
+          <div style="flex:1; min-width:0; margin-right:8px;">
+            <div class="dest-name" title="${item.name}">${item.name}</div>
+            <div class="dest-sub" title="${subtext}">${subtext}</div>
           </div>
-          <span style="font-size:14px; color:var(--accent-orange);">➔</span>
+          <span style="font-size:14px; color:var(--accent-orange); flex-shrink:0;">➔</span>
         `;
         card.onclick = () => {
           flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
