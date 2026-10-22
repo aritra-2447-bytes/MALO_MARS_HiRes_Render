@@ -205,6 +205,74 @@
       color: white;
     }
 
+    /* 3D Globe Layer Selector Menu */
+    .layer-menu-container {
+      position: relative;
+    }
+
+    .layer-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 270px;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 10px;
+      z-index: 250;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+    }
+
+    .layer-dropdown-menu.open {
+      display: block;
+    }
+
+    .layer-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .layer-menu-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .layer-menu-item.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent-cyan);
+    }
+
+    .layer-item-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .layer-item-desc {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .layer-indicator {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .layer-menu-item.active .layer-indicator {
+      color: var(--accent-cyan);
+    }
+
     /* Fullscreen Viewport */
     #viewport-container {
       position: relative;
@@ -666,6 +734,55 @@
       </div>
       <button class="pill-btn active" id="btn-mode-3d">🌐 3D Earth-Style Globe</button>
       <button class="pill-btn" id="btn-mode-2d">🗺️ 2D Flat Map</button>
+
+      <!-- 3D Globe Layer Selector Menu -->
+      <div class="layer-menu-container" id="layer-menu-container">
+        <button class="pill-btn" id="btn-layer-menu" title="Select 3D Globe Surface Layer">
+          🗂️ Globe Layer: <span id="current-layer-name" style="color:var(--accent-cyan); margin-left:2px;">MOLA Topo</span> <span style="font-size:9px; margin-left:2px;">▼</span>
+        </button>
+        <div class="layer-dropdown-menu" id="layer-dropdown">
+          <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-dim); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <span>3D Globe Surface Layers</span>
+            <span style="font-size:9px; color:var(--accent-orange); background:rgba(244,162,97,0.15); padding:1px 6px; border-radius:4px;">Level 5 WMTS</span>
+          </div>
+
+          <!-- Option 1: MOLA Color Topography -->
+          <div class="layer-menu-item active" data-layer="mola" id="layer-opt-mola">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="layer-item-title">🎨 MOLA Color Elevation</span>
+              <span class="layer-item-desc">NASA MOLA + HRSC Color Shaded (8K LOD)</span>
+            </div>
+            <span class="layer-indicator" style="color:var(--accent-cyan);">●</span>
+          </div>
+
+          <!-- Option 2: Zoom 5 Surface Tiles -->
+          <div class="layer-menu-item" data-layer="zoom5" id="layer-opt-zoom5">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="layer-item-title">📷 Zoom 5 Surface Tiles</span>
+              <span class="layer-item-desc">NASA Mars Trek 64×32 Grayscale Tiles</span>
+            </div>
+            <span class="layer-indicator">○</span>
+          </div>
+
+          <!-- Option 3: Zoom 5 Overlay Blend -->
+          <div class="layer-menu-item" data-layer="overlay" id="layer-opt-overlay">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="layer-item-title">✨ Zoom 5 Overlay Blend</span>
+              <span class="layer-item-desc">Zoom 5 Layer overlaid on MOLA Topo</span>
+            </div>
+            <span class="layer-indicator">○</span>
+          </div>
+
+          <!-- Overlay Opacity Slider -->
+          <div id="layer-overlay-controls" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--text-dim); margin-bottom:5px;">
+              <span>Overlay Opacity:</span>
+              <span id="layer-opacity-val" style="color:var(--accent-orange); font-weight:bold;">65%</span>
+            </div>
+            <input type="range" id="layer-opacity-slider" min="0" max="100" value="65" style="width:100%; accent-color:var(--accent-orange); cursor:pointer;">
+          </div>
+        </div>
+      </div>
       <button class="pill-btn" id="btn-toggle-decontour" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
       <button class="pill-btn" id="btn-toggle-drawer">📍 Destinations</button>
       <button class="pill-btn active" id="btn-toggle-solar" title="Toggle Real-Time Astronomical Sun Position & Surface Shadows">☀️ Live Sun Shadows</button>
@@ -973,67 +1090,221 @@
       metalness: 0.04
     });
 
-    // Custom GPU Decontourification Pipeline (removes contour banding artifacts & sharpens MOLA ridges)
-    marsMaterial.onBeforeCompile = (shader) => {
-      shader.uniforms.u_decontour = decontourUniforms.u_decontour;
-      shader.uniforms.u_sharpness = decontourUniforms.u_sharpness;
-      shader.uniforms.u_contrast = decontourUniforms.u_contrast;
-      shader.uniforms.u_texelSize = decontourUniforms.u_texelSize;
+    const zoom5Geo = new THREE.SphereGeometry(MARS_RADIUS * 1.0003, 128, 64);
+    const zoom5Material = new THREE.MeshStandardMaterial({
+      roughness: 1.0,
+      metalness: 0.0,
+      color: 0xd0d0d0,
+      transparent: true,
+      opacity: 0.0,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1
+    });
 
-      shader.fragmentShader = `
-        uniform float u_decontour;
-        uniform float u_sharpness;
-        uniform float u_contrast;
-        uniform vec2 u_texelSize;
-      ` + shader.fragmentShader;
+    // Custom GPU Decontourification Pipeline (removes contour banding artifacts & sharpens ridges)
+    function setupDecontourPipeline(material, isGrayscale = false) {
+      material.onBeforeCompile = (shader) => {
+        shader.uniforms.u_decontour = decontourUniforms.u_decontour;
+        shader.uniforms.u_sharpness = decontourUniforms.u_sharpness;
+        shader.uniforms.u_contrast = decontourUniforms.u_contrast;
+        shader.uniforms.u_texelSize = decontourUniforms.u_texelSize;
 
-      shader.fragmentShader = shader.fragmentShader.replace(
-        '#include <map_fragment>',
-        `
-        #ifdef USE_MAP
-          vec4 texColor = texture2D(map, vUv);
-          if (u_decontour > 0.5) {
-            // High-precision 5-tap cross convolution decontour filter
-            vec4 cU = texture2D(map, vUv + vec2(0.0, u_texelSize.y));
-            vec4 cD = texture2D(map, vUv - vec2(0.0, u_texelSize.y));
-            vec4 cL = texture2D(map, vUv - vec2(u_texelSize.x, 0.0));
-            vec4 cR = texture2D(map, vUv + vec2(u_texelSize.x, 0.0));
+        shader.fragmentShader = `
+          uniform float u_decontour;
+          uniform float u_sharpness;
+          uniform float u_contrast;
+          uniform vec2 u_texelSize;
+        ` + shader.fragmentShader;
 
-            // Laplacian second-derivative operator for ridge extraction
-            vec4 laplacian = 4.0 * texColor - (cU + cD + cL + cR);
-            // Continuous bilateral anti-banding blend
-            vec4 smoothed = (cU + cD + cL + cR) * 0.25;
-            texColor = mix(texColor, smoothed, 0.22);
-            texColor += laplacian * (u_sharpness * 0.35);
-
+        const contrastBlock = isGrayscale
+          ? `
+            // Dim & uniform geomorphology contrast centered on dim mean (prevents overexposure/hotspots)
+            texColor.rgb = (texColor.rgb - 0.35) * (u_contrast * 0.92) + 0.35;
+            texColor.rgb *= 0.970;
+            texColor = clamp(texColor, 0.0, 1.0);
+          `
+          : `
             // Contrast enhancement for geomorphology
             texColor.rgb = (texColor.rgb - 0.5) * u_contrast + 0.5;
             texColor = clamp(texColor, 0.0, 1.0);
-          }
-          diffuseColor *= texColor;
-        #endif
-        `
-      );
-    };
+          `;
+
+        shader.fragmentShader = shader.fragmentShader.replace(
+          '#include <map_fragment>',
+          `
+          #ifdef USE_MAP
+            vec4 texColor = texture2D(map, vUv);
+            if (u_decontour > 0.5) {
+              // High-precision 5-tap cross convolution decontour filter
+              vec4 cU = texture2D(map, vUv + vec2(0.0, u_texelSize.y));
+              vec4 cD = texture2D(map, vUv - vec2(0.0, u_texelSize.y));
+              vec4 cL = texture2D(map, vUv - vec2(u_texelSize.x, 0.0));
+              vec4 cR = texture2D(map, vUv + vec2(u_texelSize.x, 0.0));
+
+              // Laplacian second-derivative operator for ridge extraction
+              vec4 laplacian = 4.0 * texColor - (cU + cD + cL + cR);
+              // Continuous bilateral anti-banding blend
+              vec4 smoothed = (cU + cD + cL + cR) * 0.25;
+              texColor = mix(texColor, smoothed, 0.22);
+              texColor += laplacian * (u_sharpness * 0.35);
+
+              ` + contrastBlock + `
+            } else if (` + (isGrayscale ? "true" : "false") + `) {
+              // When decontour is off, preserve dim & uniform illumination
+              texColor.rgb *= 0.970;
+            }
+            diffuseColor *= texColor;
+          #endif
+          `
+        );
+      };
+    }
+
+    setupDecontourPipeline(marsMaterial, false);
+    setupDecontourPipeline(zoom5Material, true);
 
     const marsGlobe = new THREE.Mesh(sphereGeo, marsMaterial);
     marsGlobe.castShadow = true;
     marsGlobe.receiveShadow = true;
     scene.add(marsGlobe);
 
-    // Progressive Texture: 2K Fast -> 8K Master
+    const zoom5Globe = new THREE.Mesh(zoom5Geo, zoom5Material);
+    zoom5Globe.castShadow = true;
+    zoom5Globe.receiveShadow = true;
+    zoom5Globe.visible = false;
+    scene.add(zoom5Globe);
+
+    // Progressive Texture Pipeline (LOD) for 3D Globe Layers
     const textureLoader = new THREE.TextureLoader();
+    let molaTex2k = null;
+    let molaTex8k = null;
+    let zoom5Tex2k = null;
+    let zoom5Tex8k = null;
+    let zoom5Loading = false;
+
+    // Load MOLA 2K Base -> 8K Master
     textureLoader.load('/mars_mola_base_2k.jpg', (tex2k) => {
-      marsMaterial.map = tex2k;
-      marsMaterial.needsUpdate = true;
+      molaTex2k = tex2k;
+      if (!marsMaterial.map) {
+        marsMaterial.map = tex2k;
+        marsMaterial.needsUpdate = true;
+      }
       textureLoader.load('/mars_mola_8k.jpg', (tex8k) => {
         tex8k.generateMipmaps = true;
         tex8k.minFilter = THREE.LinearMipmapLinearFilter;
         tex8k.magFilter = THREE.LinearFilter;
+        molaTex8k = tex8k;
         marsMaterial.map = tex8k;
         marsMaterial.needsUpdate = true;
       });
     });
+
+    // Progressive Loader for Zoom 5 Surface Tiles
+    function loadZoom5Textures(onReady) {
+      if (zoom5Tex8k) {
+        if (onReady) onReady();
+        return;
+      }
+      if (zoom5Loading) return;
+      zoom5Loading = true;
+
+      textureLoader.load('/mars_zoom5_base_2k.jpg', (tex2k) => {
+        zoom5Tex2k = tex2k;
+        if (!zoom5Material.map) {
+          zoom5Material.map = tex2k;
+          zoom5Material.needsUpdate = true;
+        }
+        if (onReady) onReady();
+        textureLoader.load('/mars_zoom5_8k.jpg', (tex8k) => {
+          tex8k.generateMipmaps = true;
+          tex8k.minFilter = THREE.LinearMipmapLinearFilter;
+          tex8k.magFilter = THREE.LinearFilter;
+          zoom5Tex8k = tex8k;
+          zoom5Material.map = tex8k;
+          zoom5Material.needsUpdate = true;
+          zoom5Loading = false;
+        });
+      });
+    }
+
+    // Pre-cache Zoom 5 preview in background
+    setTimeout(() => {
+      loadZoom5Textures();
+    }, 800);
+
+    let currentGlobeLayer = 'mola'; // 'mola' | 'zoom5' | 'overlay'
+    let overlayOpacity = 0.65;
+
+    function setGlobeLayer(layer) {
+      currentGlobeLayer = layer;
+      loadZoom5Textures();
+
+      const layerNameEl = document.getElementById('current-layer-name');
+      const overlayControls = document.getElementById('layer-overlay-controls');
+
+      // Update UI menu items
+      document.querySelectorAll('.layer-menu-item').forEach(item => {
+        const isMatch = item.getAttribute('data-layer') === layer;
+        item.classList.toggle('active', isMatch);
+        const ind = item.querySelector('.layer-indicator');
+        if (ind) {
+          ind.textContent = isMatch ? '●' : '○';
+          ind.style.color = isMatch ? 'var(--accent-cyan)' : 'var(--text-dim)';
+        }
+      });
+
+      if (layer === 'mola') {
+        if (layerNameEl) layerNameEl.textContent = 'MOLA Topo';
+        if (overlayControls) overlayControls.style.display = 'none';
+
+        marsGlobe.visible = true;
+        marsMaterial.opacity = 1.0;
+        marsMaterial.transparent = false;
+        marsMaterial.needsUpdate = true;
+
+        zoom5Globe.visible = false;
+        zoom5Material.opacity = 0.0;
+        zoom5Material.needsUpdate = true;
+      } else if (layer === 'zoom5') {
+        if (layerNameEl) layerNameEl.textContent = 'Zoom 5 Tiles';
+        if (overlayControls) overlayControls.style.display = 'none';
+
+        marsGlobe.visible = false;
+
+        zoom5Globe.visible = true;
+        zoom5Material.opacity = 1.0;
+        zoom5Material.transparent = false;
+        if (zoom5Tex8k) {
+          zoom5Material.map = zoom5Tex8k;
+        } else if (zoom5Tex2k) {
+          zoom5Material.map = zoom5Tex2k;
+        }
+        zoom5Material.needsUpdate = true;
+      } else if (layer === 'overlay') {
+        if (layerNameEl) layerNameEl.textContent = 'Zoom 5 Overlay';
+        if (overlayControls) overlayControls.style.display = 'block';
+
+        marsGlobe.visible = true;
+        marsMaterial.opacity = 1.0;
+        marsMaterial.transparent = false;
+        marsMaterial.needsUpdate = true;
+
+        zoom5Globe.visible = true;
+        zoom5Material.transparent = true;
+        zoom5Material.opacity = overlayOpacity;
+        if (zoom5Tex8k) {
+          zoom5Material.map = zoom5Tex8k;
+        } else if (zoom5Tex2k) {
+          zoom5Material.map = zoom5Tex2k;
+        }
+        zoom5Material.needsUpdate = true;
+      }
+
+      if (typeof applyLightingState === 'function') {
+        applyLightingState();
+      }
+    }
 
     // Atmosphere Mesh
     const atmosGeo = new THREE.SphereGeometry(MARS_RADIUS * 1.018, 64, 32);
@@ -2609,17 +2880,20 @@
       appMode = mode;
       const btn3D = document.getElementById('btn-mode-3d');
       const btn2D = document.getElementById('btn-mode-2d');
+      const layerMenuContainer = document.getElementById('layer-menu-container');
 
       if (mode === '3D') {
         threeCanvas.style.display = 'block';
         flatCanvas.style.display = 'none';
         btn3D.classList.add('active');
         btn2D.classList.remove('active');
+        if (layerMenuContainer) layerMenuContainer.style.display = 'block';
       } else {
         threeCanvas.style.display = 'none';
         flatCanvas.style.display = 'block';
         btn3D.classList.remove('active');
         btn2D.classList.add('active');
+        if (layerMenuContainer) layerMenuContainer.style.display = 'none';
         init2DFlatCanvas();
       }
     }
@@ -2876,32 +3150,126 @@
     };
 
     // Toggle Realistic Solar Terminator & Sun Position
-    document.getElementById('btn-toggle-solar').onclick = () => {
-      solarTerminatorActive = !solarTerminatorActive;
-      const btn = document.getElementById('btn-toggle-solar');
-      btn.classList.toggle('active', solarTerminatorActive);
+    // --- Grayscale Hemisphere Equalization Lighting with Legacy Fallback ---
+    let useEqualizedGrayscaleLighting = true;
+
+    const LIGHTING_CONFIG = {
+      // Equalized mode: ensures both hemispheres (Jezero Crater & Olympus Mons) are equally bright
+      equalizedGrayscale: {
+        solar: { ambient: 0.52, headlight: 0.42, sun: 1.15, emissiveHex: 0x222222 },
+        uniform: { ambient: 1.05, headlight: 0.55, sun: 0.0, emissiveHex: 0x000000 }
+      },
+      // Standard MOLA baseline
+      molaStandard: {
+        solar: { ambient: 0.48, headlight: 0.22, sun: 1.35, emissiveHex: 0x000000 },
+        uniform: { ambient: 0.85, headlight: 0.35, sun: 1.20, emissiveHex: 0x000000 }
+      },
+      // Complete legacy fallback config (preserves original behavior if needed)
+      legacyFallback: {
+        solar: { ambient: 0.48, headlight: 0.22, sun: 1.35, emissiveHex: 0x000000 },
+        uniform: { ambient: 0.85, headlight: 0.35, sun: 1.20, emissiveHex: 0x000000 }
+      }
+    };
+
+    function applyLightingState() {
+      const isGrayscale = (currentGlobeLayer === 'zoom5' || currentGlobeLayer === 'overlay');
+      const cfg = (isGrayscale && useEqualizedGrayscaleLighting)
+        ? LIGHTING_CONFIG.equalizedGrayscale
+        : (useEqualizedGrayscaleLighting ? LIGHTING_CONFIG.molaStandard : LIGHTING_CONFIG.legacyFallback);
+
+      const modeCfg = solarTerminatorActive ? cfg.solar : cfg.uniform;
+
+      ambientLight.intensity = modeCfg.ambient;
+      cameraHeadlight.intensity = modeCfg.headlight;
+      sunLight.intensity = modeCfg.sun;
 
       if (solarTerminatorActive) {
-        // True physical ephemeris mode: Sun positioned directly at subsolar point with dynamic shadows
-        ambientLight.intensity = 0.48; // Ambient radiance preserves crater/topography readability
-        cameraHeadlight.intensity = 0.22;
-        sunLight.intensity = 1.35;
         sunLight.castShadow = true;
-        const sunPos = latLonToVector3(currentEphemeris.subsolar_point.lat, currentEphemeris.subsolar_point.lon, 6.0);
-        sunLight.position.copy(sunPos);
+        if (currentEphemeris && currentEphemeris.subsolar_point) {
+          const sunPos = latLonToVector3(currentEphemeris.subsolar_point.lat, currentEphemeris.subsolar_point.lon, 6.0);
+          sunLight.position.copy(sunPos);
+        }
         document.getElementById('eph-shadows').textContent = "REAL-TIME ASTRONOMICAL SUN";
         document.getElementById('eph-shadows').style.color = "var(--accent-yellow)";
       } else {
-        // Uniform global illumination mode
-        ambientLight.intensity = 0.85;
-        cameraHeadlight.intensity = 0.35;
-        sunLight.intensity = 1.2;
         sunLight.castShadow = false;
         sunLight.position.set(6, 4, 5);
         document.getElementById('eph-shadows').textContent = "FULL UNIFORM ILLUMINATION";
         document.getElementById('eph-shadows').style.color = "var(--accent-green)";
       }
+
+      // Emissive night-fill calibration for grayscale globe
+      if (typeof zoom5Material !== 'undefined' && zoom5Material) {
+        zoom5Material.emissive.setHex(modeCfg.emissiveHex);
+        if (zoom5Material.map && modeCfg.emissiveHex !== 0x000000) {
+          zoom5Material.emissiveMap = zoom5Material.map;
+        } else if (modeCfg.emissiveHex === 0x000000) {
+          zoom5Material.emissiveMap = null;
+        }
+        zoom5Material.needsUpdate = true;
+      }
+    }
+
+    // Fallback toggle available globally: window.toggleGrayscaleLightingEqualizer(false) restores legacy lighting immediately
+    window.toggleGrayscaleLightingEqualizer = function(enable) {
+      useEqualizedGrayscaleLighting = enable !== undefined ? !!enable : !useEqualizedGrayscaleLighting;
+      applyLightingState();
+      console.log(`[Mars3D] Grayscale Lighting Equalizer: ${useEqualizedGrayscaleLighting ? 'ACTIVE (Balanced)' : 'LEGACY FALLBACK'}`);
+      return useEqualizedGrayscaleLighting;
     };
+    window.restoreLegacyLighting = function() {
+      return window.toggleGrayscaleLightingEqualizer(false);
+    };
+
+    document.getElementById('btn-toggle-solar').onclick = () => {
+      solarTerminatorActive = !solarTerminatorActive;
+      const btn = document.getElementById('btn-toggle-solar');
+      btn.classList.toggle('active', solarTerminatorActive);
+      applyLightingState();
+    };
+
+    // Apply initial lighting state
+    applyLightingState();
+
+    // Layer Selection Menu Interactions
+    const btnLayerMenu = document.getElementById('btn-layer-menu');
+    const layerDropdown = document.getElementById('layer-dropdown');
+    if (btnLayerMenu && layerDropdown) {
+      btnLayerMenu.onclick = (e) => {
+        e.stopPropagation();
+        layerDropdown.classList.toggle('open');
+      };
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#layer-menu-container')) {
+          layerDropdown.classList.remove('open');
+        }
+      });
+
+      document.querySelectorAll('.layer-menu-item').forEach(item => {
+        item.onclick = (e) => {
+          e.stopPropagation();
+          const selected = item.getAttribute('data-layer');
+          setGlobeLayer(selected);
+          if (selected !== 'overlay') {
+            layerDropdown.classList.remove('open');
+          }
+        };
+      });
+    }
+
+    const overlaySlider = document.getElementById('layer-opacity-slider');
+    const overlayValLabel = document.getElementById('layer-opacity-val');
+    if (overlaySlider) {
+      overlaySlider.oninput = (e) => {
+        overlayOpacity = parseFloat(e.target.value) / 100.0;
+        if (overlayValLabel) overlayValLabel.textContent = `${Math.round(overlayOpacity * 100)}%`;
+        if (currentGlobeLayer === 'overlay') {
+          zoom5Material.opacity = overlayOpacity;
+          zoom5Material.needsUpdate = true;
+        }
+      };
+    }
 
     // Toggle Real-Time Decontourification (Anti-Banding & Ridge Sharpening)
     const btnDecontour = document.getElementById('btn-toggle-decontour');
@@ -2911,6 +3279,7 @@
       btnDecontour.classList.toggle('active', decontourActive);
       decontourUniforms.u_decontour.value = decontourActive ? 1.0 : 0.0;
       marsMaterial.needsUpdate = true;
+      zoom5Material.needsUpdate = true;
       const statusEl = document.getElementById('eph-decontour');
       if (statusEl) {
         statusEl.textContent = decontourActive ? "SMOOTH REAL-TIME ACTIVE" : "RAW DISCRETE MESH";
