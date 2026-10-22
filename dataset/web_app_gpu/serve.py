@@ -46,6 +46,17 @@ DATASET_DIR = os.path.abspath(os.path.join(GPU_DIR, ".."))
 WEB_APP_DIR = os.path.abspath(os.path.join(DATASET_DIR, "web_app"))
 ROOT_DIR = os.path.abspath(os.path.join(DATASET_DIR, ".."))
 
+ZOOM5_DIR = os.path.abspath(os.path.join(ROOT_DIR, "zoom_5"))
+if not os.path.exists(ZOOM5_DIR):
+    for cz in [
+        os.path.join(CURRENT_FILE_DIR, "zoom_5"),
+        os.path.join(DATASET_DIR, "zoom_5"),
+        os.path.join(GPU_DIR, "zoom_5")
+    ]:
+        if os.path.exists(cz):
+            ZOOM5_DIR = os.path.abspath(cz)
+            break
+
 CACHE = {}
 CACHE_TTL = 3600  # 1 hour
 
@@ -371,7 +382,18 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
 
         if clean_path.startswith("/tiles/") or clean_path.startswith("\\tiles\\"):
             rel = clean_path[len("/tiles/"):].lstrip("/\\")
+            if rel.startswith("zoom_5/") or rel.startswith("zoom_5\\"):
+                rel_z5 = rel[len("zoom_5/"):].lstrip("/\\")
+                cand_z5 = os.path.join(ZOOM5_DIR, rel_z5)
+                if os.path.exists(cand_z5):
+                    return cand_z5
             candidate = os.path.join(DATASET_DIR, rel)
+            if os.path.exists(candidate):
+                return candidate
+
+        if clean_path.startswith("/zoom_5/") or clean_path.startswith("\\zoom_5\\"):
+            rel = clean_path[len("/zoom_5/"):].lstrip("/\\")
+            candidate = os.path.join(ZOOM5_DIR, rel)
             if os.path.exists(candidate):
                 return candidate
 
@@ -380,6 +402,13 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             t_path = os.path.join(DATASET_DIR, basename)
             if os.path.exists(t_path):
                 return t_path
+
+        # Zoom 5 tile schema: {row}_{col}.jpg (32 rows x 64 cols)
+        parts = os.path.splitext(basename)[0].split("_")
+        if len(parts) == 2 and parts[0].isdigit() and parts[1].isdigit() and basename.endswith(".jpg"):
+            z5_path = os.path.join(ZOOM5_DIR, basename)
+            if os.path.exists(z5_path):
+                return z5_path
 
         if basename == "mars_mola_level5_mosaic.jpg":
             f = os.path.join(WEB_APP_DIR, "mars_mola_level5_mosaic.jpg")
