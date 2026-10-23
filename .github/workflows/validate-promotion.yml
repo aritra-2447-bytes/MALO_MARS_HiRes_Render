@@ -20,20 +20,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Validate source branch
+      - name: Validate promotion path
         env:
           HEAD_BRANCH: ${{ github.head_ref }}
           BASE_BRANCH: ${{ github.base_ref }}
         run: |
+          echo "Target base branch: $BASE_BRANCH"
+          echo "Source head branch: $HEAD_BRANCH"
+
           if [[ "$BASE_BRANCH" != "official/dev" ]]; then
-            echo "Rejected: unexpected target branch."
+            echo "::error::Invalid target branch: '$BASE_BRANCH'. This workflow only validates promotions into 'official/dev'."
             exit 1
           fi
 
           if [[ "$HEAD_BRANCH" != "official/preview" ]]; then
-            echo "Rejected: PRs into official/dev must come from official/preview."
-            echo "Actual source: $HEAD_BRANCH"
+            echo "::error::Promotion rejected. Pull requests targeting 'official/dev' are strictly restricted to come from 'official/preview'. Received: '$HEAD_BRANCH'."
             exit 1
           fi
 
-          echo "Promotion path validated successfully."
+          echo "Promotion path successfully validated: '$HEAD_BRANCH' -> '$BASE_BRANCH'."
