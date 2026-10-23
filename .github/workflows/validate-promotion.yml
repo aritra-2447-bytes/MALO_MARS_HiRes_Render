@@ -1,0 +1,39 @@
+name: Validate Promotion Path
+
+on:
+  pull_request:
+    branches:
+      - official/dev
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate-promotion:
+    name: validate-promotion
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate source branch
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+          BASE_BRANCH: ${{ github.base_ref }}
+        run: |
+          if [[ "$BASE_BRANCH" != "official/dev" ]]; then
+            echo "Rejected: unexpected target branch."
+            exit 1
+          fi
+
+          if [[ "$HEAD_BRANCH" != "official/preview" ]]; then
+            echo "Rejected: PRs into official/dev must come from official/preview."
+            echo "Actual source: $HEAD_BRANCH"
+            exit 1
+          fi
+
+          echo "Promotion path validated successfully."
