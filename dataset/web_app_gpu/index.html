@@ -984,7 +984,7 @@
     controls.dampingFactor = 0.06;
     controls.rotateSpeed = 0.65;
     controls.zoomSpeed = 0.9;
-    controls.minDistance = 1.03;
+    controls.minDistance = 1.28; // Enforced minimum distance to strictly prevent surface texture pixelation
     controls.maxDistance = 8.5;
     controls.enablePan = false;
 
@@ -1376,7 +1376,7 @@
       return item.category === 'polar_cap' ? POLAR_CAP_CAM_DIST : DEFAULT_LANDMARK_CAM_DIST;
     }
 
-    // Google Earth Smooth Fly-To
+    // High-Precision Smooth Planetary Fly-To
     let isTransitioning = false;
     let transitionStart = 0;
     let transitionDuration = 1200;
@@ -1389,7 +1389,8 @@
       transitionStart = performance.now();
       startCamPos.copy(camera.position);
 
-      const targetSurface = latLonToVector3(lat, lon, targetDist);
+      const safeDist = Math.max(controls.minDistance, targetDist);
+      const targetSurface = latLonToVector3(lat, lon, safeDist);
       targetCamPos.copy(targetSurface);
       controls.target.set(0, 0, 0);
 
@@ -1954,38 +1955,19 @@
         }
 
         if (geom.type === 'LineString' && Array.isArray(geom.coordinates)) {
-          // Convert [lon, lat, elev] to 3D vectors
-          const curvePoints = geom.coordinates.map(c =>
-            latLonToVector3(c[1], c[0], MARS_RADIUS + ((c[2] || 0) / 3396190.0) * 1.5 + 0.0006)
+          // Convert [lon, lat, elev] to 3D surface vectors
+          const linePoints = geom.coordinates.map(c =>
+            latLonToVector3(c[1], c[0], MARS_RADIUS * 1.0006)
           );
 
-          if (curvePoints.length > 1) {
-            // Emissive 3D Tube
-            const curve = new THREE.CatmullRomCurve3(curvePoints);
-            const segments = Math.max(32, curvePoints.length * 4);
-            const radius = props.type === 'rover_traverse' ? 0.0004 : 0.00055;
-            const tubeGeo = new THREE.TubeGeometry(curve, segments, radius, 8, false);
-            const tubeMat = new THREE.MeshStandardMaterial({
-              color: colorHex,
-              emissive: colorHex,
-              emissiveIntensity: 0.45,
-              transparent: true,
-              opacity: 0.95,
-              roughness: 0.4,
-              metalness: 0.2
-            });
-            const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
-            tubeMesh.userData = { feature, type: 'traverse_tube', missionId: props.id, name: props.name };
-            astroPathsGroup.add(tubeMesh);
-
-            // Sub-surface line
-            const lineGeo = new THREE.BufferGeometry().setFromPoints(
-              geom.coordinates.map(c => latLonToVector3(c[1], c[0], MARS_RADIUS * 1.0005))
-            );
+          if (linePoints.length > 1) {
+            // Clean, razor-sharp single-line cartographic pathway
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
             const lineMat = new THREE.LineBasicMaterial({
               color: colorHex,
               transparent: true,
-              opacity: 0.7
+              opacity: 0.95,
+              linewidth: 2
             });
             const lineMesh = new THREE.Line(lineGeo, lineMat);
             lineMesh.userData = { feature, type: 'surface_line', missionId: props.id, name: props.name };
@@ -2119,31 +2101,7 @@
         const pinHeight = 0.013;
         const pinHeadRadius = 0.0024;
 
-        // Continuous Glowing 3D Tube along the Traversed Path
-        const curve = new THREE.CatmullRomCurve3(highlightPoints);
-        const segments = Math.min(320, Math.max(48, highlightPoints.length * 3));
-        const tubeGeo = new THREE.TubeGeometry(curve, segments, tubeRadius, 8, false);
-        const tubeMat = new THREE.MeshStandardMaterial({
-          color: cyanColorHex,
-          emissive: 0x0284c7,
-          emissiveIntensity: 0.9,
-          transparent: true,
-          opacity: 0.95,
-          roughness: 0.3,
-          metalness: 0.2
-        });
-        const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
-        const trackDesc = `🚀 <b>Landing Point:</b> ${tData.touchdown?.name || 'Touchdown'} ➔ 🏁 <b>Point Traveled:</b> ${tData.final?.name || 'Final Location'}<br><b>Odometry:</b> ${tData.odometry_km} km • <b>Duration:</b> ${tData.sol_range}`;
-        tubeMesh.userData = {
-          missionId,
-          type: 'traverse_tube',
-          name: `${tData.name} Cumulative Drive Traverse`,
-          category: 'ROVER DRIVE TRAVERSE TRACK',
-          description: trackDesc
-        };
-        group.add(tubeMesh);
-
-        // High-contrast crisp surface polyline
+        // Clean, crisp single-line rover pathway along actual drive coordinates
         const lineGeo = new THREE.BufferGeometry().setFromPoints(highlightPoints);
         const lineMat = new THREE.LineBasicMaterial({
           color: cyanColorHex,
@@ -2152,7 +2110,14 @@
           linewidth: 2
         });
         const lineMesh = new THREE.Line(lineGeo, lineMat);
-        lineMesh.userData = tubeMesh.userData;
+        const trackDesc = `🚀 <b>Landing Point:</b> ${tData.touchdown?.name || 'Touchdown'} ➔ 🏁 <b>Point Traveled:</b> ${tData.final?.name || 'Final Location'}<br><b>Odometry:</b> ${tData.odometry_km} km • <b>Duration:</b> ${tData.sol_range}`;
+        lineMesh.userData = {
+          missionId,
+          type: 'surface_line',
+          name: `${tData.name} Cumulative Drive Traverse`,
+          category: 'ROVER DRIVE TRAVERSE TRACK',
+          description: trackDesc
+        };
         group.add(lineMesh);
 
         // Touchdown Point Marker (Green Pin & Target Ring at Landing Point)
@@ -2279,19 +2244,16 @@
 
         if (actualPath && actualPath.length >= 2) {
           const highlightPoints = actualPath.map(p =>
-            latLonToVector3(p.lat, p.lon, MARS_RADIUS + ((p.elev || 0) / 3396190.0) * 1.5 + 0.002)
+            latLonToVector3(p.lat, p.lon, MARS_RADIUS * 1.0006)
           );
-          const curve = new THREE.CatmullRomCurve3(highlightPoints);
-          const segments = Math.min(320, Math.max(48, highlightPoints.length * 4));
-          const tubeGeo = new THREE.TubeGeometry(curve, segments, 0.00065, 8, false);
-          const tubeMat = new THREE.MeshStandardMaterial({
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(highlightPoints);
+          const lineMat = new THREE.LineBasicMaterial({
             color: 0x38bdf8,
-            emissive: 0x38bdf8,
-            emissiveIntensity: 0.85,
             transparent: true,
-            opacity: 0.95
+            opacity: 0.95,
+            linewidth: 2
           });
-          const mesh = new THREE.Mesh(tubeGeo, tubeMat);
+          const mesh = new THREE.Line(lineGeo, lineMat);
           mesh.userData = { type: 'corridor_highlight', missionId };
           group.add(mesh);
         }
@@ -2422,34 +2384,19 @@
         routesGroup.add(pinGroup);
       });
 
-      // 2. High-Precision Cartographic Continuous Drive Ribbon
+      // 2. High-Precision Cartographic Single-Line Pathway
       const pathNodes = (actualPath && actualPath.length > 1) ? actualPath : samples;
-      const curvePoints = pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0012));
 
-      if (curvePoints.length > 1) {
-        // Crisp, delicate 3D tube hugging the Martian terrain (radius 0.00035 = ~1.2 km scale width)
-        const curve = new THREE.CatmullRomCurve3(curvePoints);
-        const tubeSegments = Math.min(480, Math.max(96, curvePoints.length * 2));
-        const tubeRadius = isRover ? 0.00032 : 0.00045;
-        const tubeGeo = new THREE.TubeGeometry(curve, tubeSegments, tubeRadius, 8, false);
-        const tubeMat = new THREE.MeshStandardMaterial({
-          color: isRover ? 0x00f0ff : 0xfbbf24,
-          roughness: 0.3,
-          metalness: 0.8,
-          emissive: isRover ? 0x0284c7 : 0xd97706,
-          emissiveIntensity: 0.55
-        });
-        const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
-        routesGroup.add(tubeMesh);
-
-        // Surface track line (razor-sharp high-contrast line right on terrain)
+      if (pathNodes && pathNodes.length > 1) {
+        // Razor-sharp single-line pathway hugging the terrain (no bulky tubes)
         const trackGeo = new THREE.BufferGeometry().setFromPoints(
-          pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0004))
+          pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0006))
         );
         const trackMat = new THREE.LineBasicMaterial({
-          color: isRover ? 0x38bdf8 : 0xfde047,
+          color: isRover ? 0x00f0ff : 0xfbbf24,
           transparent: true,
-          opacity: 0.95
+          opacity: 0.95,
+          linewidth: 2
         });
         const trackLine = new THREE.Line(trackGeo, trackMat);
         routesGroup.add(trackLine);
@@ -2865,14 +2812,24 @@
     // Reset North Up
     document.getElementById('btn-compass').onclick = () => flyToCoordinate(0, 0, 3.2);
 
-    // Zoom
+    // Zoom with strictly enforced distance and scale boundaries (prevents surface pixelation)
     document.getElementById('btn-zoom-in').onclick = () => {
-      camera.position.multiplyScalar(0.85);
-      if (camera.position.length() < controls.minDistance) camera.position.setLength(controls.minDistance);
+      if (appMode === '2D') {
+        flatZoom = Math.min(3.5, flatZoom * 1.25);
+        draw2DFlat();
+      } else {
+        camera.position.multiplyScalar(0.85);
+        if (camera.position.length() < controls.minDistance) camera.position.setLength(controls.minDistance);
+      }
     };
     document.getElementById('btn-zoom-out').onclick = () => {
-      camera.position.multiplyScalar(1.18);
-      if (camera.position.length() > controls.maxDistance) camera.position.setLength(controls.maxDistance);
+      if (appMode === '2D') {
+        flatZoom = Math.max(1.0, flatZoom / 1.25);
+        draw2DFlat();
+      } else {
+        camera.position.multiplyScalar(1.18);
+        if (camera.position.length() > controls.maxDistance) camera.position.setLength(controls.maxDistance);
+      }
     };
 
     // Toggle Mode
@@ -3037,6 +2994,34 @@
         }
       }
     }
+
+    // Interactive 2D Navigation with Clamped Zoom (Max 3.5x strictly prevents surface pixelation)
+    let isDraggingFlat = false;
+    let flatStartX = 0, flatStartY = 0;
+
+    flatCanvas.addEventListener('mousedown', (e) => {
+      isDraggingFlat = true;
+      flatStartX = e.clientX - flatPanX;
+      flatStartY = e.clientY - flatPanY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDraggingFlat || appMode !== '2D') return;
+      flatPanX = e.clientX - flatStartX;
+      flatPanY = e.clientY - flatStartY;
+      draw2DFlat();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDraggingFlat = false;
+    });
+
+    flatCanvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 0.87;
+      flatZoom = Math.max(1.0, Math.min(3.5, flatZoom * factor));
+      draw2DFlat();
+    }, { passive: false });
 
     // --- Dynamic Live Mars24 Ephemeris Engine (Allison & McEwen 2000 Formulation) ---
     function computeLiveMarsEphemeris(targetDate = new Date()) {
