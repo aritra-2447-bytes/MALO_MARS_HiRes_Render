@@ -22,6 +22,8 @@ import urllib.parse
 import mimetypes
 import time
 import math
+import struct
+import re
 
 PORT = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8083))
 CURRENT_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -45,6 +47,74 @@ for c in candidate_gpu_dirs:
 DATASET_DIR = os.path.abspath(os.path.join(GPU_DIR, ".."))
 WEB_APP_DIR = os.path.abspath(os.path.join(DATASET_DIR, "web_app"))
 ROOT_DIR = os.path.abspath(os.path.join(DATASET_DIR, ".."))
+
+# Level 6 BigTIFF (32768x16384 True Resolution Mosaic) Zero-Dependency Tile Server Engine
+class Level6TileIndex:
+    def __init__(self):
+        self.tiff_path = None
+        self.table_payload = b""
+        self.offsets = ()
+        self.bytecounts = ()
+        self._init_index()
+
+    def _init_index(self):
+        candidates = [
+            os.path.join(ROOT_DIR, "mars_mola_level6_mosaic.tif"),
+            os.path.join(DATASET_DIR, "mars_mola_level6_mosaic.tif"),
+            os.path.join(os.path.dirname(ROOT_DIR), "mars_mola_level6_mosaic.tif"),
+            os.path.abspath("mars_mola_level6_mosaic.tif")
+        ]
+        for c in candidates:
+            if os.path.exists(c):
+                self.tiff_path = os.path.abspath(c)
+                break
+        if not self.tiff_path:
+            return
+        try:
+            with open(self.tiff_path, "rb") as f:
+                header = f.read(16)
+                endian = "<" if header[:2] == b"II" else ">"
+                first_ifd = struct.unpack(endian + "Q", header[8:16])[0]
+                f.seek(first_ifd)
+                num_entries = struct.unpack(endian + "Q", f.read(8))[0]
+                tags = {}
+                for _ in range(num_entries):
+                    entry = f.read(20)
+                    tag, dtype, count, val_or_offset = struct.unpack(endian + "HHQQ", entry)
+                    tags[tag] = (dtype, count, val_or_offset)
+
+                if 347 in tags:  # JPEGTables
+                    f.seek(tags[347][2])
+                    tables = f.read(tags[347][1])
+                    if tables.startswith(b"\xff\xd8") and tables.endswith(b"\xff\xd9"):
+                        self.table_payload = tables[2:-2]
+
+                if 324 in tags and 325 in tags:
+                    off_val = tags[324][2]
+                    f.seek(off_val)
+                    self.offsets = struct.unpack(endian + "8192Q", f.read(8192 * 8))
+
+                    cnt_val = tags[325][2]
+                    f.seek(cnt_val)
+                    self.bytecounts = struct.unpack(endian + "8192I", f.read(8192 * 4))
+        except Exception as e:
+            sys.stderr.write(f"Level 6 BigTIFF index init warning: {e}\n")
+
+    def get_tile_bytes(self, row, col):
+        if not self.offsets or not (0 <= row < 64 and 0 <= col < 128):
+            return None
+        idx = row * 128 + col
+        try:
+            with open(self.tiff_path, "rb") as f:
+                f.seek(self.offsets[idx])
+                raw = f.read(self.bytecounts[idx])
+                if raw.startswith(b"\xff\xd8"):
+                    return b"\xff\xd8" + self.table_payload + raw[2:]
+                return raw
+        except Exception:
+            return None
+
+L6_INDEX = Level6TileIndex()
 
 CACHE = {}
 CACHE_TTL = 3600  # 1 hour
@@ -329,6 +399,47 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         # Mars Solar Ephemeris & Day/Night Terminator (Allison & McEwen Mars24)
         if path == "/api/mars/ephemeris":
             self.handle_mars_ephemeris(query)
+            return
+
+        # True Resolution Level 6 BigTIFF & Level 5 Tile Provider
+        # Supports: /tiles/6_row_col.jpg, /tiles/6/row/col.jpg, /tiles/5_row_col.jpg, /tiles/5/row/col.jpg
+        tile_match = re.match(r"^/tiles/(\d+)[_/](\d+)[_/](\d+)\.jpg$", path)
+        if tile_match:
+            level, row, col = int(tile_match.group(1)), int(tile_match.group(2)), int(tile_match.group(3))
+            if level == 6:
+                tile_data = L6_INDEX.get_tile_bytes(row, col)
+                if tile_data:
+                    self.send_response(200)
+                    self.send_header("Content-Type", "image/jpeg")
+                    self.send_header("Content-Length", str(len(tile_data)))
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+                    self.end_headers()
+                    self.wfile.write(tile_data)
+                    return
+                # If Level 6 tile not available or out of bounds, fallback to downsampled Level 5
+                row5, col5 = row // 2, col // 2
+                level = 5
+                row, col = row5, col5
+
+            if level == 5:
+                t_path = os.path.join(DATASET_DIR, f"5_{row}_{col}.jpg")
+                if os.path.exists(t_path):
+                    try:
+                        with open(t_path, "rb") as f:
+                            tile_data = f.read()
+                        self.send_response(200)
+                        self.send_header("Content-Type", "image/jpeg")
+                        self.send_header("Content-Length", str(len(tile_data)))
+                        self.send_header("Access-Control-Allow-Origin", "*")
+                        self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+                        self.end_headers()
+                        self.wfile.write(tile_data)
+                        return
+                    except Exception:
+                        pass
+
+            self.send_error(404, f"Tile not found: level {level}, row {row}, col {col}")
             return
 
         super().do_GET()

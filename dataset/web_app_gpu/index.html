@@ -230,7 +230,7 @@
       z-index: 10;
     }
 
-    #flat-canvas {
+    #flat-map-container {
       position: absolute;
       top: 0;
       left: 0;
@@ -238,6 +238,17 @@
       height: 100%;
       display: none;
       z-index: 10;
+      background: #000206;
+    }
+
+    #flat-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      z-index: 9;
     }
 
     /* Floating Landmark Hover Card */
@@ -518,6 +529,27 @@
       gap: 12px;
     }
 
+    /* Custom Dark Leaflet Styling for Mars Map */
+    .leaflet-container {
+      background: #000206 !important;
+      font-family: inherit;
+    }
+    .leaflet-control-zoom {
+      display: none !important;
+    }
+    .leaflet-mars-tooltip {
+      background: rgba(10, 14, 25, 0.95) !important;
+      border: 1px solid var(--accent-cyan) !important;
+      border-radius: 8px !important;
+      color: #fff !important;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8) !important;
+      padding: 6px 10px !important;
+      font-size: 11px !important;
+    }
+    .leaflet-mars-tooltip:before {
+      border-top-color: var(--accent-cyan) !important;
+    }
+
     /* NASA Modal */
     #product-modal {
       display: none;
@@ -558,8 +590,10 @@
       color: #fff;
     }
   </style>
+  <link rel="stylesheet" href="/lib/leaflet.css">
   <script src="/lib/three.min.js"></script>
   <script src="/lib/OrbitControls.js"></script>
+  <script src="/lib/leaflet.js"></script>
 </head>
 <body>
 
@@ -627,6 +661,7 @@
   <!-- Main Viewport -->
   <div id="viewport-container">
     <canvas id="three-canvas"></canvas>
+    <div id="flat-map-container"></div>
     <canvas id="flat-canvas"></canvas>
 
     <!-- Landmark Hover Card -->
@@ -1067,6 +1102,7 @@
       landmarksData = [...DEFAULT_LANDMARKS];
       renderDrawerDestinations(landmarksData);
       create3DLandmarks(landmarksData);
+      if (typeof render2DOverlays === 'function') render2DOverlays();
 
       try {
         const resp = await fetch('/api/landmarks');
@@ -1076,6 +1112,7 @@
             landmarksData = data.landmarks;
             renderDrawerDestinations(landmarksData);
             create3DLandmarks(landmarksData);
+            if (typeof render2DOverlays === 'function') render2DOverlays();
           }
         }
       } catch (e) {
@@ -1097,7 +1134,11 @@
           <span style="font-size:14px; color:var(--accent-orange);">➔</span>
         `;
         card.onclick = () => {
-          flyToCoordinate(item.lat, item.lon, item.category === 'polar_cap' ? 1.8 : 1.25);
+          if (appMode === '2D' && leafletMap) {
+            leafletMap.flyTo([item.lat, item.lon], 6, { duration: 1.2 });
+          } else {
+            flyToCoordinate(item.lat, item.lon, item.category === 'polar_cap' ? 1.8 : 1.25);
+          }
           currentElevation = item.elevation_m;
           updateStatusHUD();
         };
@@ -1214,6 +1255,16 @@
           currentRouteSamples = (actualPath && actualPath.length > 1) ? actualPath : planData.profile_samples;
           drawElevationChart(currentRouteSamples, isRoverMission ? routeObj.name : "Astronaut EVA");
           renderHighlyVisibleTraverseTube(routeObj.waypoints, planData.profile_samples, isRoverMission, actualPath);
+
+          // Track active route globally for seamless 2D/3D dual rendering
+          window.currentActiveRoute = {
+            waypoints: routeObj.waypoints,
+            samples: planData.profile_samples,
+            isRover: isRoverMission,
+            actualPath: actualPath,
+            name: isRoverMission ? routeObj.name : "Astronaut EVA"
+          };
+          if (typeof render2DOverlays === 'function') render2DOverlays();
 
           // Fly smoothly to route center/start with appropriate close-up zoom (1.06 instead of 1.22)
           flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, 1.06);
@@ -1458,7 +1509,11 @@
         const query = e.target.value.toLowerCase().trim();
         const found = landmarksData.find(lm => lm.name.toLowerCase().includes(query) || lm.id.includes(query));
         if (found) {
-          flyToCoordinate(found.lat, found.lon, 1.25);
+          if (appMode === '2D' && leafletMap) {
+            leafletMap.flyTo([found.lat, found.lon], 6, { duration: 1.2 });
+          } else {
+            flyToCoordinate(found.lat, found.lon, 1.25);
+          }
           currentElevation = found.elevation_m;
           updateStatusHUD();
         }
@@ -1489,38 +1544,64 @@
       routesVisible = !routesVisible;
       routesGroup.visible = routesVisible;
       document.getElementById('bottom-dock').style.display = routesVisible ? 'flex' : 'none';
+      if (leafletRoutesLayer && leafletRoverPathLayer) {
+        if (routesVisible) {
+          if (!leafletMap.hasLayer(leafletRoutesLayer)) leafletMap.addLayer(leafletRoutesLayer);
+          if (!leafletMap.hasLayer(leafletRoverPathLayer)) leafletMap.addLayer(leafletRoverPathLayer);
+        } else {
+          if (leafletMap.hasLayer(leafletRoutesLayer)) leafletMap.removeLayer(leafletRoutesLayer);
+          if (leafletMap.hasLayer(leafletRoverPathLayer)) leafletMap.removeLayer(leafletRoverPathLayer);
+        }
+      }
     };
 
     // Reset North Up
-    document.getElementById('btn-compass').onclick = () => flyToCoordinate(0, 0, 3.2);
+    document.getElementById('btn-compass').onclick = () => {
+      if (appMode === '2D' && leafletMap) {
+        leafletMap.setView([0, 0], 2);
+      } else {
+        flyToCoordinate(0, 0, 3.2);
+      }
+    };
 
     // Zoom
     document.getElementById('btn-zoom-in').onclick = () => {
-      camera.position.multiplyScalar(0.85);
-      if (camera.position.length() < controls.minDistance) camera.position.setLength(controls.minDistance);
+      if (appMode === '2D' && leafletMap) {
+        leafletMap.zoomIn();
+      } else {
+        camera.position.multiplyScalar(0.85);
+        if (camera.position.length() < controls.minDistance) camera.position.setLength(controls.minDistance);
+      }
     };
     document.getElementById('btn-zoom-out').onclick = () => {
-      camera.position.multiplyScalar(1.18);
-      if (camera.position.length() > controls.maxDistance) camera.position.setLength(controls.maxDistance);
+      if (appMode === '2D' && leafletMap) {
+        leafletMap.zoomOut();
+      } else {
+        camera.position.multiplyScalar(1.18);
+        if (camera.position.length() > controls.maxDistance) camera.position.setLength(controls.maxDistance);
+      }
     };
 
-    // Toggle Mode
+    // Toggle Mode (3D Globe vs 2D Flat Tile Map)
     function setMode(mode) {
       appMode = mode;
       const btn3D = document.getElementById('btn-mode-3d');
       const btn2D = document.getElementById('btn-mode-2d');
+      const flatContainer = document.getElementById('flat-map-container');
 
       if (mode === '3D') {
         threeCanvas.style.display = 'block';
         flatCanvas.style.display = 'none';
+        if (flatContainer) flatContainer.style.display = 'none';
         btn3D.classList.add('active');
         btn2D.classList.remove('active');
       } else {
         threeCanvas.style.display = 'none';
-        flatCanvas.style.display = 'block';
+        flatCanvas.style.display = 'none';
+        if (flatContainer) flatContainer.style.display = 'block';
         btn3D.classList.remove('active');
         btn2D.classList.add('active');
-        init2DFlatCanvas();
+        init2DLeafletMap();
       }
     }
 
@@ -1554,30 +1635,213 @@
     document.getElementById('modal-close').onclick = () => document.getElementById('product-modal').style.display = 'none';
     document.getElementById('modal-close-btn').onclick = () => document.getElementById('product-modal').style.display = 'none';
 
-    // 2D Flat Engine
-    let flatImg = new Image();
-    flatImg.src = '/mars_mola_8k.jpg';
-    let flatPanX = 0, flatPanY = 0, flatZoom = 1.0;
+    // 2D High-Resolution Google Maps-Style Tile Engine (MOLA Level 6 True Resolution + Level 5 Pyramid)
+    let leafletMap = null;
+    let leafletTileLayer = null;
+    let leafletMarkersLayer = null;
+    let leafletRoutesLayer = null;
+    let leafletRoverPathLayer = null;
 
-    function init2DFlatCanvas() {
-      flatCanvas.width = container.clientWidth;
-      flatCanvas.height = container.clientHeight;
-      draw2DFlat();
+    function init2DLeafletMap() {
+      const flatContainer = document.getElementById('flat-map-container');
+      if (!flatContainer) return;
+
+      if (!leafletMap) {
+        // Mars Equirectangular Projection bounds: [-90, -180] to [90, 180]
+        const marsBounds = [[-90, -180], [90, 180]];
+
+        leafletMap = L.map('flat-map-container', {
+          crs: L.CRS.EPSG4326,
+          maxBounds: [[-100, -190], [100, 190]],
+          minZoom: 2,
+          maxZoom: 9,
+          zoomSnap: 0.25,
+          zoomDelta: 0.5,
+          attributionControl: false,
+          preferCanvas: true
+        }).setView([currentLat || 0, currentLon || 0], 3);
+
+        // Custom High-Performance Multi-Level Mars Tile Grid
+        // Level 6: 32768x16384 (64 rows x 128 cols, 256px tiles) - mars_mola_level6_mosaic.tif true resolution
+        // Level 5: 16384x8192  (32 rows x 64 cols,  256px tiles) - 5_{row}_{col}.jpg
+        const MarsMultiResolutionGrid = L.GridLayer.extend({
+          createTile: function(coords, done) {
+            const tile = document.createElement('img');
+            tile.alt = '';
+            tile.setAttribute('role', 'presentation');
+
+            // Standardize zoom level mapping:
+            // High zooms (>= 6) fetch Level 6 true resolution tiles directly from mars_mola_level6_mosaic.tif
+            // Lower zooms (< 6) fetch Level 5 tiles
+            const z = coords.z;
+            const isLevel6 = (z >= 5.5);
+
+            if (isLevel6) {
+              const COLS = 128;
+              const ROWS = 64;
+              const col = ((coords.x % COLS) + COLS) % COLS;
+              const row = coords.y;
+              if (row >= 0 && row < ROWS) {
+                tile.src = `/tiles/6_${row}_${col}.jpg`;
+              } else {
+                tile.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+              }
+            } else {
+              const COLS = 64;
+              const ROWS = 32;
+              const col = ((coords.x % COLS) + COLS) % COLS;
+              const row = coords.y;
+              if (row >= 0 && row < ROWS) {
+                tile.src = `/tiles/5_${row}_${col}.jpg`;
+              } else {
+                tile.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+              }
+            }
+
+            L.DomEvent.on(tile, 'load', L.Util.bind(done, null, null, tile));
+            L.DomEvent.on(tile, 'error', L.Util.bind(function() {
+              // Fallback to Level 5 downsampled tile if Level 6 encounters boundary
+              if (isLevel6) {
+                const r5 = Math.floor(coords.y / 2);
+                const c5 = Math.floor((((coords.x % 128) + 128) % 128) / 2);
+                tile.src = `/tiles/5_${r5}_${c5}.jpg`;
+              } else {
+                done(null, tile);
+              }
+            }, null));
+
+            return tile;
+          }
+        });
+
+        leafletTileLayer = new MarsMultiResolutionGrid({
+          tileSize: 256,
+          minZoom: 2,
+          maxZoom: 9,
+          bounds: marsBounds,
+          updateWhenIdle: false,
+          updateInterval: 100
+        }).addTo(leafletMap);
+
+        leafletMarkersLayer = L.layerGroup().addTo(leafletMap);
+        leafletRoutesLayer = L.layerGroup().addTo(leafletMap);
+        leafletRoverPathLayer = L.layerGroup().addTo(leafletMap);
+
+        // Sync coordinates HUD with 2D pointer
+        leafletMap.on('mousemove', (e) => {
+          if (appMode !== '2D') return;
+          let lat = e.latlng.lat;
+          let lon = e.latlng.lng;
+          while (lon > 180) lon -= 360;
+          while (lon < -180) lon += 360;
+          currentLat = lat;
+          currentLon = lon;
+          updateStatusHUD();
+        });
+
+        leafletMap.on('zoomend moveend', () => {
+          if (appMode !== '2D') return;
+          const center = leafletMap.getCenter();
+          currentLat = center.lat;
+          let lon = center.lng;
+          while (lon > 180) lon -= 360;
+          while (lon < -180) lon += 360;
+          currentLon = lon;
+          updateStatusHUD();
+        });
+      }
+
+      // Sync viewport center with current 3D position
+      setTimeout(() => {
+        leafletMap.invalidateSize();
+        leafletMap.setView([currentLat || 0, currentLon || 0], leafletMap.getZoom() || 3);
+        render2DOverlays();
+      }, 50);
     }
 
-    function draw2DFlat() {
-      if (appMode !== '2D') return;
-      const ctx = flatCanvas.getContext('2d');
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, flatCanvas.width, flatCanvas.height);
+    function render2DOverlays() {
+      if (!leafletMap || !leafletMarkersLayer) return;
 
-      if (flatImg.complete && flatImg.naturalWidth > 0) {
-        const aspect = flatImg.naturalWidth / flatImg.naturalHeight;
-        const drawW = flatCanvas.width * flatZoom;
-        const drawH = (flatCanvas.width / aspect) * flatZoom;
-        const drawX = (flatCanvas.width - drawW) / 2 + flatPanX;
-        const drawY = (flatCanvas.height - drawH) / 2 + flatPanY;
-        ctx.drawImage(flatImg, drawX, drawY, drawW, drawH);
+      // 1. Render Landmarks onto 2D Flat Map
+      leafletMarkersLayer.clearLayers();
+      if (landmarksData && landmarksData.length > 0) {
+        landmarksData.forEach(lm => {
+          let colorHex = '#e2e8f0';
+          if (lm.category === 'polar_cap') colorHex = '#b0c4de';
+          else if (lm.category === 'landing_site') colorHex = '#5eead4';
+          else if (lm.category === 'volcano') colorHex = '#f4a261';
+          else if (lm.category === 'canyon') colorHex = '#d4a373';
+          else if (lm.category === 'basin') colorHex = '#93c5fd';
+
+          const marker = L.circleMarker([lm.lat, lm.lon], {
+            radius: 6,
+            fillColor: colorHex,
+            color: '#000',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.9
+          });
+
+          marker.bindTooltip(`<strong>${lm.name}</strong><br><span style="font-size:10px; color:#94a3b8;">${lm.category.toUpperCase()} • ${lm.elevation_m.toLocaleString()} m</span>`, {
+            direction: 'top',
+            offset: [0, -6],
+            className: 'leaflet-mars-tooltip'
+          });
+
+          marker.on('click', () => {
+            leafletMap.flyTo([lm.lat, lm.lon], 6, { duration: 1.2 });
+            currentElevation = lm.elevation_m;
+            updateStatusHUD();
+          });
+
+          leafletMarkersLayer.addLayer(marker);
+        });
+      }
+
+      // 2. Render Rover / EVA Traverses onto 2D Flat Map
+      if (leafletRoutesLayer) leafletRoutesLayer.clearLayers();
+      if (leafletRoverPathLayer) leafletRoverPathLayer.clearLayers();
+
+      if (window.currentActiveRoute) {
+        const r = window.currentActiveRoute;
+
+        // Render actual continuous drive path polyline
+        if (r.actualPath && r.actualPath.length > 1) {
+          const latlngs = r.actualPath.map(p => [p.lat, p.lon]);
+          const pathLine = L.polyline(latlngs, {
+            color: '#00f0ff',
+            weight: 3.5,
+            opacity: 0.95,
+            smoothFactor: 1.0
+          });
+          leafletRoverPathLayer.addLayer(pathLine);
+        }
+
+        // Render waypoint beacons
+        if (r.waypoints && r.waypoints.length > 0) {
+          r.waypoints.forEach((wp, idx) => {
+            const isStart = (idx === 0);
+            const isEnd = (idx === r.waypoints.length - 1);
+            let color = isStart ? '#22c55e' : (isEnd ? '#38bdf8' : '#fbbf24');
+            if (wp.hazard === 'CRITICAL_SLOPE') color = '#ef4444';
+            else if (wp.hazard === 'CAUTION_STEEP') color = '#f97316';
+
+            const wpMarker = L.circleMarker([wp.lat, wp.lon], {
+              radius: (isStart || isEnd) ? 7 : 4.5,
+              fillColor: color,
+              color: '#ffffff',
+              weight: 1.5,
+              fillOpacity: 0.95
+            });
+
+            wpMarker.bindTooltip(`<b>${wp.label || 'Waypoint'}</b><br>Sol ${wp.sol !== undefined ? wp.sol : idx} • ${wp.elev_m ? wp.elev_m + ' m' : ''}`, {
+              direction: 'top',
+              offset: [0, -6]
+            });
+
+            leafletRoutesLayer.addLayer(wpMarker);
+          });
+        }
       }
     }
 
