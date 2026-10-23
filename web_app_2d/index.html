@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mars 2D - Level 5 Tile Viewer (Leaflet)</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/lib/leaflet.css">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --card-bg: rgba(13, 17, 27, 0.92);
+      --card-border: #1e283d;
+      --text-main: #f1f5f9;
+      --text-dim: #94a3b8;
+      --accent-orange: #ff5e36;
+      --accent-cyan: #38bdf8;
+      --accent-green: #22c55e;
+      --accent-yellow: #facc15;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-dark); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+    header { background: rgba(11, 15, 25, 0.96); backdrop-filter: blur(12px); border-bottom: 1px solid var(--card-border); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .mars-glyph { width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff7a50, #9f2a08); box-shadow: 0 0 10px rgba(255, 94, 54, 0.6); }
+    .title-group h1 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .title-group p { font-size: 11px; color: var(--text-dim); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    button.btn { background: #192233; color: var(--text-main); border: 1px solid var(--card-border); padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    button.btn:hover { background: #223044; border-color: var(--accent-orange); }
+    #map { flex: 1; width: 100%; }
+    .control-panel { position: absolute; top: 70px; right: 20px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 16px; min-width: 240px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 1000; }
+    .control-panel h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--accent-orange); }
+    .control-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .control-row label { font-size: 12px; color: var(--text-dim); min-width: 100px; }
+    .control-row select, .control-row input { background: #0a101a; border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 10px; border-radius: 4px; font-size: 12px; }
+    .layer-toggle { display: flex; align-items: center; gap: 8px; }
+    .layer-toggle input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent-orange); }
+    .info-box { position: absolute; bottom: 20px; left: 20px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 16px; max-width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 1000; font-size: 12px; line-height: 1.6; }
+    .info-box h4 { color: var(--accent-cyan); margin-bottom: 8px; }
+    .info-box .coord { font-family: monospace; color: var(--accent-yellow); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="mars-glyph"></div>
+      <div class="title-group">
+        <h1>Mars Level 5 <span style="font-size:11px;color:var(--accent-green);font-weight:700;">Tile Viewer</span></h1>
+        <p>NASA Mars Trek WMTS · 2,048 tiles · 134.2 MP · 200 m/px</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn" id="btn-fullscreen" title="Fullscreen">⛶ Fullscreen</button>
+      <button class="btn" id="btn-3d" onclick="window.location.href='/'">🌐 3D Globe</button>
+    </div>
+  </header>
+
+  <div id="map"></div>
+
+  <div class="control-panel">
+    <h3>Layer Controls</h3>
+    <div class="control-row layer-toggle">
+      <input type="checkbox" id="layer-mola" checked>
+      <label for="layer-mola">MOLA Topography</label>
+    </div>
+    <div class="control-row layer-toggle">
+      <input type="checkbox" id="layer-geology">
+      <label for="layer-geology">USGS SIM 3292 Geology</label>
+    </div>
+    <div class="control-row layer-toggle">
+      <input type="checkbox" id="layer-traverses">
+      <label for="layer-traverses">Rover Traverses</label>
+    </div>
+    <div class="control-row layer-toggle">
+      <input type="checkbox" id="layer-landers">
+      <label for="layer-landers">Landing Sites</label>
+    </div>
+    <div class="control-row">
+      <label>Opacity</label>
+      <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="1">
+    </div>
+  </div>
+
+  <div class="info-box">
+    <h4>📍 Coordinates</h4>
+    <div class="coord" id="coord-display">Lat: —, Lon: —</div>
+    <div style="margin-top:8px;color:var(--text-dim);font-size:11px;">
+      Click map for coordinates · Shift+drag to rotate · Scroll to zoom
+    </div>
+  </div>
+
+  <script src="/lib/leaflet.js"></script>
+  <script>
+    // Mars CRS (Equirectangular / Plate Carrée)
+    const MARS_RADIUS = 3396190; // meters
+    const MARS_CRS = L.CRS.Simple;
+    MARS_CRS.projection = {
+      project: function(latlng) { return new L.Point(latlng.lng, -latlng.lat); },
+      unproject: function(point) { return new L.LatLng(-point.y, point.x); }
+    };
+    MARS_CRS.scale = function(zoom) { return Math.pow(2, zoom) / 360; };
+    MARS_CRS.zoom = function(scale) { return Math.log(scale * 360) / Math.LN2; };
+    MARS_CRS.infinite = false;
+
+    // Map bounds: [-180, -90] to [180, 90]
+    const bounds = [[-90, -180], [90, 180]];
+
+    // Initialize map
+    const map = L.map('map', {
+      crs: MARS_CRS,
+      maxZoom: 7,
+      minZoom: 0,
+      center: [0, 0],
+      zoom: 2,
+      maxBounds: bounds,
+      maxBoundsViscosity: 1.0,
+      attributionControl: false,
+      zoomControl: false
+    });
+
+    // Add zoom control
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Custom tile layer for Mars Level 5 tiles
+    function createTileLayer(templateUrl, options = {}) {
+      const layer = L.tileLayer(templateUrl, {
+        tileSize: 256,
+        noWrap: true,
+        bounds: bounds,
+        errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+        ...options
+      });
+      const origGetTileUrl = layer.getTileUrl.bind(layer);
+      layer.getTileUrl = function(coords) {
+        if (templateUrl.includes('{row}') || templateUrl.includes('{col}')) {
+          let r = Math.max(0, Math.min(7, coords.y));
+          let c = Math.max(0, Math.min(8, coords.x));
+          const rowStr = String(r).padStart(2, '0');
+          const colStr = String(c).padStart(2, '0');
+          return templateUrl.replace('{row}', rowStr).replace('{col}', colStr);
+        }
+        if (coords.y < 0 || coords.y > 31 || coords.x < 0 || coords.x > 63) {
+          return this.options.errorTileUrl;
+        }
+        return origGetTileUrl(coords);
+      };
+      return layer;
+    }
+
+    // MOLA Topography Layer (Level 5 tiles)
+    const molaLayer = createTileLayer('/tiles/5_{y}_{x}.jpg', {
+      attribution: 'NASA Mars Trek / MGS MOLA + MEX HRSC',
+      maxNativeZoom: 5,
+      maxZoom: 7
+    });
+    molaLayer.addTo(map);
+
+    // USGS SIM 3292 Geology Layer
+    const geologyLayer = createTileLayer('/sim3292_tiles/tile_r{row}_c{col}.jpg', {
+      attribution: 'USGS SIM 3292 / CRISM + OMEGA',
+      maxNativeZoom: 3,
+      maxZoom: 5
+    });
+
+    // Rover Traverses & Landing Sites (GeoJSON)
+    let traversesLayer = null;
+    let landersLayer = null;
+
+    async function loadExplorationData() {
+      try {
+        const resp = await fetch('/data/astronaut_paths.geojson');
+        if (!resp.ok) throw new Error('Failed to load');
+        const data = await resp.json();
+
+        // Rover traverses (LineString)
+        const traverseFeatures = data.features.filter(f => f.geometry.type === 'LineString');
+        traversesLayer = L.geoJSON(traverseFeatures, {
+          style: f => ({
+            color: f.properties.color || '#22c55e',
+            weight: 3,
+            opacity: 0.9,
+            dashArray: '8, 4'
+          }),
+          onEachFeature: (f, layer) => {
+            const p = f.properties;
+            layer.bindTooltip(`<strong>${p.name}</strong><br>${p.landing_site}<br>${p.sol_range}<br>${p.total_odometry_km} km`, {
+              sticky: true, direction: 'top', offset: [0, -10]
+            });
+          }
+        });
+
+        // Landers (Point)
+        const landerFeatures = data.features.filter(f => f.geometry.type === 'Point');
+        landersLayer = L.geoJSON(landerFeatures, {
+          pointToLayer: (f, latlng) => {
+            const color = f.properties.color || '#94a3b8';
+            return L.circleMarker(latlng, {
+              radius: 8, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9
+            });
+          },
+          onEachFeature: (f, layer) => {
+            const p = f.properties;
+            layer.bindTooltip(`<strong>${p.name}</strong><br>${p.station_name || ''}<br>Status: ${p.status}`, {
+              sticky: true, direction: 'top', offset: [0, -10]
+            });
+          }
+        });
+      } catch (err) {
+        console.warn('Could not load exploration data:', err);
+      }
+    }
+
+    // Layer toggles
+    document.getElementById('layer-mola').addEventListener('change', e => {
+      e.target.checked ? molaLayer.addTo(map) : map.removeLayer(molaLayer);
+    });
+    document.getElementById('layer-geology').addEventListener('change', e => {
+      e.target.checked ? geologyLayer.addTo(map) : map.removeLayer(geologyLayer);
+    });
+    document.getElementById('layer-traverses').addEventListener('change', e => {
+      if (e.target.checked && traversesLayer) traversesLayer.addTo(map);
+      else if (traversesLayer) map.removeLayer(traversesLayer);
+    });
+    document.getElementById('layer-landers').addEventListener('change', e => {
+      if (e.target.checked && landersLayer) landersLayer.addTo(map);
+      else if (landersLayer) map.removeLayer(landersLayer);
+    });
+    document.getElementById('opacity-slider').addEventListener('input', e => {
+      const op = parseFloat(e.target.value);
+      [molaLayer, geologyLayer].forEach(l => { if (map.hasLayer(l)) l.setOpacity(op); });
+    });
+
+    // Coordinate display on click
+    map.on('click', e => {
+      const lat = e.latlng.lat.toFixed(4);
+      const lng = e.latlng.lng.toFixed(4);
+      document.getElementById('coord-display').textContent = `Lat: ${lat}, Lon: ${lng}`;
+    });
+
+    // Fullscreen
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      const el = document.documentElement;
+      if (document.fullscreenElement) document.exitFullscreen();
+      else el.requestFullscreen();
+    });
+
+    // Load exploration data
+    loadExplorationData();
+  </script>
+</body>
+</html>
