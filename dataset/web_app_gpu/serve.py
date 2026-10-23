@@ -406,23 +406,35 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         tile_match = re.match(r"^/tiles/(\d+)[_/](\d+)[_/](\d+)\.jpg$", path)
         if tile_match:
             level, row, col = int(tile_match.group(1)), int(tile_match.group(2)), int(tile_match.group(3))
+
+            # Handle overview zooms (< 5) by mapping smoothly to Level 5
+            if level < 5:
+                scale = 2 ** (5 - level)
+                row = min(31, max(0, row * scale))
+                col = min(63, max(0, col * scale))
+                level = 5
+
             if level == 6:
-                tile_data = L6_INDEX.get_tile_bytes(row, col)
-                if tile_data:
-                    self.send_response(200)
-                    self.send_header("Content-Type", "image/jpeg")
-                    self.send_header("Content-Length", str(len(tile_data)))
-                    self.send_header("Access-Control-Allow-Origin", "*")
-                    self.send_header("Cache-Control", "public, max-age=31536000, immutable")
-                    self.end_headers()
-                    self.wfile.write(tile_data)
-                    return
-                # If Level 6 tile not available or out of bounds, fallback to downsampled Level 5
-                row5, col5 = row // 2, col // 2
+                col = ((col % 128) + 128) % 128
+                if 0 <= row < 64:
+                    tile_data = L6_INDEX.get_tile_bytes(row, col)
+                    if tile_data:
+                        self.send_response(200)
+                        self.send_header("Content-Type", "image/jpeg")
+                        self.send_header("Content-Length", str(len(tile_data)))
+                        self.send_header("Access-Control-Allow-Origin", "*")
+                        self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+                        self.end_headers()
+                        self.wfile.write(tile_data)
+                        return
+                # If Level 6 tile out of bounds or unavailable, fallback to Level 5
+                row5, col5 = min(31, max(0, row // 2)), min(63, max(0, col // 2))
                 level = 5
                 row, col = row5, col5
 
             if level == 5:
+                col = ((col % 64) + 64) % 64
+                row = min(31, max(0, row))
                 t_path = os.path.join(DATASET_DIR, f"5_{row}_{col}.jpg")
                 if os.path.exists(t_path):
                     try:
@@ -443,6 +455,19 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         super().do_GET()
+
+    def do_HEAD(self):
+        parsed = urllib.parse.urlsplit(self.path).path
+        clean_path = os.path.normpath(urllib.parse.unquote(parsed))
+        tile_match = re.match(r"^/tiles/(\d+)[_/](\d+)[_/](\d+)\.jpg$", clean_path)
+        if tile_match:
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+            self.end_headers()
+            return
+        super().do_HEAD()
 
     def translate_path(self, path):
         parsed = urllib.parse.urlsplit(path).path

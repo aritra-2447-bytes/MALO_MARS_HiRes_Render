@@ -241,6 +241,16 @@
       background: #000206;
     }
 
+    #flat-map-container .leaflet-container {
+      background: #000206 !important;
+      outline: none;
+    }
+
+    .leaflet-tile {
+      outline: 1px solid transparent;
+      image-rendering: -webkit-optimize-contrast;
+    }
+
     #flat-canvas {
       position: absolute;
       top: 0;
@@ -988,7 +998,20 @@
     let targetCamPos = new THREE.Vector3();
 
     function flyToCoordinate(lat, lon, targetDist = 1.35) {
-      if (appMode === '2D') setMode('3D');
+      currentLat = lat;
+      currentLon = lon;
+      updateStatusHUD();
+
+      if (appMode === '2D' && leafletMap) {
+        let zoom2D = 6;
+        if (targetDist <= 1.10) zoom2D = 7.5;
+        else if (targetDist <= 1.40) zoom2D = 6;
+        else if (targetDist <= 2.0) zoom2D = 4;
+        else zoom2D = 3;
+        leafletMap.flyTo([lat, lon], zoom2D, { duration: 1.2 });
+        return;
+      }
+
       isTransitioning = true;
       transitionStart = performance.now();
       startCamPos.copy(camera.position);
@@ -996,10 +1019,6 @@
       const targetSurface = latLonToVector3(lat, lon, targetDist);
       targetCamPos.copy(targetSurface);
       controls.target.set(0, 0, 0);
-
-      currentLat = lat;
-      currentLon = lon;
-      updateStatusHUD();
     }
 
     // Canonical IAU Landmark Catalog with embedded client-side fallback
@@ -1595,6 +1614,12 @@
         if (flatContainer) flatContainer.style.display = 'none';
         btn3D.classList.add('active');
         btn2D.classList.remove('active');
+        if (currentLat !== undefined && currentLon !== undefined) {
+          const camLen = camera.position.length();
+          camera.position.copy(latLonToVector3(currentLat, currentLon, Math.max(1.15, camLen)));
+          controls.target.set(0, 0, 0);
+          controls.update();
+        }
       } else {
         threeCanvas.style.display = 'none';
         flatCanvas.style.display = 'none';
@@ -1652,8 +1677,9 @@
 
         leafletMap = L.map('flat-map-container', {
           crs: L.CRS.EPSG4326,
-          maxBounds: [[-100, -190], [100, 190]],
-          minZoom: 2,
+          maxBounds: [[-90, -180], [90, 180]],
+          maxBoundsViscosity: 1.0,
+          minZoom: 1,
           maxZoom: 9,
           zoomSnap: 0.25,
           zoomDelta: 0.5,
@@ -1661,66 +1687,30 @@
           preferCanvas: true
         }).setView([currentLat || 0, currentLon || 0], 3);
 
-        // Custom High-Performance Multi-Level Mars Tile Grid
-        // Level 6: 32768x16384 (64 rows x 128 cols, 256px tiles) - mars_mola_level6_mosaic.tif true resolution
-        // Level 5: 16384x8192  (32 rows x 64 cols,  256px tiles) - 5_{row}_{col}.jpg
-        const MarsMultiResolutionGrid = L.GridLayer.extend({
-          createTile: function(coords, done) {
-            const tile = document.createElement('img');
-            tile.alt = '';
-            tile.setAttribute('role', 'presentation');
+        // 1. Permanent Ultra-Crisp 8K Base Mosaic Layer
+        // mars_mola_8k.jpg is 8192x4096 (exact 2:1 Plate Carrée / EPSG:4326)
+        // Provides instant 60fps rendering at global zoom levels 1-4 with ZERO black flashes,
+        // and acts as the immediate backdrop while Level 5/6 high-res tiles load.
+        L.imageOverlay('/mars_mola_8k.jpg', marsBounds, {
+          opacity: 1.0,
+          interactive: false,
+          zIndex: 1
+        }).addTo(leafletMap);
 
-            // Standardize zoom level mapping:
-            // High zooms (>= 6) fetch Level 6 true resolution tiles directly from mars_mola_level6_mosaic.tif
-            // Lower zooms (< 6) fetch Level 5 tiles
-            const z = coords.z;
-            const isLevel6 = (z >= 5.5);
-
-            if (isLevel6) {
-              const COLS = 128;
-              const ROWS = 64;
-              const col = ((coords.x % COLS) + COLS) % COLS;
-              const row = coords.y;
-              if (row >= 0 && row < ROWS) {
-                tile.src = `/tiles/6_${row}_${col}.jpg`;
-              } else {
-                tile.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-              }
-            } else {
-              const COLS = 64;
-              const ROWS = 32;
-              const col = ((coords.x % COLS) + COLS) % COLS;
-              const row = coords.y;
-              if (row >= 0 && row < ROWS) {
-                tile.src = `/tiles/5_${row}_${col}.jpg`;
-              } else {
-                tile.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-              }
-            }
-
-            L.DomEvent.on(tile, 'load', L.Util.bind(done, null, null, tile));
-            L.DomEvent.on(tile, 'error', L.Util.bind(function() {
-              // Fallback to Level 5 downsampled tile if Level 6 encounters boundary
-              if (isLevel6) {
-                const r5 = Math.floor(coords.y / 2);
-                const c5 = Math.floor((((coords.x % 128) + 128) % 128) / 2);
-                tile.src = `/tiles/5_${r5}_${c5}.jpg`;
-              } else {
-                done(null, tile);
-              }
-            }, null));
-
-            return tile;
-          }
-        });
-
-        leafletTileLayer = new MarsMultiResolutionGrid({
-          tileSize: 256,
-          minZoom: 2,
+        // 2. High-Resolution Dynamic Tile Layer
+        // Level 5 (16384x8192) at zoom 5
+        // Level 6 (32768x16384 BigTIFF mosaic) at zoom 6, 7, 8, 9
+        leafletTileLayer = L.tileLayer('/tiles/{z}_{y}_{x}.jpg', {
+          minZoom: 5,
           maxZoom: 9,
+          maxNativeZoom: 6,
           bounds: marsBounds,
+          tileSize: 256,
+          noWrap: false,
+          zIndex: 2,
           updateWhenIdle: false,
-          updateInterval: 100
+          updateWhenZooming: true,
+          keepBuffer: 8
         }).addTo(leafletMap);
 
         leafletMarkersLayer = L.layerGroup().addTo(leafletMap);
@@ -1753,9 +1743,13 @@
 
       // Sync viewport center with current 3D position
       setTimeout(() => {
-        leafletMap.invalidateSize();
-        leafletMap.setView([currentLat || 0, currentLon || 0], leafletMap.getZoom() || 3);
-        render2DOverlays();
+        if (leafletMap) {
+          leafletMap.invalidateSize();
+          if (currentLat !== undefined && currentLon !== undefined) {
+            leafletMap.setView([currentLat, currentLon], leafletMap.getZoom() || 3);
+          }
+          render2DOverlays();
+        }
       }, 50);
     }
 
@@ -1813,6 +1807,17 @@
             weight: 3.5,
             opacity: 0.95,
             smoothFactor: 1.0
+          });
+          leafletRoverPathLayer.addLayer(pathLine);
+        } else if (r.waypoints && r.waypoints.length > 1) {
+          const latlngs = (r.samples && r.samples.length > 1)
+            ? r.samples.map(p => [p.lat, p.lon])
+            : r.waypoints.map(p => [p.lat, p.lon]);
+          const pathLine = L.polyline(latlngs, {
+            color: '#38bdf8',
+            weight: 3,
+            dashArray: '5, 5',
+            opacity: 0.9
           });
           leafletRoverPathLayer.addLayer(pathLine);
         }
@@ -2040,7 +2045,7 @@
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-      if (appMode === '2D') init2DFlatCanvas();
+      if (appMode === '2D' && leafletMap) leafletMap.invalidateSize();
       if (currentRouteSamples.length > 0) drawElevationChart(currentRouteSamples);
     });
 
