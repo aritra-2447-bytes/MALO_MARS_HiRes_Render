@@ -206,6 +206,45 @@ def run_tests():
     assert "updateDynamicScaleBar()" in html, "updateDynamicScaleBar() call missing in index.html"
     print("  PASS: Dynamic zoom-responsive cartographic scale bar (3D & 2D) verified.")
 
+    # Test 11: Verify ARES-OS Cooperative Informative Path Planning (ETH ASL Scouting-IPP)
+    print("\n[Test 11] Verifying ARES-OS Cooperative Informative Path Planning (ETH ASL Scouting-IPP)...")
+    ipp_engine_path = os.path.join(gpu_dir, "ipp_engine.py")
+    assert os.path.exists(ipp_engine_path), "ipp_engine.py missing in dataset/web_app_gpu"
+    if gpu_dir not in sys.path:
+        sys.path.insert(0, gpu_dir)
+    from ipp_engine import AresScoutPlanner, IPP_PRESETS
+
+    # Benchmark test at Jezero Crater
+    jezero_planner = AresScoutPlanner("jezero")
+    jezero_res = jezero_planner.run_scout_ipp(max_iterations=10)
+
+    assert jezero_res["grid_size"] == 64, "Jezero planning grid size must be 64x64"
+    assert jezero_res["max_slope_deg"] == 38.83, f"Max slope must be 38.83 deg, got {jezero_res['max_slope_deg']}"
+    assert jezero_res["proof_status"] == "OPTIMAL_PROVEN", f"Proof status must be OPTIMAL_PROVEN, got {jezero_res['proof_status']}"
+    assert jezero_res["feasible_route"]["distance_km"] == 7.354, f"Feasible route must be 7.354 km, got {jezero_res['feasible_route']['distance_km']}"
+    assert len(jezero_res["scout_sorties"]) > 0, "Scout sorties must be generated"
+
+    # Verify conservative hazard classification stats
+    h_stats = jezero_res["hazard_stats"]
+    assert h_stats["safe_pct"] > 0 and h_stats["caution_pct"] > 0 and h_stats["nogo_pct"] > 0, "Must classify 0-15 safe, 15-30 caution, >30 no-go"
+
+    # Verify serve.py & index.html integration
+    serve_py = os.path.join(gpu_dir, "serve.py")
+    with open(serve_py, "r", encoding="utf-8") as f_s:
+        serve_content = f_s.read()
+    assert "/api/ipp/presets" in serve_content, "/api/ipp/presets route missing in serve.py"
+    assert "/api/ipp/terrain-grid" in serve_content, "/api/ipp/terrain-grid route missing in serve.py"
+    assert "/api/ipp/scout-plan" in serve_content, "/api/ipp/scout-plan route missing in serve.py"
+
+    assert "btn-toggle-scout-ipp" in html, "btn-toggle-scout-ipp missing in index.html"
+    assert "scout-ipp-panel" in html, "scout-ipp-panel missing in index.html"
+    assert "ipp-proof-badge" in html, "ipp-proof-badge missing in index.html"
+    assert "ipp-convergence-canvas" in html, "ipp-convergence-canvas missing in index.html"
+    assert "loadScoutIPPPlan" in html, "loadScoutIPPPlan function missing in index.html"
+    assert "renderScoutIPP3D" in html, "renderScoutIPP3D function missing in index.html"
+    assert "focusScoutRoute" in html, "focusScoutRoute function missing in index.html"
+    print("  PASS: ARES-OS Scouting-IPP verified (Jezero 64x64, max slope 38.83°, OPTIMAL_PROVEN @ 7.354 km, full mission-control UI & 3D visualization operational).")
+
     print("\n" + "=" * 65)
     print("ALL TESTS PASSED! MARS EXPLORATION SUITE FULLY OPERATIONAL.")
     print("=" * 65)

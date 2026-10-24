@@ -46,6 +46,11 @@ DATASET_DIR = os.path.abspath(os.path.join(GPU_DIR, ".."))
 WEB_APP_DIR = os.path.abspath(os.path.join(DATASET_DIR, "web_app"))
 ROOT_DIR = os.path.abspath(os.path.join(DATASET_DIR, ".."))
 
+if GPU_DIR not in sys.path:
+    sys.path.insert(0, GPU_DIR)
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
 ZOOM5_DIR = os.path.abspath(os.path.join(ROOT_DIR, "zoom_5"))
 if not os.path.exists(ZOOM5_DIR):
     for cz in [
@@ -353,6 +358,38 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json_response({"status": "success", "routes": EVA_PRESET_ROUTES})
             return
 
+        # ARES-OS Cooperative Informative Path Planning (ETH ASL scouting-ipp)
+        if path == "/api/ipp/presets":
+            try:
+                from ipp_engine import IPP_PRESETS
+                self.send_json_response({"status": "success", "presets": list(IPP_PRESETS.values())})
+            except Exception as e:
+                self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
+            return
+
+        if path == "/api/ipp/terrain-grid":
+            preset = query.get("preset", ["jezero"])[0]
+            try:
+                from ipp_engine import AresScoutPlanner
+                planner = AresScoutPlanner(preset)
+                self.send_json_response(planner.get_terrain_payload())
+            except Exception as e:
+                self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
+            return
+
+        if path == "/api/ipp/scout-plan":
+            preset = query.get("preset", ["jezero"])[0]
+            max_iter = int(query.get("max_iterations", [10])[0])
+            swath = float(query.get("swath_radius", [3.5])[0])
+            try:
+                from ipp_engine import AresScoutPlanner
+                planner = AresScoutPlanner(preset)
+                res = planner.run_scout_ipp(max_iterations=max_iter, swath_radius_cells=swath)
+                self.send_json_response(res)
+            except Exception as e:
+                self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
+            return
+
         # Real Historical & Live NASA Rover Traverses (Perseverance, Curiosity, Opportunity, Spirit)
         if path == "/api/rover/missions":
             self.handle_rover_missions(query)
@@ -389,6 +426,30 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         super().do_GET()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlsplit(self.path)
+        path = parsed.path
+        if path == "/api/ipp/scout-plan":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+            try:
+                params = json.loads(body)
+            except Exception:
+                params = {}
+            preset = params.get("preset", "jezero")
+            max_iter = int(params.get("max_iterations", 10))
+            swath = float(params.get("swath_radius", 3.5))
+            try:
+                from ipp_engine import AresScoutPlanner
+                planner = AresScoutPlanner(preset)
+                res = planner.run_scout_ipp(max_iterations=max_iter, swath_radius_cells=swath)
+                self.send_json_response(res)
+            except Exception as e:
+                self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
+            return
+
+        self.send_error(404, "Not Found")
 
     def translate_path(self, path):
         parsed = urllib.parse.urlsplit(path).path
