@@ -984,7 +984,7 @@
     controls.dampingFactor = 0.06;
     controls.rotateSpeed = 0.65;
     controls.zoomSpeed = 0.9;
-    controls.minDistance = 1.28; // Enforced minimum distance to strictly prevent surface texture pixelation
+    controls.minDistance = 1.08; // Close-up orbital perspective (~270 km altitude, matching NASA MRO low Mars orbit)
     controls.maxDistance = 8.5;
     controls.enablePan = false;
 
@@ -1381,12 +1381,14 @@
     }
 
     // Landmark & Destination Camera Zoom Distances
-    const DEFAULT_LANDMARK_CAM_DIST = 1.95; // Reduced zoom level for balanced terrain context (radius 1.0 = surface)
-    const POLAR_CAP_CAM_DIST = 2.40;        // Reduced zoom level for wide polar ice sheet observation
+    const DEFAULT_LANDMARK_CAM_DIST = 1.85; // Regional context zoom for large volcanoes & canyons (radius 1.0 = surface)
+    const LANDING_SITE_CAM_DIST = 1.15;     // Close-up orbital perspective (~500 km altitude) framing rover traverses in crisp detail
+    const POLAR_CAP_CAM_DIST = 2.40;        // Wide view for continental polar ice sheets
 
     function getLandmarkZoomDist(item) {
       if (!item) return DEFAULT_LANDMARK_CAM_DIST;
       if (item.targetDist) return item.targetDist;
+      if (item.category === 'landing_site') return LANDING_SITE_CAM_DIST;
       return item.category === 'polar_cap' ? POLAR_CAP_CAM_DIST : DEFAULT_LANDMARK_CAM_DIST;
     }
 
@@ -1888,14 +1890,17 @@
           }
         };
 
-        // Fly action
+        // Fly action (Smooth close-up zoom into landing site and rover traverse)
         const flyAction = (e) => {
           if (e) e.stopPropagation();
-          flyToCoordinate(item.lat, item.lon, 1.85);
+          flyToCoordinate(item.lat, item.lon, LANDING_SITE_CAM_DIST);
           if (item.elevation_m !== undefined) currentElevation = item.elevation_m;
           updateStatusHUD();
         };
 
+        card.onclick = (e) => {
+          if (e.target.tagName !== 'INPUT') flyAction(e);
+        };
         card.querySelector('.landing-info-action').onclick = flyAction;
         card.querySelector('.landing-fly-btn').onclick = flyAction;
 
@@ -2323,7 +2328,7 @@
 
           // Fly smoothly to route center/start only when explicitly requested by user (e.g. from preset dropdown)
           if (autoFly) {
-            flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, 1.70);
+            flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, LANDING_SITE_CAM_DIST);
           }
         }
       } catch (err) {
@@ -2766,7 +2771,9 @@
           elev = p.elevation_m !== undefined ? p.elevation_m : (g.coordinates && g.coordinates[2] ? g.coordinates[2] : 0);
         }
         if (lat !== undefined && lon !== undefined) {
-          flyToCoordinate(lat, lon, 1.85);
+          const isLanding = u.type === 'lander' || u.type === 'landing_site' || u.type === 'touchdown_marker' || u.type === 'final_stop_marker' || (u.category && u.category.includes('LANDING'));
+          const targetDist = isLanding ? LANDING_SITE_CAM_DIST : (u.category === 'polar_cap' ? POLAR_CAP_CAM_DIST : DEFAULT_LANDMARK_CAM_DIST);
+          flyToCoordinate(lat, lon, targetDist);
           if (elev !== undefined) currentElevation = elev;
           updateStatusHUD();
         }
@@ -2818,7 +2825,7 @@
     // Zoom with strictly enforced distance and scale boundaries (prevents surface pixelation)
     document.getElementById('btn-zoom-in').onclick = () => {
       if (appMode === '2D') {
-        flatZoom = Math.min(3.5, flatZoom * 1.25);
+        flatZoom = Math.min(5.5, flatZoom * 1.25);
         draw2DFlat();
       } else {
         camera.position.multiplyScalar(0.85);
@@ -3022,7 +3029,7 @@
     flatCanvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       const factor = e.deltaY < 0 ? 1.15 : 0.87;
-      flatZoom = Math.max(1.0, Math.min(3.5, flatZoom * factor));
+      flatZoom = Math.max(1.0, Math.min(5.5, flatZoom * factor));
       draw2DFlat();
     }, { passive: false });
 
