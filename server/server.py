@@ -20,6 +20,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+import socket
 import http.server
 import socketserver
 import json
@@ -28,6 +29,25 @@ import mimetypes
 
 from server.core.handlers import APIHandler
 from server.core.tile_server import translate_path, get_project_dirs
+
+
+def is_port_in_use(port, host="127.0.0.1"):
+    """Check if a port is already bound on host."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind((host, port))
+            return False
+        except OSError:
+            return True
+
+
+def find_available_port(start_port=8083, host="127.0.0.1"):
+    """Find the next open port starting from start_port."""
+    port = start_port
+    while is_port_in_use(port, host) and port < start_port + 100:
+        port += 1
+    return port
+
 
 def get_port():
     if "PORT" in os.environ:
@@ -201,19 +221,36 @@ class ThreadingServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
 
 
 def run():
-    print(f"============================================================")
-    print(f"  MARS UNIFIED 3D GLOBE & 2D SURFACE MAP ENGINE")
-    print(f"  Live NASA ODE (/live2) & GDS (/livegds) Integrated")
-    print(f"  Serving on: http://0.0.0.0:{PORT}")
-    print(f"  Public Dir: {DIRS['PUBLIC_DIR']}")
-    print(f"  Data Dir:   {DIRS['DATA_DIR']}")
-    print(f"  Tiles Dir:  {DIRS['TILES_DIR']}")
-    print(f"============================================================")
-    server = ThreadingServer(("0.0.0.0", PORT), MarsHandler)
+    target_port = get_port()
+    if is_port_in_use(target_port):
+        print(f"\n[!] WARNING: Port {target_port} is already in use by another program", flush=True)
+        if target_port == 8080:
+            print("    (e.g., Steam CEF remote debugging or an existing local server).", flush=True)
+        alt_port = find_available_port(8083 if target_port == 8080 else target_port + 1)
+        print(f"[+] Automatically selecting open port: {alt_port}\n", flush=True)
+        port = alt_port
+    else:
+        port = target_port
+
+    print("============================================================", flush=True)
+    print("  MARS UNIFIED 3D GLOBE & 2D SURFACE MAP ENGINE", flush=True)
+    print("  Live NASA ODE (/live2) & GDS (/livegds) Integrated", flush=True)
+    print("", flush=True)
+    print(f"  --> Open in browser:  http://localhost:{port}", flush=True)
+    print(f"  --> Alternative URL:  http://127.0.0.1:{port}", flush=True)
+    print(f"  --> Listening on all: http://0.0.0.0:{port}", flush=True)
+    print("", flush=True)
+    print(f"  Public Dir: {DIRS['PUBLIC_DIR']}", flush=True)
+    print(f"  Data Dir:   {DIRS['DATA_DIR']}", flush=True)
+    print(f"  Tiles Dir:  {DIRS['TILES_DIR']}", flush=True)
+    print("============================================================", flush=True)
+    print("  Press Ctrl+C in this terminal to stop the server.\n", flush=True)
+
+    server = ThreadingServer(("0.0.0.0", port), MarsHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nShutting down Mars Map Server...")
+        print("\nShutting down Mars Map Server...", flush=True)
         server.server_close()
 
 
