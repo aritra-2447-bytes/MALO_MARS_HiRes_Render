@@ -807,7 +807,7 @@
 
     <div class="header-actions">
       <a href="/" class="nav-btn primary">🌐 Return to 3D Globe</a>
-      <a href="/Table.pdf" target="_blank" class="nav-btn">📊 Chronology (Table.pdf)</a>
+      <a href="Table.pdf" target="_blank" class="nav-btn">📊 Chronology (Table.pdf)</a>
     </div>
   </header>
 
@@ -856,9 +856,6 @@
     <div class="tabs-bar">
       <button class="tab-btn active" data-tab="tab-spectral">🔬 Aqueous Mineral Mapping &amp; Spectral Workflow</button>
       <button class="tab-btn" data-tab="tab-units">🪐 44 USGS Geologic Units Explorer</button>
-      <button class="tab-btn" data-tab="tab-structures">⚡ Structures &amp; Contacts Geodatabase</button>
-      <button class="tab-btn" data-tab="tab-rovers">🛬 Rover Ground-Truth &amp; In-Situ Sites</button>
-      <button class="tab-btn" data-tab="tab-docs">📚 USGS SIM 3292 Monograph &amp; PDFs</button>
     </div>
 
     <!-- TAB 1: Aqueous Mineral Mapping & Spectral Workflow -->
@@ -1228,7 +1225,7 @@
             <tbody>
               <tr>
                 <td><strong>Perseverance (Mars 2020)</strong><br><span style="font-size:10px; color:var(--text-dim);">Jezero Crater</span></td>
-                <td><span class="unit-symbol-pill" style="background:#b3b3e6;">eHt</span> / <span class="unit-symbol-pill" style="background:#ffff99;">AHi</span></td>
+                <td><span class="unit-symbol-pill" style="background:#e0b026;">eHt</span> / <span class="unit-symbol-pill" style="background:#fff100;">AHi</span></td>
                 <td>18.44° N, 77.45° E</td>
                 <td>Fe/Mg-smectites in delta; Mg-carbonates in crater margin; olivine-rich floor unit.</td>
                 <td><strong>SuperCam / PIXL / SHERLOC:</strong> Confirmed trioctahedral smectites, hydrated silica, and sparry Mg-carbonates with organic fluorescence signals.</td>
@@ -1236,7 +1233,7 @@
               </tr>
               <tr>
                 <td><strong>Curiosity (MSL)</strong><br><span style="font-size:10px; color:var(--text-dim);">Gale Crater</span></td>
-                <td><span class="unit-symbol-pill" style="background:#b3b3e6;">eHt</span> / <span class="unit-symbol-pill" style="background:#ffff99;">AHi</span></td>
+                <td><span class="unit-symbol-pill" style="background:#e0b026;">eHt</span> / <span class="unit-symbol-pill" style="background:#fff100;">AHi</span></td>
                 <td>4.59° S, 137.44° E</td>
                 <td>Smectite-bearing mudstones overlain by polyhydrated &amp; monohydrated sulfate sequence on Mt Sharp.</td>
                 <td><strong>CheMin XRD / ChemCam:</strong> Identified nontronite, ferrian saponite, bassanite, anhydrite, and crystalline jarosite in sedimentary mudstones.</td>
@@ -1244,7 +1241,7 @@
               </tr>
               <tr>
                 <td><strong>Opportunity (MER-B)</strong><br><span style="font-size:10px; color:var(--text-dim);">Meridiani Planum</span></td>
-                <td><span class="unit-symbol-pill" style="background:#99cc99;">lHl</span> / <span class="unit-symbol-pill" style="background:#8585ad;">eHh</span></td>
+                <td><span class="unit-symbol-pill" style="background:#8cc640;">lHl</span> / <span class="unit-symbol-pill" style="background:#eaccaf;">eHh</span></td>
                 <td>1.95° S, 354.47° E</td>
                 <td>Crystalline coarse gray hematite; polyhydrated sulfate plains.</td>
                 <td><strong>Mössbauer / APXS:</strong> Discovered hematite "blueberries" and &gt;25 wt% jarosite and gypsum in sulfate-rich sandstone bedrock.</td>
@@ -1252,7 +1249,7 @@
               </tr>
               <tr>
                 <td><strong>Spirit (MER-A)</strong><br><span style="font-size:10px; color:var(--text-dim);">Gusev Crater</span></td>
-                <td><span class="unit-symbol-pill" style="background:#ffff99;">AHi</span> / <span class="unit-symbol-pill" style="background:#c49a6c;">mNh</span></td>
+                <td><span class="unit-symbol-pill" style="background:#fff100;">AHi</span> / <span class="unit-symbol-pill" style="background:#cd9d80;">mNh</span></td>
                 <td>14.57° S, 175.47° E</td>
                 <td>Basaltic floor plains with minor alteration undetected at orbital resolution.</td>
                 <td><strong>APXS / Mini-TES:</strong> Discovered &gt;90 wt% pure opaline silica deposits at Home Plate, revealing ancient hydrothermal fumaroles.</td>
@@ -1260,7 +1257,7 @@
               </tr>
               <tr>
                 <td><strong>Phoenix Lander</strong><br><span style="font-size:10px; color:var(--text-dim);">Vastitas Borealis</span></td>
-                <td><span class="unit-symbol-pill" style="background:#b3e6b3;">mAl</span></td>
+                <td><span class="unit-symbol-pill" style="background:#bdc031;">mAl</span></td>
                 <td>68.22° N, 234.25° E</td>
                 <td>Circumpolar water ice beneath thin dry regolith layer; seasonal frost.</td>
                 <td><strong>TEGA / MECA:</strong> Directly excavated subsurface water ice table and detected perchlorate salts (0.5–1 wt%) and calcite.</td>
@@ -1545,7 +1542,7 @@
     const DOCS_METADATA = {
       readme: { title: 'README.txt - USGS SIM 3292 Database Description', url: '/README.txt' },
       metadata: { title: 'Metadata.txt - FGDC Federal Geographic Data Committee Metadata', url: '/Metadata.txt' },
-      table: { title: 'Table.pdf - Tanaka et al. Crater Size-Frequency Distribution & Model Ages', url: 'https://pubs.usgs.gov/sim/3292/', usgs_url: 'https://pubs.usgs.gov/sim/3292/' },
+      table: { title: 'Table.pdf - Tanaka et al. Crater Size-Frequency Distribution & Model Ages', url: 'Table.pdf', usgs_url: 'https://pubs.usgs.gov/sim/3292/' },
       pamphlet: { title: 'sim3292_pamphlet.pdf - 48-Page Geologic Map of Mars Monograph', url: 'https://pubs.usgs.gov/sim/3292/', usgs_url: 'https://pubs.usgs.gov/sim/3292/' },
       map: { title: 'sim3292_map.pdf - Official 1:20M Geologic Map Sheet (36 MB)', url: 'https://pubs.usgs.gov/sim/3292/', usgs_url: 'https://pubs.usgs.gov/sim/3292/' }
     };

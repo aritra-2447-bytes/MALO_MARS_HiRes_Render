@@ -1,0 +1,497 @@
+{
+  "layers": [
+    {
+      "layerId": 0,
+      "layerName": "SIM3292_Global_Geology",
+      "layerType": "Feature Layer",
+      "minScale": 0,
+      "maxScale": 0,
+      "legend": [
+        {
+          "label": "Amazonian and Hesperian impact unit",
+          "url": "9d2ba4442d5253484f574674a09fc4eb",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6c1DKZbMPyanIZGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgC8dwwcJGoDpwAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian and Hesperian impact unit"
+          ]
+        },
+        {
+          "label": "Amazonian and Hesperian transition undivided unit",
+          "url": "c1f93509bc3d5d03f78283d720d7b762",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6sKc8m27CWzqkMDAy09PKogaMGjho4aiBOA2FFEDlg8uTJjCgGwgQoBQDWLQxnkjnYTwAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian and Hesperian transition undivided unit"
+          ]
+        },
+        {
+          "label": "Amazonian and Hesperian volcanic",
+          "url": "f76bd43875a744b0c3fe66636b7825ac",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAERJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7s1vhDtmGlNyBG0c7LowaOGjhq4KiBOA2EFUHkgMmTJzOiGAgToBQAALrXDBbLKoXFAAAAAElFTkSuQmCC",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian and Hesperian volcanic"
+          ]
+        },
+        {
+          "label": "Amazonian and Noachian apron unit",
+          "url": "6378e8bd5598db459ed5dc5d8bb3b26d",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC4MsDxBtmEbjlswMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA2y4MdKg63RsAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian and Noachian apron unit"
+          ]
+        },
+        {
+          "label": "Amazonian apron unit",
+          "url": "f12821062de25cabadb3718cd23d3931",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC5sTFlOtmH1cyIZGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgDGlAw5KV5LUAAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian apron unit"
+          ]
+        },
+        {
+          "label": "Amazonian polar undivided unit",
+          "url": "f1d728d08454958fb1cb4e76b38731e5",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7Ucw8k27BLO9czMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAACrAM/2IUB84AAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian polar undivided unit"
+          ]
+        },
+        {
+          "label": "Amazonian polar unit",
+          "url": "d59c1df3a4af09682ed83a24e303ce7b",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6crB9HtmG5FxcxMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA61kMpRJSWuEAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian polar unit"
+          ]
+        },
+        {
+          "label": "Amazonian volcanic edifice",
+          "url": "7e88fb85878459989d6ccf34e88c2154",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6M539NtmELP4oyMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA2IIMbIBRDN4AAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian volcanic edifice"
+          ]
+        },
+        {
+          "label": "Amazonian volcanic unit",
+          "url": "8bb3586bd3f2db4b5f5c6a93d6ca8141",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7stjUk27DSw+cZGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgD4nAzMZoXYbAAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Amazonian volcanic unit"
+          ]
+        },
+        {
+          "label": "Early Amazonian basin unit",
+          "url": "30c69ab138f60f5043f44427c5732e68",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7USQ8i27ArM9cxMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAAAsM4NW0gagAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Early Amazonian basin unit"
+          ]
+        },
+        {
+          "label": "Early Hesperian basin unit",
+          "url": "1917716cab09ab228e3cc51dadbf976c",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC68aupItmHap/czMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA3DIMeqyOPVYAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Early Hesperian basin unit"
+          ]
+        },
+        {
+          "label": "Early Hesperian highland unit",
+          "url": "cbac6265429ef6cdd86ac75975bedc71",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6sjXci27DmhfsYGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgDsAwynPnJBBwAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Early Hesperian highland unit"
+          ]
+        },
+        {
+          "label": "Early Hesperian transition unit",
+          "url": "2f2e3454f2f99bbe2c4f61c554d5b0b9",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC4sdt5JtmG9e90ZGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgDQrAxW62B6BAAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Early Hesperian transition unit"
+          ]
+        },
+        {
+          "label": "Early Hesperian volcanic unit",
+          "url": "b646f1724a12c75793ab6f4c66209a52",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC505fUg27Ddn3cwMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAGbANKxq6QtYAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Early Hesperian volcanic unit"
+          ]
+        },
+        {
+          "label": "Early Noachian highland massif unit",
+          "url": "aa6417e050313a9c393fdc28d02bdcdc",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC5UUBQl27AH918zMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAMQINbyDrOoEAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Early Noachian highland massif unit"
+          ]
+        },
+        {
+          "label": "Early Noachian highland unit",
+          "url": "8aa1b6bc71cf5808f961a09ede250722",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC70kfpEtmFbnvExMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA2PQMbXP1PLEAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Early Noachian highland unit"
+          ]
+        },
+        {
+          "label": "Hesperian and Noachian basin unit",
+          "url": "47cf9fffd3eae5c90b568baa5edb68ee",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAENJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMqC60NCLftOPnGBgYaOnlUQNHDRw1cNRA3AZCiyBywOTJkxlRDIQJUAoAfK0LWp4jr0sAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian and Noachian basin unit"
+          ]
+        },
+        {
+          "label": "Hesperian and Noachian highland undivided unit",
+          "url": "482459c7e7408c9d86feecd10c7bd188",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6MDw0i27CFq9cxMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA9HEMvzLts34AAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian and Noachian highland undivided unit"
+          ]
+        },
+        {
+          "label": "Hesperian and Noachian transition unit",
+          "url": "cebb7c298ef29781d189995b19b70d14",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7ss1xHtmFFx4MYGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgDOdgxQJGnp6wAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian and Noachian transition unit"
+          ]
+        },
+        {
+          "label": "Hesperian polar edifice unit",
+          "url": "af5adfd774099c7ac41935da2b5ade4d",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6cLJNMtmG5T+YyMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA8C4Ms0vUh2kAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian polar edifice unit"
+          ]
+        },
+        {
+          "label": "Hesperian polar undivided unit",
+          "url": "536e1e44d49b54662f6a28eabe2f55e6",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC4Udggg27C3BzYwMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAFtINIvXFo2oAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian polar undivided unit"
+          ]
+        },
+        {
+          "label": "Hesperian polar unit",
+          "url": "2908b19634ff77a480a85c373c613718",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6crO9KtmG5F3czMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA89gMvjRx6lsAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian polar unit"
+          ]
+        },
+        {
+          "label": "Hesperian transition outflow unit",
+          "url": "2cdee37636ac44a286a1f2b50d754070",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC60Lekl27DDPcUMDAy09PKogaMGjho4aiBOA2FFEDlg8uTJjCgGwgQoBQDhjgyHyMKJSAAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian transition outflow unit"
+          ]
+        },
+        {
+          "label": "Hesperian transition undivided unit",
+          "url": "c03879b6a3cfcbb6700a8df7c6dddf26",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7Mz0gl27CJM2YzMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA4eQMiQ4dSYEAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian transition undivided unit"
+          ]
+        },
+        {
+          "label": "Hesperian transition unit",
+          "url": "4f20ab398342ac4042ae49553220411d",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6cVGBGtmF5E04xMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAA4vIMjeFsU/oAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian transition unit"
+          ]
+        },
+        {
+          "label": "Hesperian volcanic edifice unit",
+          "url": "269f919a7a03fa1465e460995ec37060",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC5sY9pCtmFV/3wYGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgDiHAyJV+/HFgAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Hesperian volcanic edifice unit"
+          ]
+        },
+        {
+          "label": "Late Amazonian apron unit",
+          "url": "3b5156eab7a687dcd5b376509efd0739",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6clDWZbMPypuUyMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAxWcMNijIg58AAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Amazonian apron unit"
+          ]
+        },
+        {
+          "label": "Late Amazonian polar cap unit",
+          "url": "4705eb467beb8efb79673f4e77ff2f0c",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAERJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7MbZ1AvmHVBQwMDLT08qiBowaOGjhqIE4DYUUQOWDy5MmMKAbCBCgFAMoBDEMK8MT8AAAAAElFTkSuQmCC",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Amazonian polar cap unit"
+          ]
+        },
+        {
+          "label": "Late Amazonian polar dunes unit",
+          "url": "dd88aefcde5828b298e906ff2232b86d",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6cWOtLtmH5zZsZGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgDXAgxq3kvGYgAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Amazonian polar dunes unit"
+          ]
+        },
+        {
+          "label": "Late Amazonian volcanic field unit",
+          "url": "76ad7df953e54d675c867f4d7144d1ac",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6Md7Yk27CFe48zMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAAy8M6qONfxgAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Amazonian volcanic field unit"
+          ]
+        },
+        {
+          "label": "Late Amazonian volcanic unit",
+          "url": "0d76bb08589249974fcbf7906f53387e",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEVJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC7sDfQi27Di9dsYGBho6eVRA0cNHDVw1ECcBsKKIHLA5MmTGVEMhAlQCgDoiwyd7xYNJQAAAABJRU5ErkJggg==",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Amazonian volcanic unit"
+          ]
+        },
+        {
+          "label": "Late Hesperian basin unit",
+          "url": "ce3e76a0757bf9e47d62934997888245",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC40cjMi27Bzu84xMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAFC0NGxe2ak4AAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Hesperian basin unit"
+          ]
+        },
+        {
+          "label": "Late Hesperian lowland unit",
+          "url": "b66b6d1c209762d304f467283c99027e",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAADFJREFUOI1jYaAyYKGZgT3HHP5TYlCJ1QFGFAOpBUYNHDVw1MBRA+lsIKw8o5qB1AIALV4FwP0tw8oAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Hesperian lowland unit"
+          ]
+        },
+        {
+          "label": "Late Hesperian transition unit",
+          "url": "30b9bcf6a5ce3fa75f478176b4808d0a",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6cFDePbMPyFiUxMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAxcoMN7lL5BMAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Hesperian transition unit"
+          ]
+        },
+        {
+          "label": "Late Hesperian volcanic field unit",
+          "url": "8cdc9f3c8554e8223eefad5dfc9c42b2",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6MN1Qi27CF5+8xMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAETANE6dUPXAAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Hesperian volcanic field unit"
+          ]
+        },
+        {
+          "label": "Late Hesperian volcanic unit",
+          "url": "8cdc9f3c8554e8223eefad5dfc9c42b2",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6MN1Qi27CF5+8xMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAETANE6dUPXAAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Hesperian volcanic unit"
+          ]
+        },
+        {
+          "label": "Late Noachian highland unit",
+          "url": "80bcc321c0c65187e6e7d5b9f6ffee7b",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC5MdJQm27D5+58yMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAADV8NCD0Y3OQAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Noachian highland unit"
+          ]
+        },
+        {
+          "label": "Late Noachian volcanic unit",
+          "url": "6f0ed44a3a23336113a5e5638aa0b64d",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6UFg0g27CnrzcwMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAItINRYw8jAwAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Late Noachian volcanic unit"
+          ]
+        },
+        {
+          "label": "Middle Amazonian lowland unit",
+          "url": "8e41a1d4389aa31ba5a658faca0e21b7",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAADFJREFUOI1jYaAyYKGZgXsPGP6nxCBnh/OMKAZSC4waOGrgqIGjBtLZQFh5RjUDqQUAI34FpD0mAg0AAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Middle Amazonian lowland unit"
+          ]
+        },
+        {
+          "label": "Middle Noachian highland massif unit",
+          "url": "fa1e25970f18daf2ba82805e1b6db9eb",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC40Ntcm27CzJ68yMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAG10NMEVulkoAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Middle Noachian highland massif unit"
+          ]
+        },
+        {
+          "label": "Middle Noachian highland unit",
+          "url": "e6c68d364c63138ab756f49f3b89a587",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC5MMBAm27AFF94yMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAAFkgNIutb4mcAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Middle Noachian highland unit"
+          ]
+        },
+        {
+          "label": "Noachian highland edifice unit",
+          "url": "5f51a84409c839eed23a61ee42996bd5",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC60PPiAbMOO2yswMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAArEUL65NHXi8AAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Noachian highland edifice unit"
+          ]
+        },
+        {
+          "label": "Noachian highland undivided unit",
+          "url": "40c8fe833db7caf69a648074af42d433",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC70sLUk27Adh48zMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAADT4NB2+X6csAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Noachian highland undivided unit"
+          ]
+        },
+        {
+          "label": "Noachian volcanic edifice unit",
+          "url": "cfcd36751addfef2d922d165b4ede9e4",
+          "imageData": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAEZJREFUOI1jYaAyYKGZgbm5uf8pNWzy5MmMKC6M2XmQbMOWuNszMDDQ0sujBo4aOGrgqIE4DYQVQeSAyZMnM6IYCBOgFAAArWML77cj3ScAAAAASUVORK5CYII=",
+          "contentType": "image/png",
+          "height": 20,
+          "width": 20,
+          "values": [
+            "Noachian volcanic edifice unit"
+          ]
+        }
+      ]
+    }
+  ]
+}

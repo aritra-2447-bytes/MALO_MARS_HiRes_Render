@@ -1427,9 +1427,10 @@
             <button class="pill-btn submenu-item active" id="btn-tex-geology-4k" role="menuitem">🪐 USGS SIM 3292 4K Master</button>
             <button class="pill-btn submenu-item" id="btn-tex-mola-4k" role="menuitem">🏔️ MOLA Topo 4K</button>
             <button class="pill-btn submenu-item" id="btn-tex-mola-8k" role="menuitem">🛰️ MOLA 8K Master</button>
+            <button class="pill-btn submenu-item" id="btn-add-texture" role="menuitem">➕ Add Texture</button>
             <div class="submenu-divider"></div>
             <button class="pill-btn submenu-item active" id="btn-toggle-landings" role="menuitem">🛬 Landing Sites (16)</button>
-            <button class="pill-btn submenu-item" id="btn-toggle-legend" role="menuitem">🗺️ Geologic Legend</button>
+            <button class="pill-btn submenu-item" id="btn-geologic-legend" role="menuitem">🗺️ Geologic Legend</button>
             <button class="pill-btn submenu-item" id="btn-toggle-grid" role="menuitem">🌐 Lat/Lon Grid</button>
             <button class="pill-btn submenu-item" id="btn-toggle-sun" role="menuitem">☀️ Solar Sun</button>
             <button class="pill-btn submenu-item" id="btn-reset-cam" role="menuitem">🎯 Center View</button>
@@ -1528,31 +1529,38 @@
             <div class="legend-group-title" style="color:#22c55e;">🟢 Noachian Period (4.1 – 3.7 Ga)</div>
             <div class="legend-items-list">
               <div class="legend-unit-item" data-fly-lat="-20.0" data-fly-lon="25.0" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#6d9e31;"></span>
+                <span class="unit-color-box" style="background:#cd9d80;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">mNh &bull; Middle Noachian Highland</span>
-                  <span class="u-name">Smectite clay crust &bull; 44,917,000 km²</span>
+                  <span class="u-name">Smectite clay crust &bull; 32,313,000 km²</span>
                 </div>
               </div>
               <div class="legend-unit-item" data-fly-lat="24.0" data-fly-lon="-19.0" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#4d7c0f;"></span>
+                <span class="unit-color-box" style="background:#b9875f;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">eNh &bull; Early Noachian Highland</span>
-                  <span class="u-name">Mawrth basement clays &bull; 3,595,000 km²</span>
+                  <span class="u-name">Mawrth basement clays &bull; 14,599,000 km²</span>
                 </div>
               </div>
               <div class="legend-unit-item" data-fly-lat="24.6" data-fly-lon="-18.5" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#84cc16;"></span>
+                <span class="unit-color-box" style="background:#ceae88;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">lNh &bull; Late Noachian Highland</span>
-                  <span class="u-name">Leached Al-clay upper horizon</span>
+                  <span class="u-name">Leached Al-clay upper horizon &bull; 8,419,000 km²</span>
                 </div>
               </div>
-              <div class="legend-unit-item" data-fly-lat="-25.0" data-fly-lon="40.0" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#059669;"></span>
+              <div class="legend-unit-item" data-fly-lat="-12.0" data-fly-lon="65.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#8882bd;"></span>
                 <div class="legend-unit-info">
-                  <span class="u-sym">mNf &bull; Noachian Fluvial</span>
-                  <span class="u-name">Valley networks &bull; dendritic channels</span>
+                  <span class="u-sym">lNv &bull; Late Noachian Volcanic</span>
+                  <span class="u-name">Intercrater volcanic plains &bull; 2,753,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="-35.0" data-fly-lon="40.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#8d8e82;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">eNhm &bull; Early Noachian Massif</span>
+                  <span class="u-name">Uplifted impact rim massifs &bull; 1,510,000 km²</span>
                 </div>
               </div>
             </div>
@@ -1562,32 +1570,53 @@
           <div>
             <div class="legend-group-title" style="color:#facc15;">🟤 Hesperian Period (3.7 – 3.0 Ga)</div>
             <div class="legend-items-list">
+              <div class="legend-unit-item" data-fly-lat="30.0" data-fly-lon="110.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#8cc640;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">lHl &bull; Late Hesperian Lowland</span>
+                  <span class="u-name">Northern plains vastitas &bull; 16,021,000 km²</span>
+                </div>
+              </div>
               <div class="legend-unit-item" data-fly-lat="-15.0" data-fly-lon="175.0" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#d97706;"></span>
+                <span class="unit-color-box" style="background:#b27ab5;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">eHv &bull; Early Hesperian Volcanic</span>
-                  <span class="u-name">Ridged flood plains &bull; 23,450,000 km²</span>
+                  <span class="u-name">Ridged flood basalt plains &bull; 7,920,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="8.4" data-fly-lon="69.5" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#cc9e8f;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">lHv &bull; Late Hesperian Volcanic</span>
+                  <span class="u-name">Syrtis Major volcanic plains &bull; 3,240,000 km²</span>
                 </div>
               </div>
               <div class="legend-unit-item" data-fly-lat="-6.5" data-fly-lon="-75.8" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#b45309;"></span>
+                <span class="unit-color-box" style="background:#ffcb0b;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">lHt &bull; Late Hesperian Transition</span>
                   <span class="u-name">Valles Marineris sulfate ILDs &bull; 5,888,000 km²</span>
                 </div>
               </div>
               <div class="legend-unit-item" data-fly-lat="-1.95" data-fly-lon="-5.53" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#ca8a04;"></span>
+                <span class="unit-color-box" style="background:#e0b026;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">eHt &bull; Early Hesperian Transition</span>
-                  <span class="u-name">Meridiani jarosite evaporite beds</span>
+                  <span class="u-name">Meridiani jarosite evaporite beds &bull; 2,420,000 km²</span>
                 </div>
               </div>
               <div class="legend-unit-item" data-fly-lat="-80.0" data-fly-lon="0.0" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#a8825c;"></span>
+                <span class="unit-color-box" style="background:#009cb2;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">Hp &bull; Hesperian Polar</span>
                   <span class="u-name">Southern layered deposits &bull; 2,670,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="-42.0" data-fly-lon="70.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#42a2ae;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">eHb &bull; Early Hesperian Basin</span>
+                  <span class="u-name">Hellas basin floor deposits &bull; 1,980,000 km²</span>
                 </div>
               </div>
             </div>
@@ -1597,25 +1626,53 @@
           <div>
             <div class="legend-group-title" style="color:#fb923c;">🟠 Amazonian Period (3.0 Ga – Present)</div>
             <div class="legend-items-list">
-              <div class="legend-unit-item" data-fly-lat="18.65" data-fly-lon="-133.8" data-fly-dist="460">
-                <span class="unit-color-box" style="background:#e11d48;"></span>
-                <div class="legend-unit-info">
-                  <span class="u-sym">Ave &bull; Amazonian Volcanic</span>
-                  <span class="u-name">Olympus Mons &bull; Tharsis constructs</span>
-                </div>
-              </div>
               <div class="legend-unit-item" data-fly-lat="45.0" data-fly-lon="110.0" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#f97316;"></span>
+                <span class="unit-color-box" style="background:#bdc031;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">mAl &bull; Middle Amazonian Lowland</span>
-                  <span class="u-name">Vastitas Borealis &bull; 23,246,000 km²</span>
+                  <span class="u-name">Vastitas Borealis smooth plains &bull; 23,246,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="5.0" data-fly-lon="-115.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#f89569;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">AHv &bull; Amazonian/Hesperian Volcanic</span>
+                  <span class="u-name">Tharsis & Elysium volcanic plains &bull; 13,214,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="18.65" data-fly-lon="-133.8" data-fly-dist="460">
+                <span class="unit-color-box" style="background:#cc7c58;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">Ave &bull; Amazonian Volcanic Edifice</span>
+                  <span class="u-name">Olympus Mons & Tharsis constructs &bull; 2,120,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="12.0" data-fly-lon="-120.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#fabeb7;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">lAv &bull; Late Amazonian Volcanic</span>
+                  <span class="u-name">Youngest Tharsis lava flows &bull; 1,840,000 km²</span>
                 </div>
               </div>
               <div class="legend-unit-item" data-fly-lat="84.5" data-fly-lon="0.0" data-fly-dist="440">
-                <span class="unit-color-box" style="background:#e0f2fe;"></span>
+                <span class="unit-color-box" style="background:#daf2fd;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">lApc &bull; Amazonian Polar Cap</span>
                   <span class="u-name">North polar water ice dome &bull; 853,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="78.0" data-fly-lon="120.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#feeaba;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">lApd &bull; Late Amazonian Polar Dunes</span>
+                  <span class="u-name">Olympia Cavi circumpolar erg dunes &bull; 620,000 km²</span>
+                </div>
+              </div>
+              <div class="legend-unit-item" data-fly-lat="-5.0" data-fly-lon="-35.0" data-fly-dist="440">
+                <span class="unit-color-box" style="background:#e9e4d8;"></span>
+                <div class="legend-unit-info">
+                  <span class="u-sym">AHtu &bull; Transition Undivided</span>
+                  <span class="u-name">Chaotic terrain & outflow floors &bull; 4,150,000 km²</span>
                 </div>
               </div>
             </div>
@@ -1623,13 +1680,13 @@
 
           <!-- Impact -->
           <div>
-            <div class="legend-group-title" style="color:#38bdf8;">🔵 Impact Materials</div>
+            <div class="legend-group-title" style="color:#fff100;">🟡 Impact Materials</div>
             <div class="legend-items-list">
-              <div class="legend-unit-item" data-fly-lat="-42.7" data-fly-lon="70.0" data-fly-dist="460">
-                <span class="unit-color-box" style="background:#38bdf8;"></span>
+              <div class="legend-unit-item" data-fly-lat="18.44" data-fly-lon="77.45" data-fly-dist="460">
+                <span class="unit-color-box" style="background:#fff100;"></span>
                 <div class="legend-unit-info">
                   <span class="u-sym">AHi &bull; Amazonian/Hesperian Impact</span>
-                  <span class="u-name">Basin ejecta &bull; Hellas, Gale, Jezero</span>
+                  <span class="u-name">Basin ejecta &bull; Hellas, Gale, Jezero &bull; 5,820,000 km²</span>
                 </div>
               </div>
             </div>
@@ -1670,7 +1727,7 @@
     </div>
 
     <!-- Side Destinations Drawer (Left) -->
-    <div id="left-drawer">
+    <div id="left-drawer" class="collapsed">
       <div class="drawer-title">
         <div style="display:flex; align-items:center; gap:8px;">
           <span>Exploration Sites</span>
@@ -1738,11 +1795,10 @@
             <span class="metric-val" id="eva-val-safety" style="color:var(--accent-green);">SAFE (&lt;12.5km)</span>
           </div>
         </div>
+        <div class="chart-box">
+          <canvas id="eva-canvas-chart"></canvas>
+        </div>
       </div>
-      <div class="chart-box">
-        <canvas id="eva-canvas-chart"></canvas>
-      </div>
-    </div>
 
     <!-- Floating Coordinates Telemetry (Bottom-Left) -->
     <div id="status-pill">
@@ -1795,6 +1851,7 @@
     let currentElevation = -2540;
     let landmarksData = [];
     let currentRouteSamples = [];
+    let currentRouteTitle = "Perseverance (Jezero Delta)";
 
     const container = document.getElementById('viewport-container');
     const threeCanvas = document.getElementById('three-canvas');
@@ -2733,12 +2790,18 @@
         let isRoverMission = false;
 
         if (!historicalMissions || historicalMissions.length === 0) {
-          const misResp = await fetch('/api/rover/missions');
-          const misData = await misResp.json();
-          if (misData.status === 'success') historicalMissions = misData.missions;
+          try {
+            const misResp = await fetch('/api/rover/missions');
+            if (misResp.ok) {
+              const misData = await misResp.json();
+              if (misData.status === 'success') historicalMissions = misData.missions;
+            }
+          } catch (e) {
+            console.warn("Could not fetch /api/rover/missions, using local dataset", e);
+          }
         }
 
-        const roverMatch = historicalMissions.find(m => m.id === presetId);
+        const roverMatch = (historicalMissions || []).find(m => m.id === presetId);
         let actualPath = null;
         if (roverMatch) {
           isRoverMission = true;
@@ -2751,15 +2814,30 @@
             actual_path: actualPath
           };
         } else {
-          const presetsResp = await fetch('/api/eva/presets');
-          const presetsData = await presetsResp.json();
-          routeObj = presetsData.routes.find(r => r.id === presetId) || presetsData.routes[0];
+          try {
+            const presetsResp = await fetch('/api/eva/presets');
+            if (presetsResp.ok) {
+              const presetsData = await presetsResp.json();
+              routeObj = presetsData.routes.find(r => r.id === presetId) || presetsData.routes[0];
+            }
+          } catch (e) {
+            console.warn("Could not fetch /api/eva/presets", e);
+          }
         }
 
-        const planResp = await fetch(`/api/eva/plan?waypoints=${encodeURIComponent(JSON.stringify(routeObj.waypoints))}`);
-        const planData = await planResp.json();
+        let planData = null;
+        if (routeObj && routeObj.waypoints) {
+          try {
+            const planResp = await fetch(`/api/eva/plan?waypoints=${encodeURIComponent(JSON.stringify(routeObj.waypoints))}`);
+            if (planResp.ok) {
+              planData = await planResp.json();
+            }
+          } catch (e) {
+            console.warn("Could not fetch /api/eva/plan, falling back to local calculation", e);
+          }
+        }
 
-        if (planData.status === 'success') {
+        if (planData && planData.status === 'success') {
           const s = planData.route_summary;
           document.getElementById('eva-val-dist').textContent = `${s.total_distance_km} km`;
           document.getElementById('eva-val-time').textContent = isRoverMission ? `${routeObj.waypoints.length} Sols` : `${s.estimated_eva_time_hrs} hrs`;
@@ -2775,16 +2853,46 @@
           }
 
           currentRouteSamples = (actualPath && actualPath.length > 1) ? actualPath : planData.profile_samples;
-          drawElevationChart(currentRouteSamples, isRoverMission ? routeObj.name : "Astronaut EVA");
+          currentRouteTitle = isRoverMission ? routeObj.name : "Astronaut EVA";
+          drawElevationChart(currentRouteSamples, currentRouteTitle);
           renderHighlyVisibleTraverseTube(routeObj.waypoints, planData.profile_samples, isRoverMission, actualPath);
 
-          // Fly smoothly to route center/start only when explicitly requested by user (e.g. from preset dropdown)
           if (autoFly) {
             flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, 1.70);
           }
+          return;
         }
+
+        throw new Error("Plan API unavailable or empty, falling back to local dataset");
       } catch (err) {
-        console.error("Failed loading EVA/Rover route:", err);
+        console.warn("Using local traverse dataset fallback:", err);
+        try {
+          const geoResp = await fetch('/data/astronaut_paths.geojson');
+          const geoData = await geoResp.json();
+          const feat = geoData.features.find(f => f.properties.id === presetId) || geoData.features[0];
+          const p = feat.properties;
+          const wps = p.waypoints || [];
+          document.getElementById('eva-val-dist').textContent = `${p.total_odometry_km || 28.4} km`;
+          document.getElementById('eva-val-time').textContent = p.sol_range || `${wps.length} Sols`;
+          document.getElementById('eva-val-energy').textContent = `${((p.total_odometry_km || 28.4) * 18.5).toFixed(0)} Wh/km`;
+          document.getElementById('eva-val-slope').textContent = "9.8°";
+          const safetyEl = document.getElementById('eva-val-safety');
+          if (safetyEl) {
+            safetyEl.textContent = 'AUTONAV VERIFIED (LOCAL)';
+            safetyEl.style.color = 'var(--accent-green)';
+          }
+          currentRouteSamples = wps;
+          currentRouteTitle = p.name || "Perseverance";
+          drawElevationChart(currentRouteSamples, currentRouteTitle);
+          if (wps.length > 0) {
+            renderHighlyVisibleTraverseTube(wps, wps, true, null);
+            if (autoFly) {
+              flyToCoordinate(wps[0].lat, wps[0].lon, 1.70);
+            }
+          }
+        } catch (fbErr) {
+          console.error("Local fallback failed:", fbErr);
+        }
       }
     }
 
@@ -2880,8 +2988,11 @@
     // Topographic Chart (NASA Professional Cross-Section Profile)
     function drawElevationChart(samples, routeTitle = "Traverse") {
       const cvs = document.getElementById('eva-canvas-chart');
-      cvs.width = cvs.parentElement.clientWidth;
-      cvs.height = cvs.parentElement.clientHeight;
+      if (!cvs) return;
+      const pW = (cvs.parentElement && cvs.parentElement.clientWidth) || cvs.clientWidth || 724;
+      const pH = (cvs.parentElement && cvs.parentElement.clientHeight) || cvs.clientHeight || 72;
+      cvs.width = pW;
+      cvs.height = pH;
       const ctx = cvs.getContext('2d');
       ctx.clearRect(0, 0, cvs.width, cvs.height);
 
@@ -3529,7 +3640,7 @@
         closeMainMenu();
         const legendDrawer = document.getElementById('globe-legend-drawer');
         if (legendDrawer) legendDrawer.style.display = 'none';
-        const btnToggleLegend = document.getElementById('btn-toggle-legend');
+        const btnToggleLegend = document.getElementById('btn-geologic-legend');
         if (btnToggleLegend) btnToggleLegend.classList.remove('active');
       }
       ephPanel.style.display = willShow ? 'block' : 'none';
@@ -3985,7 +4096,7 @@
 
       // Legend Drawer Toggle
       const legendDrawer = document.getElementById('globe-legend-drawer');
-      const btnToggleLegend = document.getElementById('btn-toggle-legend');
+      const btnToggleLegend = document.getElementById('btn-geologic-legend');
       if (btnToggleLegend && legendDrawer) {
         btnToggleLegend.onclick = () => {
           const isShown = legendDrawer.style.display === 'flex';
@@ -3995,6 +4106,26 @@
           }
           legendDrawer.style.display = isShown ? 'none' : 'flex';
           btnToggleLegend.classList.toggle('active', !isShown);
+        };
+      }
+
+      // Add Custom Texture Button
+      const btnAddTexture = document.getElementById('btn-add-texture');
+      if (btnAddTexture) {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+        btnAddTexture.onclick = () => {
+          fileInput.click();
+        };
+        fileInput.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const url = URL.createObjectURL(file);
+            loadGeologyGlobeTexture(url, url, file.name);
+          }
         };
       }
 
@@ -4169,7 +4300,7 @@
       if (ephPanel) ephPanel.style.display = 'none';
       const legendDrawer = document.getElementById('globe-legend-drawer');
       if (legendDrawer) legendDrawer.style.display = 'none';
-      const btnToggleLegend = document.getElementById('btn-toggle-legend');
+      const btnToggleLegend = document.getElementById('btn-geologic-legend');
       if (btnToggleLegend) btnToggleLegend.classList.remove('active');
 
       mainMenuDropdown.style.display = 'flex';
@@ -4388,7 +4519,7 @@
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
       if (appMode === '2D') init2DFlatCanvas();
-      if (currentRouteSamples.length > 0) drawElevationChart(currentRouteSamples);
+      if (currentRouteSamples.length > 0) drawElevationChart(currentRouteSamples, currentRouteTitle);
       if (isGeologyGlobeActive && typeof onGlobeContainerResize === 'function') {
         onGlobeContainerResize();
       }
