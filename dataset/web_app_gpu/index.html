@@ -773,6 +773,15 @@
             <span class="layer-indicator">○</span>
           </div>
 
+          <!-- Option 4: Level 6 Inset Patches (100 m/px) -->
+          <div class="layer-menu-item" data-layer="level6" id="layer-opt-level6">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="layer-item-title">🔬 Level 6 (32K / 100 m/px)</span>
+              <span class="layer-item-desc">High-Res Landing Insets & Dynamic LOD</span>
+            </div>
+            <span class="layer-indicator">○</span>
+          </div>
+
           <!-- Overlay Opacity Slider -->
           <div id="layer-overlay-controls" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--text-dim); margin-bottom:5px;">
@@ -923,6 +932,7 @@
       </div>
       <div class="ge-btn-group">
         <button class="ge-ctrl-btn" id="btn-compass" title="Reset North Up">🧭</button>
+        <button class="ge-ctrl-btn active" id="btn-toggle-insets" title="Toggle Level 6 High-Res Inset Patches">🔬</button>
         <button class="ge-ctrl-btn" id="btn-toggle-routes" title="Toggle Traverse Visibility">🛣️</button>
         <button class="ge-ctrl-btn" id="btn-toggle-atmo" title="Atmospheric Lighting">🌌</button>
       </div>
@@ -1313,6 +1323,18 @@
           zoom5Material.map = zoom5Tex2k;
         }
         zoom5Material.needsUpdate = true;
+      } else if (layer === 'level6') {
+        if (layerNameEl) layerNameEl.textContent = 'Level 6 (32K)';
+        if (overlayControls) overlayControls.style.display = 'none';
+
+        marsGlobe.visible = true;
+        marsMaterial.opacity = 1.0;
+        marsMaterial.transparent = false;
+        marsMaterial.needsUpdate = true;
+
+        zoom5Globe.visible = false;
+        insetsActive = true;
+        if (window.highResInsetsGroup) window.highResInsetsGroup.visible = true;
       }
 
       if (typeof applyLightingState === 'function') {
@@ -1360,6 +1382,14 @@
 
     const corridorHighlightGroup = new THREE.Group();
     scene.add(corridorHighlightGroup);
+
+    // Targeted High-Resolution Level 6 Inset Patches Group
+    const highResInsetsGroup = new THREE.Group();
+    scene.add(highResInsetsGroup);
+    window.highResInsetsGroup = highResInsetsGroup;
+    let highResInsets = [];
+    let insetsActive = true;
+    let insetsMasterOpacity = 1.0;
 
     // Coordinate Math
     function latLonToVector3(lat, lon, radius = MARS_RADIUS) {
@@ -2271,6 +2301,170 @@
     }
 
 
+    // --- Level 6 (32K / 100 m/px) Targeted High-Resolution Landing Insets ---
+    function createCurvedSurfacePatchGeometry(latMin, latMax, lonMin, lonMax, segsLat = 24, segsLon = 24) {
+      const geom = new THREE.BufferGeometry();
+      const positions = [];
+      const uvs = [];
+      const indices = [];
+
+      for (let i = 0; i <= segsLat; i++) {
+        const v = i / segsLat;
+        const lat = latMax - v * (latMax - latMin);
+        for (let j = 0; j <= segsLon; j++) {
+          const u = j / segsLon;
+          const lon = lonMin + u * (lonMax - lonMin);
+          const p = latLonToVector3(lat, lon, MARS_RADIUS * 1.0004);
+          positions.push(p.x, p.y, p.z);
+          uvs.push(u, 1.0 - v);
+        }
+      }
+
+      for (let i = 0; i < segsLat; i++) {
+        for (let j = 0; j < segsLon; j++) {
+          const a = i * (segsLon + 1) + j;
+          const b = i * (segsLon + 1) + (j + 1);
+          const c = (i + 1) * (segsLon + 1) + j;
+          const d = (i + 1) * (segsLon + 1) + (j + 1);
+          indices.push(a, c, b);
+          indices.push(b, c, d);
+        }
+      }
+
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geom.setIndex(indices);
+      geom.computeVertexNormals();
+      return geom;
+    }
+
+    const DEFAULT_INSETS_DATA = [
+      {
+        id: "jezero_crater",
+        name: "Jezero Crater (Perseverance / Mars 2020)",
+        mission: "m20_perseverance",
+        lat: 18.4446,
+        lon: 77.4508,
+        lat_min: 17.3446,
+        lat_max: 19.5446,
+        lon_min: 76.3508,
+        lon_max: 78.5508,
+        texture_url: "/insets/jezero_crater_hires.jpg"
+      },
+      {
+        id: "gale_crater",
+        name: "Gale Crater (Curiosity / MSL)",
+        mission: "msl_curiosity",
+        lat: -4.5895,
+        lon: 137.4417,
+        lat_min: -5.7895,
+        lat_max: -3.3895,
+        lon_min: 136.2417,
+        lon_max: 138.6417,
+        texture_url: "/insets/gale_crater_hires.jpg"
+      },
+      {
+        id: "meridiani_planum",
+        name: "Meridiani Planum (Opportunity / MER-B)",
+        mission: "mer_opportunity",
+        lat: -1.9462,
+        lon: -5.5266,
+        lat_min: -3.2462,
+        lat_max: -0.6462,
+        lon_min: -6.8266,
+        lon_max: -4.2266,
+        texture_url: "/insets/meridiani_planum_hires.jpg"
+      },
+      {
+        id: "gusev_crater",
+        name: "Gusev Crater (Spirit / MER-A)",
+        mission: "mer_spirit",
+        lat: -14.5684,
+        lon: 175.4726,
+        lat_min: -15.6684,
+        lat_max: -13.4684,
+        lon_min: 174.3726,
+        lon_max: 176.5726,
+        texture_url: "/insets/gusev_crater_hires.jpg"
+      },
+      {
+        id: "utopia_planitia",
+        name: "Southern Utopia Planitia (Zhurong / Tianwen-1)",
+        mission: "cnsa_zhurong",
+        lat: 25.0833,
+        lon: 109.9084,
+        lat_min: 23.9833,
+        lat_max: 26.1833,
+        lon_min: 108.8084,
+        lon_max: 111.0084,
+        texture_url: "/insets/utopia_planitia_hires.jpg"
+      }
+    ];
+
+    async function initHighResLandingInsets() {
+      let insetsList = DEFAULT_INSETS_DATA;
+      try {
+        const resp = await fetch('/api/insets');
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && Array.isArray(data.insets) && data.insets.length > 0) {
+            insetsList = data.insets;
+          }
+        }
+      } catch (err) {
+        console.warn("Using embedded high-res insets metadata fallback:", err);
+      }
+
+      const texLoader = new THREE.TextureLoader();
+      highResInsets = [];
+
+      insetsList.forEach(item => {
+        const img = new Image();
+        img.src = item.texture_url;
+
+        const tex = texLoader.load(item.texture_url);
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+
+        const geom = createCurvedSurfacePatchGeometry(item.lat_min, item.lat_max, item.lon_min, item.lon_max, 24, 24);
+        const mat = new THREE.MeshBasicMaterial({
+          map: tex,
+          transparent: true,
+          opacity: 0.0,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        });
+
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.visible = false;
+        mesh.userData = {
+          type: 'high_res_inset',
+          id: item.id,
+          name: item.name,
+          mission: item.mission
+        };
+        highResInsetsGroup.add(mesh);
+
+        const centerVector = latLonToVector3(item.lat, item.lon, MARS_RADIUS * 1.0004);
+        highResInsets.push({
+          id: item.id,
+          name: item.name,
+          mission: item.mission,
+          lat: item.lat,
+          lon: item.lon,
+          lat_min: item.lat_min,
+          lat_max: item.lat_max,
+          lon_min: item.lon_min,
+          lon_max: item.lon_max,
+          centerVector: centerVector,
+          mesh: mesh,
+          image: img
+        });
+      });
+    }
+
     // --- High-Visibility 3D Tube Traverse & Historical Rover Path Geometry ---
     let historicalMissions = [];
 
@@ -2819,6 +3013,21 @@
       document.getElementById('bottom-dock').style.display = routesVisible ? 'flex' : 'none';
     };
 
+    // Toggle High-Res Inset Patches
+    const btnToggleInsets = document.getElementById('btn-toggle-insets');
+    if (btnToggleInsets) {
+      btnToggleInsets.onclick = () => {
+        insetsActive = !insetsActive;
+        btnToggleInsets.classList.toggle('active', insetsActive);
+        if (window.highResInsetsGroup) {
+          window.highResInsetsGroup.visible = insetsActive;
+        }
+        if (appMode === '2D') {
+          draw2DFlat();
+        }
+      };
+    }
+
     // Reset North Up
     document.getElementById('btn-compass').onclick = () => flyToCoordinate(0, 0, 3.2);
 
@@ -2919,6 +3128,32 @@
         const drawX = (flatCanvas.width - drawW) / 2 + flatPanX;
         const drawY = (flatCanvas.height - drawH) / 2 + flatPanY;
         ctx.drawImage(flatImg, drawX, drawY, drawW, drawH);
+
+        // Render 2D High-Res Level 6 Insets when zoomed in
+        if (insetsActive && highResInsets.length > 0 && flatZoom >= 1.35) {
+          const to2DInset = (lon, lat) => ({
+            x: drawX + ((lon + 180.0) / 360.0) * drawW,
+            y: drawY + ((90.0 - lat) / 180.0) * drawH
+          });
+
+          highResInsets.forEach(patch => {
+            if (patch.image && patch.image.complete && patch.image.naturalWidth > 0) {
+              const pTopLeft = to2DInset(patch.lon_min, patch.lat_max);
+              const pBottomRight = to2DInset(patch.lon_max, patch.lat_min);
+              const patchW = pBottomRight.x - pTopLeft.x;
+              const patchH = pBottomRight.y - pTopLeft.y;
+
+              ctx.save();
+              ctx.globalAlpha = Math.min(1.0, (flatZoom - 1.2) * 1.5) * insetsMasterOpacity;
+              ctx.drawImage(patch.image, pTopLeft.x, pTopLeft.y, patchW, patchH);
+              ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+              ctx.lineWidth = 1.5;
+              ctx.setLineDash([4, 3]);
+              ctx.strokeRect(pTopLeft.x, pTopLeft.y, patchW, patchH);
+              ctx.restore();
+            }
+          });
+        }
 
         // Render visible exploration paths & landing sites on 2D map
         if (astroPathsData && Array.isArray(astroPathsData.features)) {
@@ -3310,6 +3545,24 @@
         });
       }
 
+      // Proximity LOD crossfading for Level 6 high-res landing insets
+      if (insetsActive && highResInsets.length > 0) {
+        const camPos = camera.position;
+        const camDist = camPos.length();
+        highResInsets.forEach(patch => {
+          if (!patch.mesh) return;
+          const distToCenter = camPos.distanceTo(patch.centerVector);
+          if (camDist < 1.45 && distToCenter < 0.70) {
+            patch.mesh.visible = true;
+            const alpha = THREE.MathUtils.clamp((0.70 - distToCenter) / 0.25, 0.0, 1.0) * insetsMasterOpacity;
+            patch.mesh.material.opacity = alpha;
+          } else {
+            patch.mesh.visible = false;
+            patch.mesh.material.opacity = 0.0;
+          }
+        });
+      }
+
       if (appMode === '3D') {
         const centerCoord = vector3ToLatLon(camera.position);
         currentLat = centerCoord.lat;
@@ -3371,6 +3624,7 @@
     renderDrawerLandings(DEFAULT_LANDING_SITES);
     loadAstroPaths();
     loadRoverTraversesData();
+    initHighResLandingInsets();
     updateLiveMarsEphemeris();
     setInterval(updateLiveMarsEphemeris, 1000); // 1-second live clock update
     loadEVARoute('m20_perseverance', false); // Initialize route metrics without hijacking camera view
