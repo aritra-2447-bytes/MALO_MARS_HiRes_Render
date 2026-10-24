@@ -1,0 +1,131 @@
+{
+  "status": "success",
+  "layer": "Level 6 (32K / 100m/px) Targeted Inset Patches",
+  "count": 5,
+  "insets": [
+    {
+      "id": "jezero_crater",
+      "name": "Jezero Crater (Perseverance / Mars 2020)",
+      "mission": "m20_perseverance",
+      "lat": 18.4446,
+      "lon": 77.4508,
+      "deg_span": 2.2,
+      "lat_min": 17.3446,
+      "lat_max": 19.544600000000003,
+      "lon_min": 76.3508,
+      "lon_max": 78.5508,
+      "tile_l6": {
+        "col": 91,
+        "row": 25
+      },
+      "texture_url": "/insets/jezero_crater_hires.jpg",
+      "file_size_bytes": 212287,
+      "resolution": "100m/px L6 Composite + HiRISE Inset",
+      "features": [
+        "Western Delta",
+        "Belva Crater",
+        "S\u00e9\u00edtah Dunes",
+        "Kodiak Butte"
+      ]
+    },
+    {
+      "id": "gale_crater",
+      "name": "Gale Crater (Curiosity / MSL)",
+      "mission": "msl_curiosity",
+      "lat": -4.5895,
+      "lon": 137.4417,
+      "deg_span": 2.4,
+      "lat_min": -5.7895,
+      "lat_max": -3.3895,
+      "lon_min": 136.2417,
+      "lon_max": 138.6417,
+      "tile_l6": {
+        "col": 112,
+        "row": 33
+      },
+      "texture_url": "/insets/gale_crater_hires.jpg",
+      "file_size_bytes": 218874,
+      "resolution": "100m/px L6 Composite + CTX Inset",
+      "features": [
+        "Mount Sharp (Aeolis Mons)",
+        "Bradbury Landing",
+        "Vera Rubin Ridge",
+        "Gediz Vallis"
+      ]
+    },
+    {
+      "id": "meridiani_planum",
+      "name": "Meridiani Planum (Opportunity / MER-B)",
+      "mission": "mer_opportunity",
+      "lat": -1.9462,
+      "lon": -5.5266,
+      "deg_span": 2.6,
+      "lat_min": -3.2462,
+      "lat_max": -0.6461999999999999,
+      "lon_min": -6.8266,
+      "lon_max": -4.2266,
+      "tile_l6": {
+        "col": 62,
+        "row": 32
+      },
+      "texture_url": "/insets/meridiani_planum_hires.jpg",
+      "file_size_bytes": 152561,
+      "resolution": "100m/px L6 Composite + MOC Inset",
+      "features": [
+        "Challenger Memorial Station",
+        "Eagle Crater",
+        "Victoria Crater",
+        "Endeavour Crater"
+      ]
+    },
+    {
+      "id": "gusev_crater",
+      "name": "Gusev Crater (Spirit / MER-A)",
+      "mission": "mer_spirit",
+      "lat": -14.5684,
+      "lon": 175.4726,
+      "deg_span": 2.2,
+      "lat_min": -15.6684,
+      "lat_max": -13.4684,
+      "lon_min": 174.3726,
+      "lon_max": 176.5726,
+      "tile_l6": {
+        "col": 126,
+        "row": 37
+      },
+      "texture_url": "/insets/gusev_crater_hires.jpg",
+      "file_size_bytes": 140159,
+      "resolution": "100m/px L6 Composite",
+      "features": [
+        "Columbia Memorial Station",
+        "Bonneville Crater",
+        "Husband Hill",
+        "Home Plate"
+      ]
+    },
+    {
+      "id": "utopia_planitia",
+      "name": "Southern Utopia Planitia (Zhurong / Tianwen-1)",
+      "mission": "cnsa_zhurong",
+      "lat": 25.0833,
+      "lon": 109.9084,
+      "deg_span": 2.2,
+      "lat_min": 23.9833,
+      "lat_max": 26.183300000000003,
+      "lon_min": 108.8084,
+      "lon_max": 111.0084,
+      "tile_l6": {
+        "col": 103,
+        "row": 23
+      },
+      "texture_url": "/insets/utopia_planitia_hires.jpg",
+      "file_size_bytes": 75588,
+      "resolution": "100m/px L6 Composite",
+      "features": [
+        "Zhurong Landing Site",
+        "Dune Corridor",
+        "Southern Utopia Hibernation Site"
+      ]
+    }
+  ]
+}
