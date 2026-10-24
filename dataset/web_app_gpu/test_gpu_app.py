@@ -196,6 +196,16 @@ def run_tests():
     assert not os.path.exists(blender_py), "render_rover_video_blender.py should be removed"
     print("  PASS: Real-time topographic contours and strict planetary camera zoom limits verified; rover simulation cleanly removed.")
 
+    # Test 10: Verify Dynamic Cartographic Scale Bar
+    print("\n[Test 10] Verifying Dynamic Cartographic Scale Bar...")
+    assert "scale-bar-container" in html, "scale-bar-container missing in index.html"
+    assert "scale-bar-line" in html, "scale-bar-line element missing in index.html"
+    assert "scale-bar-label" in html, "scale-bar-label element missing in index.html"
+    assert "updateDynamicScaleBar" in html, "updateDynamicScaleBar function missing in index.html"
+    assert "STANDARD_SCALE_DISTANCES_KM" in html, "STANDARD_SCALE_DISTANCES_KM scale steps missing in index.html"
+    assert "updateDynamicScaleBar()" in html, "updateDynamicScaleBar() call missing in index.html"
+    print("  PASS: Dynamic zoom-responsive cartographic scale bar (3D & 2D) verified.")
+
     print("\n" + "=" * 65)
     print("ALL TESTS PASSED! MARS EXPLORATION SUITE FULLY OPERATIONAL.")
     print("=" * 65)

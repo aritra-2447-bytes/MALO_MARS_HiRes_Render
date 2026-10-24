@@ -653,6 +653,55 @@
       border-top: 1px solid var(--card-border);
     }
 
+    /* Dynamic Cartographic Scale Bar (Bottom-Left) */
+    #scale-bar-container {
+      position: absolute;
+      bottom: 66px;
+      left: 20px;
+      background: rgba(5, 8, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 5px 12px 6px 12px;
+      z-index: 100;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    #scale-bar-label {
+      font-size: 10px;
+      font-weight: 700;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+    }
+
+    #scale-bar-ruler {
+      position: relative;
+      height: 6px;
+      display: flex;
+      align-items: center;
+    }
+
+    .scale-bar-line {
+      height: 2px;
+      background: #ffffff;
+      box-shadow: 0 0 6px rgba(0, 240, 255, 0.5);
+      transition: width 0.15s ease-out;
+    }
+
+    .scale-bar-tick {
+      width: 2px;
+      height: 6px;
+      background: #ffffff;
+      box-shadow: 0 0 4px rgba(0, 240, 255, 0.5);
+    }
+
     /* Floating Telemetry Coordinates Bar (Bottom-Left) */
     #status-pill {
       position: absolute;
@@ -904,6 +953,16 @@
       </div>
       <div class="chart-box">
         <canvas id="eva-canvas-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Dynamic Cartographic Scale Bar (Bottom-Left) -->
+    <div id="scale-bar-container" title="Dynamic ground distance scale bar">
+      <div id="scale-bar-label">500 km</div>
+      <div id="scale-bar-ruler">
+        <div class="scale-bar-tick"></div>
+        <div class="scale-bar-line" id="scale-bar-line" style="width: 80px;"></div>
+        <div class="scale-bar-tick"></div>
       </div>
     </div>
 
@@ -2863,6 +2922,70 @@
       const camDist = camera.position.length();
       const altKm = Math.round((camDist - 1.0) * 3396.19);
       document.getElementById('st-alt').textContent = `Alt: ${altKm.toLocaleString()} km`;
+
+      updateDynamicScaleBar();
+    }
+
+    // --- Dynamic Cartographic Scale Bar Engine (Mars Mean Radius = 3,396.19 km) ---
+    const STANDARD_SCALE_DISTANCES_KM = [
+      0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 1500, 2000, 2500, 5000, 10000
+    ];
+
+    function updateDynamicScaleBar() {
+      const lineEl = document.getElementById('scale-bar-line');
+      const labelEl = document.getElementById('scale-bar-label');
+      if (!lineEl || !labelEl) return;
+
+      const MARS_EQUATORIAL_RADIUS_KM = 3396.19;
+      const MARS_CIRCUMFERENCE_KM = 2 * Math.PI * MARS_EQUATORIAL_RADIUS_KM; // ~21,338.8 km
+      let kmPerPixel = 1.0;
+
+      if (appMode === '2D') {
+        const drawW = (flatCanvas.width || window.innerWidth) * flatZoom;
+        const latCos = Math.max(0.2, Math.cos(THREE.MathUtils.degToRad(currentLat || 0)));
+        kmPerPixel = (MARS_CIRCUMFERENCE_KM * latCos) / Math.max(drawW, 1);
+      } else {
+        const camDist = camera.position.length();
+        const altitudeUnits = Math.max(0.01, camDist - MARS_RADIUS);
+        const altitudeKm = altitudeUnits * MARS_EQUATORIAL_RADIUS_KM;
+        const viewportHeightPx = renderer.domElement.clientHeight || window.innerHeight || 800;
+        const halfFovRad = THREE.MathUtils.degToRad(camera.fov * 0.5);
+        const visibleHeightAtSurfaceKm = 2.0 * altitudeKm * Math.tan(halfFovRad);
+        kmPerPixel = visibleHeightAtSurfaceKm / Math.max(viewportHeightPx, 1);
+      }
+
+      // Find standard cartographic distance that yields a bar width closest to 85 pixels
+      const TARGET_BAR_PX = 85;
+      let bestDistKm = 500;
+      let minDiff = Infinity;
+
+      for (const d of STANDARD_SCALE_DISTANCES_KM) {
+        const px = d / kmPerPixel;
+        const diff = Math.abs(px - TARGET_BAR_PX);
+        if (px >= 40 && px <= 140 && diff < minDiff) {
+          minDiff = diff;
+          bestDistKm = d;
+        }
+      }
+
+      if (minDiff === Infinity) {
+        for (const d of STANDARD_SCALE_DISTANCES_KM) {
+          const px = d / kmPerPixel;
+          if (px >= 30) {
+            bestDistKm = d;
+            break;
+          }
+        }
+      }
+
+      const barWidthPx = Math.round(bestDistKm / kmPerPixel);
+      lineEl.style.width = `${Math.max(30, Math.min(150, barWidthPx))}px`;
+
+      if (bestDistKm < 1.0) {
+        labelEl.textContent = `${Math.round(bestDistKm * 1000)} m`;
+      } else {
+        labelEl.textContent = `${bestDistKm.toLocaleString()} km`;
+      }
     }
 
     // Toggle Left Drawer
@@ -3064,6 +3187,7 @@
           }
         }
       }
+      updateDynamicScaleBar();
     }
 
     // Interactive 2D Navigation with Clamped Zoom (Max 3.5x strictly prevents surface pixelation)
@@ -3469,6 +3593,7 @@
       renderer.setSize(w, h);
       if (appMode === '2D') init2DFlatCanvas();
       if (currentRouteSamples.length > 0) drawElevationChart(currentRouteSamples);
+      updateDynamicScaleBar();
     });
 
     // Start Engine
@@ -3480,6 +3605,7 @@
     updateLiveMarsEphemeris();
     setInterval(updateLiveMarsEphemeris, 1000); // 1-second live clock update
     loadEVARoute('m20_perseverance', false); // Initialize route metrics without hijacking camera view
+    updateDynamicScaleBar();
     animate();
   </script>
 </body>
