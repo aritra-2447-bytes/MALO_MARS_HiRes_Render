@@ -178,6 +178,48 @@ def run_tests():
     assert "raycaster.params.Line" in html, "raycaster Line threshold missing in index.html"
     print("  PASS: 3D hover traversal, continuous glowing tube, touchdown/destination markers, and raycaster thresholds verified.")
 
+    # Test 9: Verify Level 6 (32K / 100 m/px) LOD Pyramid & Targeted Landing Insets
+    print("\n[Test 9] Verifying Level 6 (32K / 100 m/px) LOD Pyramid & Targeted Insets...")
+    l6_py = os.path.join(gpu_dir, "tile_pyramid_l6.py")
+    assert os.path.exists(l6_py), "tile_pyramid_l6.py missing in web_app_gpu"
+
+    insets_dir = os.path.join(gpu_dir, "insets")
+    assert os.path.exists(insets_dir), "insets directory missing in web_app_gpu"
+
+    insets_json = os.path.join(insets_dir, "insets_metadata.json")
+    assert os.path.exists(insets_json), "insets_metadata.json missing in web_app_gpu/insets"
+
+    with open(insets_json, "r", encoding="utf-8") as f:
+        insets_meta = json.load(f)
+
+    assert insets_meta.get("status") == "success", "Expected status 'success' in insets metadata"
+    insets_items = insets_meta.get("insets", [])
+    assert len(insets_items) == 5, f"Expected 5 targeted landing insets, found {len(insets_items)}"
+
+    expected_insets = ["jezero_crater", "gale_crater", "meridiani_planum", "gusev_crater", "utopia_planitia"]
+    found_ids = [item["id"] for item in insets_items]
+    for expected_id in expected_insets:
+        assert expected_id in found_ids, f"Missing inset target: {expected_id}"
+        img_name = f"{expected_id}_hires.jpg"
+        img_path = os.path.join(insets_dir, img_name)
+        assert os.path.exists(img_path), f"Missing high-res inset image: {img_name}"
+        assert os.path.getsize(img_path) > 50000, f"High-res inset image suspiciously small: {img_name}"
+
+    # Verify server routing for insets
+    assert "/api/insets" in serve_code, "/api/insets missing in serve.py"
+    assert "/api/tiles/l6/info" in serve_code, "/api/tiles/l6/info missing in serve.py"
+    assert "/insets/" in serve_code, "/insets/ static file routing missing in serve.py"
+
+    # Verify 3D client and 2D viewer implementation
+    assert "highResInsetsGroup" in html, "highResInsetsGroup missing in index.html"
+    assert "createCurvedSurfacePatchGeometry" in html, "createCurvedSurfacePatchGeometry missing in index.html"
+    assert "initHighResLandingInsets" in html, "initHighResLandingInsets missing in index.html"
+    assert "btn-toggle-insets" in html, "btn-toggle-insets missing in index.html"
+    assert "insetsActive" in html, "insetsActive state missing in index.html"
+    assert "layer-opt-level6" in html, "Level 6 layer option missing in index.html"
+    assert "to2DInset" in html, "2D flat high-res inset rendering missing in index.html"
+    print(f"  PASS: Level 6 32K pyramid tools, 5 high-res landing insets, server API, and client rendering verified.")
+
     print("\n" + "=" * 65)
     print("ALL TESTS PASSED! MARS EXPLORATION SUITE FULLY OPERATIONAL.")
     print("=" * 65)
