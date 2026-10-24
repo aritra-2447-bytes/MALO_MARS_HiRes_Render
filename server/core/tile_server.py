@@ -21,11 +21,14 @@ def get_project_dirs(current_file_dir):
     panos_dir = os.path.join(public_dir, "panos")
     web_app_2d_dir = os.path.join(root_dir, "web_app_2d")
 
+    zoom5_dir = os.path.join(root_dir, "zoom_5")
+
     return {
         "ROOT_DIR": root_dir,
         "PUBLIC_DIR": public_dir,
         "DATA_DIR": data_dir,
         "TILES_DIR": tiles_dir,
+        "ZOOM5_DIR": zoom5_dir,
         "SIM3292_TILES_DIR": sim3292_tiles_dir,
         "TEXTURES_DIR": textures_dir,
         "LIB_DIR": lib_dir,
@@ -49,6 +52,7 @@ def translate_path(path, dirs):
     lib_dir = dirs["LIB_DIR"]
     panos_dir = dirs["PANOS_DIR"]
     web_app_2d_dir = dirs["WEB_APP_2D_DIR"]
+    zoom5_dir = dirs.get("ZOOM5_DIR", os.path.join(dirs["ROOT_DIR"], "zoom_5"))
 
     # Root -> index.html
     if clean_path in ("/", "\\"):
@@ -101,6 +105,14 @@ def translate_path(path, dirs):
         rel = clean_path[len("/tiles/"):].lstrip("/\\")
         return os.path.join(tiles_dir, rel)
 
+    # Zoom 5 grayscale tiles (row_col.jpg)
+    if clean_path.startswith("/zoom_5/") or clean_path.startswith("\\zoom_5\\"):
+        rel = clean_path[len("/zoom_5/"):].lstrip("/\\")
+        target = os.path.join(zoom5_dir, rel)
+        if os.path.exists(target):
+            return target
+        return None
+
     # Direct tile filename access (5_0_0.jpg etc.)
     basename = os.path.basename(clean_path)
     if basename.startswith("5_") and basename.endswith(".jpg"):
@@ -110,7 +122,8 @@ def translate_path(path, dirs):
     texture_files = (
         "mars_mola_base_2k.jpg", "mars_mola_4k.jpg", "mars_mola_8k.jpg",
         "mars_sim3292_geology_2k.jpg", "mars_sim3292_geology_4k.jpg",
-        "mars_sim3292_geology_fast.jpg", "mars_mola_level5_mosaic.jpg"
+        "mars_sim3292_geology_fast.jpg", "mars_mola_level5_mosaic.jpg",
+        "mars_zoom5_grayscale_4k.jpg", "mars_zoom5_grayscale_8k.jpg"
     )
     if basename in texture_files:
         target = os.path.join(textures_dir, basename)

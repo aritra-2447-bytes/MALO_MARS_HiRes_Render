@@ -76,6 +76,17 @@
       <input type="checkbox" id="layer-landers">
       <label for="layer-landers">Landing Sites</label>
     </div>
+    <div class="control-row layer-toggle">
+      <input type="checkbox" id="layer-zoom5">
+      <label for="layer-zoom5">Zoom 5 Grayscale</label>
+    </div>
+    <div class="control-row" id="zoom5-opacity-row" style="display:none; flex-direction:column; gap:4px; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim);">
+        <span>Grayscale Opacity</span>
+        <span id="zoom5-opacity-val">60%</span>
+      </div>
+      <input type="range" id="zoom5-opacity-slider" min="0" max="1" step="0.05" value="0.6" style="width:100%; accent-color:var(--accent-yellow);">
+    </div>
     <div class="control-row">
       <label>Opacity</label>
       <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="1">
@@ -92,18 +103,11 @@
 
   <script src="/lib/leaflet.js"></script>
   <script>
-    // Mars CRS (Equirectangular / Plate Carrée)
+    // Mars CRS (Equirectangular / Plate Carrée, upgraded from L.CRS.Simple for standard 2:1 tile matrices)
     const MARS_RADIUS = 3396190; // meters
-    const MARS_CRS = L.CRS.Simple;
-    MARS_CRS.projection = {
-      project: function(latlng) { return new L.Point(latlng.lng, -latlng.lat); },
-      unproject: function(point) { return new L.LatLng(-point.y, point.x); }
-    };
-    MARS_CRS.scale = function(zoom) { return Math.pow(2, zoom) / 360; };
-    MARS_CRS.zoom = function(scale) { return Math.log(scale * 360) / Math.LN2; };
-    MARS_CRS.infinite = false;
+    const MARS_CRS = L.CRS.EPSG4326;
 
-    // Map bounds: [-180, -90] to [180, 90]
+    // Map bounds: [-90, -180] to [90, 180]
     const bounds = [[-90, -180], [90, 180]];
 
     // Initialize map
@@ -151,6 +155,7 @@
     // MOLA Topography Layer (Level 5 tiles)
     const molaLayer = createTileLayer('/tiles/5_{y}_{x}.jpg', {
       attribution: 'NASA Mars Trek / MGS MOLA + MEX HRSC',
+      minNativeZoom: 5,
       maxNativeZoom: 5,
       maxZoom: 7
     });
@@ -159,8 +164,18 @@
     // USGS SIM 3292 Geology Layer
     const geologyLayer = createTileLayer('/sim3292_tiles/tile_r{row}_c{col}.jpg', {
       attribution: 'USGS SIM 3292 / CRISM + OMEGA',
+      minNativeZoom: 3,
       maxNativeZoom: 3,
       maxZoom: 5
+    });
+
+    // Zoom 5 Grayscale Layer
+    const zoom5Layer = createTileLayer('/zoom_5/{y}_{x}.jpg', {
+      attribution: 'NASA Mars Trek / Zoom 5 Grayscale',
+      minNativeZoom: 5,
+      maxNativeZoom: 5,
+      maxZoom: 7,
+      opacity: 0.6
     });
 
     // Rover Traverses & Landing Sites (GeoJSON)
@@ -230,6 +245,32 @@
       const op = parseFloat(e.target.value);
       [molaLayer, geologyLayer].forEach(l => { if (map.hasLayer(l)) l.setOpacity(op); });
     });
+
+    // Zoom 5 Grayscale layer toggle & dedicated opacity slider
+    const chkZoom5 = document.getElementById('layer-zoom5');
+    const zoom5OpSlider = document.getElementById('zoom5-opacity-slider');
+    const zoom5OpVal = document.getElementById('zoom5-opacity-val');
+    const zoom5OpRow = document.getElementById('zoom5-opacity-row');
+
+    if (chkZoom5) {
+      chkZoom5.addEventListener('change', e => {
+        if (e.target.checked) {
+          zoom5Layer.addTo(map);
+          if (zoom5OpRow) zoom5OpRow.style.display = 'flex';
+        } else {
+          map.removeLayer(zoom5Layer);
+          if (zoom5OpRow) zoom5OpRow.style.display = 'none';
+        }
+      });
+    }
+
+    if (zoom5OpSlider) {
+      zoom5OpSlider.addEventListener('input', e => {
+        const op = parseFloat(e.target.value);
+        zoom5Layer.setOpacity(op);
+        if (zoom5OpVal) zoom5OpVal.textContent = `${Math.round(op * 100)}%`;
+      });
+    }
 
     // Coordinate display on click
     map.on('click', e => {

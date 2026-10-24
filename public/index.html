@@ -1386,6 +1386,11 @@
         <span class="clock-sol" id="val-sol-num">Sol 54,309</span>
       </div>
 
+      <!-- Standalone Live Sun Shadows Toggle Button -->
+      <button id="btn-toggle-solar" class="pill-btn active" title="Toggle Real-Time Astronomical Sun Position &amp; Surface Shadows" aria-label="Toggle Live Sun Shadows">
+        <span>☀️ Live Sun Shadows</span>
+      </button>
+
       <!-- Semantic Keyboard-Accessible Menu Button -->
       <button id="btn-menu-toggle" class="pill-btn menu-toggle-btn" aria-label="Menu" aria-expanded="false" aria-haspopup="true" aria-controls="main-menu-dropdown">
         <svg class="menu-icon-bars" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1402,8 +1407,7 @@
           <button class="pill-btn menu-item active" id="btn-mode-3d" role="menuitem">🌐 3D Earth-Style Globe</button>
           <button class="pill-btn menu-item" id="btn-mode-2d" role="menuitem">🗺️ 2D Flat Map</button>
           <button class="pill-btn menu-item" id="btn-toggle-decontour" role="menuitem" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
-          <button class="pill-btn menu-item" id="btn-toggle-drawer" role="menuitem">📍 Destinations</button>
-          <button class="pill-btn menu-item active" id="btn-toggle-solar" role="menuitem" title="Toggle Real-Time Astronomical Sun Position &amp; Surface Shadows">☀️ Live Sun Shadows</button>
+          <button class="pill-btn menu-item active" id="btn-toggle-drawer" role="menuitem">📍 Destinations</button>
           <button class="pill-btn menu-item" id="btn-scan-nasa" role="menuitem">🛰️ Scan NASA Orbiters</button>
 
           <!-- Geology 4K Map Item with Submenu Trigger -->
@@ -1427,9 +1431,14 @@
             <button class="pill-btn submenu-item active" id="btn-tex-geology-4k" role="menuitem">🪐 USGS SIM 3292 4K Master</button>
             <button class="pill-btn submenu-item" id="btn-tex-mola-4k" role="menuitem">🏔️ MOLA Topo 4K</button>
             <button class="pill-btn submenu-item" id="btn-tex-mola-8k" role="menuitem">🛰️ MOLA 8K Master</button>
+            <button class="pill-btn submenu-item" id="btn-tex-zoom5-grayscale" role="menuitem">📷 Zoom 5 Grayscale Base</button>
             <button class="pill-btn submenu-item" id="btn-add-texture" role="menuitem">➕ Add Texture</button>
             <div class="submenu-divider"></div>
             <button class="pill-btn submenu-item active" id="btn-toggle-landings" role="menuitem">🛬 Landing Sites (16)</button>
+            <button class="pill-btn submenu-item active" id="btn-toggle-geo-traverses" role="menuitem">🚀 Rover Traverses</button>
+            <button class="pill-btn submenu-item active" id="btn-toggle-geo-dest" role="menuitem">📍 Destinations (IAU)</button>
+            <button class="pill-btn submenu-item" id="btn-toggle-geo-topo" role="menuitem">🏔️ MOLA Blend Overlay</button>
+            <button class="pill-btn submenu-item" id="btn-toggle-geo-zoom5" role="menuitem">📷 Zoom 5 Grayscale</button>
             <button class="pill-btn submenu-item" id="btn-geologic-legend" role="menuitem">🗺️ Geologic Legend</button>
             <button class="pill-btn submenu-item" id="btn-toggle-grid" role="menuitem">🌐 Lat/Lon Grid</button>
             <button class="pill-btn submenu-item" id="btn-toggle-sun" role="menuitem">☀️ Solar Sun</button>
@@ -1716,6 +1725,48 @@
           </div>
         </div>
       </div>
+
+      <!-- Floating Geology Layer Controls Panel -->
+      <div id="geo-layer-controls-panel" class="globe-hud-panel" style="position:absolute; top:72px; right:16px; z-index:40; display:flex; flex-direction:column; gap:8px; padding:10px 14px; background:rgba(15, 23, 42, 0.88); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.14); border-radius:10px; min-width:200px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#f8fafc; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+          <span>Geology 4K Overlays</span>
+          <span style="font-size:9px; color:var(--accent-orange); font-weight:600;">ACTIVE</span>
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
+          <input type="checkbox" id="chk-geo-landings" checked style="accent-color:var(--accent-cyan); cursor:pointer;">
+          <span>🛬 Landing Sites</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
+          <input type="checkbox" id="chk-geo-traverses" checked style="accent-color:var(--accent-green); cursor:pointer;">
+          <span>🚀 Rover Traverses</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
+          <input type="checkbox" id="chk-geo-destinations" checked style="accent-color:var(--accent-orange); cursor:pointer;">
+          <span>📍 Destinations (IAU)</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
+          <input type="checkbox" id="chk-geo-topo-blend" style="accent-color:var(--accent-cyan); cursor:pointer;">
+          <span>🏔️ MOLA Blend Overlay</span>
+        </label>
+        <div id="geo-topo-blend-slider-wrap" style="display:none; flex-direction:column; gap:4px; padding-left:18px; margin-top:2px;">
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
+            <span>Blend Opacity</span>
+            <span id="lbl-geo-blend-pct">50%</span>
+          </div>
+          <input type="range" id="slider-geo-blend" min="0" max="1" step="0.05" value="0.5" style="accent-color:var(--accent-orange); cursor:pointer; width:100%;">
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
+          <input type="checkbox" id="chk-geo-zoom5-blend" style="accent-color:var(--accent-yellow); cursor:pointer;">
+          <span>📷 Zoom 5 Grayscale</span>
+        </label>
+        <div id="geo-zoom5-blend-slider-wrap" style="display:none; flex-direction:column; gap:4px; padding-left:18px; margin-top:2px;">
+          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
+            <span>Grayscale Opacity</span>
+            <span id="lbl-geo-zoom5-pct">60%</span>
+          </div>
+          <input type="range" id="slider-geo-zoom5" min="0" max="1" step="0.05" value="0.6" style="accent-color:var(--accent-yellow); cursor:pointer; width:100%;">
+        </div>
+      </div>
     </div>
 
     <!-- Landmark Hover Card -->
@@ -1727,7 +1778,7 @@
     </div>
 
     <!-- Side Destinations Drawer (Left) -->
-    <div id="left-drawer" class="collapsed">
+    <div id="left-drawer">
       <div class="drawer-title">
         <div style="display:flex; align-items:center; gap:8px;">
           <span>Exploration Sites</span>
@@ -2053,6 +2104,25 @@
       });
     });
 
+    // Zoom 5 Grayscale 3D Overlay on Main Globe
+    const mainZoom5Geo = new THREE.SphereGeometry(MARS_RADIUS * 1.0008, 128, 64);
+    textureLoader.load('/textures/mars_zoom5_grayscale_4k.jpg', (tex) => {
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      const mainZoom5Mat = new THREE.MeshStandardMaterial({
+        map: tex,
+        transparent: true,
+        opacity: 0.6,
+        roughness: 0.88,
+        metalness: 0.04,
+        depthWrite: false
+      });
+      window.mainZoom5OverlayMesh = new THREE.Mesh(mainZoom5Geo, mainZoom5Mat);
+      window.mainZoom5OverlayMesh.visible = !!window._zoom5Visible;
+      marsGlobe.add(window.mainZoom5OverlayMesh);
+    }, undefined, () => {});
+
     // Atmosphere Mesh
     const atmosGeo = new THREE.SphereGeometry(MARS_RADIUS * 1.018, 64, 32);
     const atmosMat = new THREE.ShaderMaterial({
@@ -2249,6 +2319,9 @@
       landmarksData = [...DEFAULT_LANDMARKS];
       renderDrawerDestinations(landmarksData);
       create3DLandmarks(landmarksData);
+      if (typeof renderGeologyLandmarks === 'function') {
+        renderGeologyLandmarks(landmarksData);
+      }
 
       try {
         const resp = await fetch('/api/landmarks');
@@ -2258,6 +2331,9 @@
             landmarksData = data.landmarks;
             renderDrawerDestinations(landmarksData);
             create3DLandmarks(landmarksData);
+            if (typeof renderGeologyLandmarks === 'function') {
+              renderGeologyLandmarks(landmarksData);
+            }
           }
         }
       } catch (e) {
@@ -2280,7 +2356,11 @@
           <span style="font-size:14px; color:var(--accent-orange); flex-shrink:0;">➔</span>
         `;
         card.onclick = () => {
-          flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
+          if (isGeologyGlobeActive && typeof flyGeologyGlobeTo === 'function') {
+            flyGeologyGlobeTo(item.lat, item.lon, 440);
+          } else {
+            flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
+          }
           currentElevation = item.elevation_m;
           updateStatusHUD();
         };
@@ -2587,6 +2667,22 @@
             });
           }
 
+          // Toggle 3D Geology Globe overlays
+          if (window.geoAstroPathsGroup) {
+            geoAstroPathsGroup.children.forEach(child => {
+              if (child.userData?.missionId === item.id || child.userData?.id === item.id || child.userData?.feature?.properties?.id === item.id) {
+                child.visible = visible;
+              }
+            });
+          }
+          if (window.geoLandingSitesGroup) {
+            geoLandingSitesGroup.children.forEach(child => {
+              if (child.userData?.id === item.id) {
+                child.visible = visible;
+              }
+            });
+          }
+
           // Clear corridor highlight if active for this mission
           if (!visible && hoveredMissionId === item.id) {
             clearCorridorHighlight();
@@ -2601,7 +2697,11 @@
         // Fly action
         const flyAction = (e) => {
           if (e) e.stopPropagation();
-          flyToCoordinate(item.lat, item.lon, 1.85);
+          if (isGeologyGlobeActive && typeof flyGeologyGlobeTo === 'function') {
+            flyGeologyGlobeTo(item.lat, item.lon, 440);
+          } else {
+            flyToCoordinate(item.lat, item.lon, 1.85);
+          }
           if (item.elevation_m !== undefined) currentElevation = item.elevation_m;
           updateStatusHUD();
         };
@@ -2636,6 +2736,9 @@
           renderAstroPaths(astroPathsData);
           renderDrawerLandings(astroPathsData);
           populateAstroPathsLegend(astroPathsData);
+          if (typeof renderGeologyAstroPaths === 'function') {
+            renderGeologyAstroPaths(astroPathsData);
+          }
         }
       } catch (err) {
         console.warn("Could not load astronaut_paths.geojson:", err);
@@ -3358,6 +3461,8 @@
         updateTargetHudPosition();
       };
     }
+    // Set initial target HUD alignment to open drawer
+    updateTargetHudPosition();
 
     // Toggle 3D Routes & Bottom Dock controls
     let routesVisible = true;
@@ -3791,11 +3896,62 @@
       marsGlobeMesh = new THREE.Mesh(sphereGeo, marsMat);
       marsGlobeMesh.rotation.y = -Math.PI / 2; // Prime Meridian (0 deg lon) faces front to camera
       globeScene.add(marsGlobeMesh);
+      window.flyGeologyGlobeTo = flyGeologyGlobeTo;
 
       // 6b. Landing Sites Group
       window.geoLandingSitesGroup = new THREE.Group();
       marsGlobeMesh.add(window.geoLandingSitesGroup);
       renderGeologyLandingSites(DEFAULT_LANDING_SITES);
+
+      // 6c. Rover Traverses Group (Overlays)
+      window.geoAstroPathsGroup = new THREE.Group();
+      marsGlobeMesh.add(window.geoAstroPathsGroup);
+      if (astroPathsData) renderGeologyAstroPaths(astroPathsData);
+
+      // 6d. Destinations / IAU Landmarks Group (Overlays)
+      window.geoLandmarksGroup = new THREE.Group();
+      marsGlobeMesh.add(window.geoLandmarksGroup);
+      if (landmarksData && landmarksData.length > 0) renderGeologyLandmarks(landmarksData);
+
+      // 6e. MOLA Topography Blend Overlay
+      const topoGeo = new THREE.SphereGeometry(GEO_GLOBE_RADIUS * 1.0004, 96, 64);
+      const topoLoader = new THREE.TextureLoader();
+      topoLoader.load('/textures/mars_mola_4k.jpg', (tex) => {
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        const topoMat = new THREE.MeshStandardMaterial({
+          map: tex,
+          transparent: true,
+          opacity: 0.5,
+          roughness: 0.9,
+          metalness: 0.0,
+          depthWrite: false
+        });
+        window.geoTopoOverlayMesh = new THREE.Mesh(topoGeo, topoMat);
+        window.geoTopoOverlayMesh.visible = false;
+        marsGlobeMesh.add(window.geoTopoOverlayMesh);
+      });
+
+      // 6f. Zoom 5 Grayscale Blend Overlay
+      const zoom5Geo = new THREE.SphereGeometry(GEO_GLOBE_RADIUS * 1.0008, 96, 64);
+      const zoom5Loader = new THREE.TextureLoader();
+      zoom5Loader.load('/textures/mars_zoom5_grayscale_4k.jpg', (tex) => {
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        const zoom5Mat = new THREE.MeshStandardMaterial({
+          map: tex,
+          transparent: true,
+          opacity: 0.6,
+          roughness: 0.9,
+          metalness: 0.0,
+          depthWrite: false
+        });
+        window.geoZoom5OverlayMesh = new THREE.Mesh(zoom5Geo, zoom5Mat);
+        window.geoZoom5OverlayMesh.visible = !!window._zoom5Visible;
+        marsGlobeMesh.add(window.geoZoom5OverlayMesh);
+      }, undefined, () => {});
 
       // 7. Atmosphere Rim Mesh
       const atmosGeo = new THREE.SphereGeometry(GEO_GLOBE_RADIUS * 1.018, 64, 32);
@@ -3940,6 +4096,126 @@
       globeRenderer.setSize(width, height);
     }
 
+    function latLonToVector3Geology(lat, lon, radius) {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const radLon = lon * (Math.PI / 180);
+      const r = radius || GEO_GLOBE_RADIUS;
+      const x = r * Math.sin(phi) * Math.cos(radLon);
+      const y = r * Math.cos(phi);
+      const z = -r * Math.sin(phi) * Math.sin(radLon);
+      return new THREE.Vector3(x, y, z);
+    }
+
+    function renderGeologyAstroPaths(data) {
+      if (!window.geoAstroPathsGroup) return;
+      while (window.geoAstroPathsGroup.children.length > 0) {
+        const c = window.geoAstroPathsGroup.children[0];
+        if (c.geometry) c.geometry.dispose();
+        if (c.material) {
+          if (Array.isArray(c.material)) c.material.forEach(m => m.dispose());
+          else c.material.dispose();
+        }
+        window.geoAstroPathsGroup.remove(c);
+      }
+      if (!data || !data.features) return;
+
+      const statusColors = {
+        'Active': 0x22c55e,
+        'Completed': 0x94a3b8,
+        'Failed': 0xef4444,
+        'Proposed': 0xc084fc
+      };
+
+      data.features.forEach(feature => {
+        const props = feature.properties || {};
+        const geom = feature.geometry || {};
+        let colorHex = statusColors[props.status] || 0x22c55e;
+        if (props.color) {
+          if (typeof props.color === 'string' && props.color.startsWith('#')) {
+            colorHex = parseInt(props.color.replace('#', '0x'));
+          } else if (typeof props.color === 'number') {
+            colorHex = props.color;
+          }
+        }
+
+        if (geom.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 1) {
+          const curvePoints = geom.coordinates.map(c =>
+            latLonToVector3Geology(c[1], c[0], GEO_GLOBE_RADIUS * 1.003)
+          );
+          const curve = new THREE.CatmullRomCurve3(curvePoints);
+          const segments = Math.max(32, curvePoints.length * 4);
+          const radius = props.type === 'rover_traverse' ? 0.28 : 0.38;
+          const tubeGeo = new THREE.TubeGeometry(curve, segments, radius, 8, false);
+          const tubeMat = new THREE.MeshStandardMaterial({
+            color: colorHex,
+            emissive: colorHex,
+            emissiveIntensity: 0.5,
+            transparent: true,
+            opacity: 0.95,
+            roughness: 0.3,
+            metalness: 0.2
+          });
+          const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
+          tubeMesh.userData = { feature, type: 'traverse_tube', missionId: props.id, name: props.name };
+          window.geoAstroPathsGroup.add(tubeMesh);
+
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
+          const lineMat = new THREE.LineBasicMaterial({ color: colorHex, transparent: true, opacity: 0.8 });
+          const lineMesh = new THREE.Line(lineGeo, lineMat);
+          lineMesh.userData = { feature, type: 'surface_line', missionId: props.id, name: props.name };
+          window.geoAstroPathsGroup.add(lineMesh);
+        }
+      });
+    }
+
+    function renderGeologyLandmarks(list) {
+      if (!window.geoLandmarksGroup) return;
+      while (window.geoLandmarksGroup.children.length > 0) {
+        const c = window.geoLandmarksGroup.children[0];
+        if (c.geometry) c.geometry.dispose();
+        if (c.material) c.material.dispose();
+        window.geoLandmarksGroup.remove(c);
+      }
+      if (!list || !Array.isArray(list)) return;
+
+      list.forEach(lm => {
+        const pos = latLonToVector3Geology(lm.lat, lm.lon, GEO_GLOBE_RADIUS * 1.0015);
+        const normal = pos.clone().normalize();
+
+        let colorHex = 0xe2e8f0;
+        if (lm.category === 'polar_cap') colorHex = 0xb0c4de;
+        else if (lm.category === 'landing_site') colorHex = 0x5eead4;
+        else if (lm.category === 'volcano') colorHex = 0xf4a261;
+        else if (lm.category === 'canyon') colorHex = 0xd4a373;
+        else if (lm.category === 'basin') colorHex = 0x93c5fd;
+
+        const pinGeo = new THREE.SphereGeometry(1.2, 16, 16);
+        const pinMat = new THREE.MeshStandardMaterial({
+          color: colorHex,
+          emissive: colorHex,
+          emissiveIntensity: 0.4,
+          roughness: 0.3,
+          metalness: 0.2
+        });
+        const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+        pinMesh.position.copy(pos.clone().add(normal.clone().multiplyScalar(5.5)));
+        pinMesh.userData = lm;
+
+        const stemGeo = new THREE.CylinderGeometry(0.18, 0.18, 5.5, 8);
+        const stemMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
+        const stemMesh = new THREE.Mesh(stemGeo, stemMat);
+        stemMesh.position.copy(pos.clone().add(normal.clone().multiplyScalar(2.75)));
+        stemMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+        stemMesh.userData = lm;
+
+        const lmGroup = new THREE.Group();
+        lmGroup.userData = lm;
+        lmGroup.add(pinMesh);
+        lmGroup.add(stemMesh);
+        window.geoLandmarksGroup.add(lmGroup);
+      });
+    }
+
     function renderGeologyLandingSites(sites) {
       if (!window.geoLandingSitesGroup) return;
       while (window.geoLandingSitesGroup.children.length > 0) {
@@ -4069,9 +4345,10 @@
       const btnGeo = document.getElementById('btn-tex-geology-4k');
       const btnMola4k = document.getElementById('btn-tex-mola-4k');
       const btnMola8k = document.getElementById('btn-tex-mola-8k');
+      const btnZoom5Base = document.getElementById('btn-tex-zoom5-grayscale');
 
       function setActiveTexBtn(btn) {
-        [btnGeo, btnMola4k, btnMola8k].filter(Boolean).forEach(b => b.classList.remove('active'));
+        [btnGeo, btnMola4k, btnMola8k, btnZoom5Base].filter(Boolean).forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
       }
 
@@ -4091,6 +4368,12 @@
         btnMola8k.onclick = () => {
           setActiveTexBtn(btnMola8k);
           loadGeologyGlobeTexture('/textures/mars_mola_8k.jpg', '/textures/mars_mola_4k.jpg', 'MOLA Topo 8K');
+        };
+      }
+      if (btnZoom5Base) {
+        btnZoom5Base.onclick = () => {
+          setActiveTexBtn(btnZoom5Base);
+          loadGeologyGlobeTexture('/textures/mars_zoom5_grayscale_8k.jpg', '/textures/mars_zoom5_grayscale_4k.jpg', 'Zoom 5 Grayscale');
         };
       }
 
@@ -4189,14 +4472,143 @@
         };
       }
 
-      // Landing Sites Toggle
+      // Overlay Layer Toggles & Sync (Geology 4K Map)
       const btnLandings = document.getElementById('btn-toggle-landings');
+      const chkLandings = document.getElementById('chk-geo-landings');
+      function setLandingsVisibility(vis) {
+        if (window.geoLandingSitesGroup) window.geoLandingSitesGroup.visible = vis;
+        if (btnLandings) btnLandings.classList.toggle('active', vis);
+        if (chkLandings) chkLandings.checked = vis;
+      }
       if (btnLandings) {
         btnLandings.onclick = () => {
-          if (window.geoLandingSitesGroup) {
-            window.geoLandingSitesGroup.visible = !window.geoLandingSitesGroup.visible;
-            btnLandings.classList.toggle('active', window.geoLandingSitesGroup.visible);
+          const vis = !(window.geoLandingSitesGroup && window.geoLandingSitesGroup.visible);
+          setLandingsVisibility(vis);
+        };
+      }
+      if (chkLandings) {
+        chkLandings.onchange = (e) => {
+          setLandingsVisibility(e.target.checked);
+        };
+      }
+
+      // Rover Traverses Toggle
+      const btnTraverses = document.getElementById('btn-toggle-geo-traverses');
+      const chkTraverses = document.getElementById('chk-geo-traverses');
+      function setTraversesVisibility(vis) {
+        if (window.geoAstroPathsGroup) window.geoAstroPathsGroup.visible = vis;
+        if (btnTraverses) btnTraverses.classList.toggle('active', vis);
+        if (chkTraverses) chkTraverses.checked = vis;
+      }
+      if (btnTraverses) {
+        btnTraverses.onclick = () => {
+          const vis = !(window.geoAstroPathsGroup && window.geoAstroPathsGroup.visible);
+          setTraversesVisibility(vis);
+        };
+      }
+      if (chkTraverses) {
+        chkTraverses.onchange = (e) => {
+          setTraversesVisibility(e.target.checked);
+        };
+      }
+
+      // Destinations (IAU) Toggle
+      const btnGeoDest = document.getElementById('btn-toggle-geo-dest');
+      const chkGeoDest = document.getElementById('chk-geo-destinations');
+      function setDestVisibility(vis) {
+        if (window.geoLandmarksGroup) window.geoLandmarksGroup.visible = vis;
+        if (btnGeoDest) btnGeoDest.classList.toggle('active', vis);
+        if (chkGeoDest) chkGeoDest.checked = vis;
+      }
+      if (btnGeoDest) {
+        btnGeoDest.onclick = () => {
+          const vis = !(window.geoLandmarksGroup && window.geoLandmarksGroup.visible);
+          setDestVisibility(vis);
+        };
+      }
+      if (chkGeoDest) {
+        chkGeoDest.onchange = (e) => {
+          setDestVisibility(e.target.checked);
+        };
+      }
+
+      // MOLA Topography Blend Overlay Toggle & Slider
+      const btnGeoTopo = document.getElementById('btn-toggle-geo-topo');
+      const chkGeoTopo = document.getElementById('chk-geo-topo-blend');
+      const sliderGeoTopo = document.getElementById('slider-geo-blend');
+      const sliderWrap = document.getElementById('geo-topo-blend-slider-wrap');
+      const lblGeoBlendPct = document.getElementById('lbl-geo-blend-pct');
+
+      function setTopoBlendVisibility(vis) {
+        if (window.geoTopoOverlayMesh) window.geoTopoOverlayMesh.visible = vis;
+        if (btnGeoTopo) btnGeoTopo.classList.toggle('active', vis);
+        if (chkGeoTopo) chkGeoTopo.checked = vis;
+        if (sliderWrap) sliderWrap.style.display = vis ? 'flex' : 'none';
+      }
+      if (btnGeoTopo) {
+        btnGeoTopo.onclick = () => {
+          const vis = !(window.geoTopoOverlayMesh && window.geoTopoOverlayMesh.visible);
+          setTopoBlendVisibility(vis);
+        };
+      }
+      if (chkGeoTopo) {
+        chkGeoTopo.onchange = (e) => {
+          setTopoBlendVisibility(e.target.checked);
+        };
+      }
+      if (sliderGeoTopo) {
+        sliderGeoTopo.oninput = (e) => {
+          const val = parseFloat(e.target.value);
+          if (window.geoTopoOverlayMesh && window.geoTopoOverlayMesh.material) {
+            window.geoTopoOverlayMesh.material.opacity = val;
           }
+          if (lblGeoBlendPct) lblGeoBlendPct.textContent = `${Math.round(val * 100)}%`;
+        };
+      }
+
+      // Zoom 5 Grayscale Overlay Toggle & Slider
+      const btnGeoZoom5 = document.getElementById('btn-toggle-geo-zoom5');
+      const chkGeoZoom5 = document.getElementById('chk-geo-zoom5-blend');
+      const sliderGeoZoom5 = document.getElementById('slider-geo-zoom5');
+      const sliderZoom5Wrap = document.getElementById('geo-zoom5-blend-slider-wrap');
+      const lblGeoZoom5Pct = document.getElementById('lbl-geo-zoom5-pct');
+
+      function setZoom5BlendVisibility(vis) {
+        window._zoom5Visible = vis;
+        if (window.geoZoom5OverlayMesh) window.geoZoom5OverlayMesh.visible = vis;
+        if (window.mainZoom5OverlayMesh) window.mainZoom5OverlayMesh.visible = vis;
+        if (btnGeoZoom5) btnGeoZoom5.classList.toggle('active', vis);
+        if (chkGeoZoom5) chkGeoZoom5.checked = vis;
+        if (sliderZoom5Wrap) sliderZoom5Wrap.style.display = vis ? 'flex' : 'none';
+      }
+      if (btnGeoZoom5) {
+        btnGeoZoom5.onclick = () => {
+          const vis = !(chkGeoZoom5 && chkGeoZoom5.checked);
+          setZoom5BlendVisibility(vis);
+        };
+      }
+      if (chkGeoZoom5) {
+        chkGeoZoom5.onchange = (e) => {
+          setZoom5BlendVisibility(e.target.checked);
+        };
+      }
+      if (sliderGeoZoom5) {
+        sliderGeoZoom5.oninput = (e) => {
+          const val = parseFloat(e.target.value);
+          const isFullOpaque = val >= 0.999;
+          if (window.geoZoom5OverlayMesh && window.geoZoom5OverlayMesh.material) {
+            window.geoZoom5OverlayMesh.material.opacity = val;
+            window.geoZoom5OverlayMesh.material.transparent = !isFullOpaque;
+            window.geoZoom5OverlayMesh.material.depthWrite = isFullOpaque;
+            window.geoZoom5OverlayMesh.material.needsUpdate = true;
+          }
+          if (window.mainZoom5OverlayMesh && window.mainZoom5OverlayMesh.material) {
+            window.mainZoom5OverlayMesh.material.opacity = val;
+            window.mainZoom5OverlayMesh.material.transparent = !isFullOpaque;
+            window.mainZoom5OverlayMesh.material.depthWrite = isFullOpaque;
+            window.mainZoom5OverlayMesh.material.needsUpdate = true;
+          }
+          if (lblGeoZoom5Pct) lblGeoZoom5Pct.textContent = `${Math.round(val * 100)}%`;
         };
       }
 
@@ -4220,7 +4632,7 @@
         });
       });
 
-      // Canvas Click Raycaster for Landing Sites
+      // Canvas Click Raycaster for Landing Sites and Destinations
       canvas.addEventListener('click', (e) => {
         const rect = canvas.getBoundingClientRect();
         geoMouseVector.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -4241,6 +4653,20 @@
             }
           }
         }
+
+        if (window.geoLandmarksGroup && window.geoLandmarksGroup.visible) {
+          const lmHits = geoRaycaster.intersectObjects(window.geoLandmarksGroup.children, true);
+          if (lmHits.length > 0) {
+            let obj = lmHits[0].object;
+            while (obj && !obj.userData?.name && obj.parent) {
+              obj = obj.parent;
+            }
+            if (obj && obj.userData && obj.userData.lat !== undefined) {
+              flyGeologyGlobeTo(obj.userData.lat, obj.userData.lon, 440);
+              return;
+            }
+          }
+        }
       });
 
       // Mouse Move Coordinates Raycaster
@@ -4251,10 +4677,16 @@
 
         geoRaycaster.setFromCamera(geoMouseVector, globeCamera);
 
+        let hasHover = false;
         if (window.geoLandingSitesGroup && window.geoLandingSitesGroup.visible) {
           const lHits = geoRaycaster.intersectObjects(window.geoLandingSitesGroup.children, true);
-          canvas.style.cursor = (lHits.length > 0) ? 'pointer' : 'grab';
+          if (lHits.length > 0) hasHover = true;
         }
+        if (!hasHover && window.geoLandmarksGroup && window.geoLandmarksGroup.visible) {
+          const mHits = geoRaycaster.intersectObjects(window.geoLandmarksGroup.children, true);
+          if (mHits.length > 0) hasHover = true;
+        }
+        canvas.style.cursor = hasHover ? 'pointer' : 'grab';
 
         if (marsGlobeMesh) {
           const hits = geoRaycaster.intersectObject(marsGlobeMesh);

@@ -10,11 +10,22 @@ Output: 16,384 x 8,192 mosaic (JPEG, georeferenced GeoTIFF, and GDAL VRT)
 import os
 import sys
 import numpy as np
-from osgeo import gdal, osr
+from PIL import Image
+
+Image.MAX_IMAGE_PIXELS = None
+
+try:
+    from osgeo import gdal, osr
+    HAS_GDAL = True
+except ImportError:
+    HAS_GDAL = False
+    gdal = None
+    osr = None
 
 def stitch_level5_tiles(tiles_dir, output_dir):
     os.makedirs(output_dir, exist_ok=True)
-    gdal.SetConfigOption("GDAL_ERROR_ON_LIBJPEG_WARNING", "FALSE")
+    if HAS_GDAL:
+        gdal.SetConfigOption("GDAL_ERROR_ON_LIBJPEG_WARNING", "FALSE")
     
     ROWS = 32  # 0 to 31 (North to South: Lat +90 to -90, 5.625 deg/row)
     COLS = 64  # 0 to 63 (West to East: Lon -180 to +180, 5.625 deg/col)
@@ -35,25 +46,40 @@ def stitch_level5_tiles(tiles_dir, output_dir):
             tile_path = os.path.join(tiles_dir, tile_name)
             
             if not os.path.exists(tile_path):
-                missing_tiles.append(tile_name)
-                continue
+                alt_name = f"{r}_{c}.jpg"
+                alt_path = os.path.join(tiles_dir, alt_name)
+                if os.path.exists(alt_path):
+                    tile_name = alt_name
+                    tile_path = alt_path
+                else:
+                    missing_tiles.append(tile_name)
+                    continue
                 
-            ds = gdal.Open(tile_path)
-            if ds is None:
-                print(f"[!] Warning: Could not open {tile_path}")
-                missing_tiles.append(tile_name)
-                continue
+            if HAS_GDAL:
+                ds = gdal.Open(tile_path)
+                if ds is None:
+                    print(f"[!] Warning: Could not open {tile_path}")
+                    missing_tiles.append(tile_name)
+                    continue
+                    
+                # Read channels (RGB)
+                tile_data = ds.ReadAsArray() # shape: (3, 256, 256)
+                ds = None
                 
-            # Read channels (RGB)
-            tile_data = ds.ReadAsArray() # shape: (3, 256, 256)
-            ds = None
-            
-            if tile_data.ndim == 2:
-                tile_rgb = np.stack([tile_data] * 3, axis=-1)
-            elif tile_data.shape[0] >= 3:
-                tile_rgb = np.transpose(tile_data[:3], (1, 2, 0))
+                if tile_data.ndim == 2:
+                    tile_rgb = np.stack([tile_data] * 3, axis=-1)
+                elif tile_data.shape[0] >= 3:
+                    tile_rgb = np.transpose(tile_data[:3], (1, 2, 0))
+                else:
+                    tile_rgb = np.stack([tile_data[0]] * 3, axis=-1)
             else:
-                tile_rgb = np.stack([tile_data[0]] * 3, axis=-1)
+                try:
+                    with Image.open(tile_path) as img:
+                        tile_rgb = np.array(img.convert("RGB"))
+                except Exception as e:
+                    print(f"[!] Warning: Could not open {tile_path}: {e}")
+                    missing_tiles.append(tile_name)
+                    continue
                 
             y_start = r * TILE_SIZE
             y_end = (r + 1) * TILE_SIZE
@@ -72,34 +98,42 @@ def stitch_level5_tiles(tiles_dir, output_dir):
     # 1. Save JPEG mosaic
     jpeg_path = os.path.join(output_dir, "mars_mola_level5_mosaic.jpg")
     print(f"[*] Saving composite JPEG: {jpeg_path}...")
-    driver_mem = gdal.GetDriverByName("MEM")
-    mem_ds = driver_mem.Create("", mosaic_width, mosaic_height, 3, gdal.GDT_Byte)
-    for band_idx in range(3):
-        mem_ds.GetRasterBand(band_idx + 1).WriteArray(mosaic[:, :, band_idx])
-        
-    driver_jpeg = gdal.GetDriverByName("JPEG")
-    jpeg_ds = driver_jpeg.CreateCopy(jpeg_path, mem_ds, options=["QUALITY=95"])
-    jpeg_ds = None
+    if HAS_GDAL:
+        driver_mem = gdal.GetDriverByName("MEM")
+        mem_ds = driver_mem.Create("", mosaic_width, mosaic_height, 3, gdal.GDT_Byte)
+        for band_idx in range(3):
+            mem_ds.GetRasterBand(band_idx + 1).WriteArray(mosaic[:, :, band_idx])
+            
+        driver_jpeg = gdal.GetDriverByName("JPEG")
+        jpeg_ds = driver_jpeg.CreateCopy(jpeg_path, mem_ds, options=["QUALITY=95"])
+        jpeg_ds = None
+    else:
+        im_out = Image.fromarray(mosaic, mode="RGB")
+        im_out.save(jpeg_path, format="JPEG", quality=95)
     print(f"[+] Composite JPEG saved successfully ({os.path.getsize(jpeg_path):,} bytes).")
     
     # 2. Save Georeferenced GeoTIFF
     tif_path = os.path.join(output_dir, "mars_mola_level5_mosaic.tif")
     print(f"[*] Saving georeferenced GeoTIFF: {tif_path}...")
-    driver_gtiff = gdal.GetDriverByName("GTiff")
-    gtiff_ds = driver_gtiff.CreateCopy(tif_path, mem_ds, options=["COMPRESS=JPEG", "JPEG_QUALITY=95", "TILED=YES"])
-    
-    # Set GeoTransform: [West_Lon, Pixel_Width_Lon, 0, North_Lat, 0, -Pixel_Height_Lat]
-    pixel_width = 360.0 / mosaic_width     # 360 / 16384 = 0.02197265625 deg
-    pixel_height = 180.0 / mosaic_height   # 180 / 8192 = 0.02197265625 deg
-    geotransform = [-180.0, pixel_width, 0.0, 90.0, 0.0, -pixel_height]
-    gtiff_ds.SetGeoTransform(geotransform)
-    
-    # Spatial reference: Mars 2000 Equirectangular (EPSG:104905 / IAU2000:49900)
-    srs = osr.SpatialReference()
-    srs.ImportFromProj4("+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 +units=m +no_defs")
-    gtiff_ds.SetProjection(srs.ExportToWkt())
-    gtiff_ds = None
-    mem_ds = None
+    if HAS_GDAL:
+        driver_gtiff = gdal.GetDriverByName("GTiff")
+        gtiff_ds = driver_gtiff.CreateCopy(tif_path, mem_ds, options=["COMPRESS=JPEG", "JPEG_QUALITY=95", "TILED=YES"])
+        
+        # Set GeoTransform: [West_Lon, Pixel_Width_Lon, 0, North_Lat, 0, -Pixel_Height_Lat]
+        pixel_width = 360.0 / mosaic_width     # 360 / 16384 = 0.02197265625 deg
+        pixel_height = 180.0 / mosaic_height   # 180 / 8192 = 0.02197265625 deg
+        geotransform = [-180.0, pixel_width, 0.0, 90.0, 0.0, -pixel_height]
+        gtiff_ds.SetGeoTransform(geotransform)
+        
+        # Spatial reference: Mars 2000 Equirectangular (EPSG:104905 / IAU2000:49900)
+        srs = osr.SpatialReference()
+        srs.ImportFromProj4("+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3396190 +units=m +no_defs")
+        gtiff_ds.SetProjection(srs.ExportToWkt())
+        gtiff_ds = None
+        mem_ds = None
+    else:
+        im_out = Image.fromarray(mosaic, mode="RGB")
+        im_out.save(tif_path, format="TIFF", compression="jpeg")
     print(f"[+] GeoTIFF saved successfully ({os.path.getsize(tif_path):,} bytes).")
     
     # 3. Create GDAL Virtual Raster (VRT)
