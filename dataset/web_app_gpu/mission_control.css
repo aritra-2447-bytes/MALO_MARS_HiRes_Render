@@ -1,0 +1,643 @@
+/* ==========================================================================
+   ARES-OS Mission Control — Mars Science & Cooperative Autonomy
+   Additive layer over the existing Mars 3D Explorer styling.
+   ========================================================================== */
+
+:root {
+  --ares-bg: rgba(7, 11, 20, 0.92);
+  --ares-bg-soft: rgba(15, 23, 42, 0.72);
+  --ares-line: rgba(148, 163, 184, 0.18);
+  --ares-line-strong: rgba(148, 163, 184, 0.32);
+  --ares-text: #eef4ff;
+  --ares-dim: #9fb0c9;
+  --ares-cyan: #38bdf8;
+  --ares-green: #22c55e;
+  --ares-amber: #f59e0b;
+  --ares-red: #ef4444;
+  --ares-violet: #a78bfa;
+  --ares-orange: #ff6b3d;
+  --ares-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+}
+
+/* ---------- Chronometer strip ---------- */
+#ares-chronometer {
+  position: fixed;
+  top: 76px;
+  left: 356px;
+  right: 432px;
+  z-index: 1050;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-height: 52px;
+  background: linear-gradient(180deg, rgba(10, 16, 28, 0.985), rgba(7, 11, 20, 0.97));
+  border: 1px solid var(--ares-line);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  font-family: var(--ares-mono);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+#ares-chronometer.ares-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+.ares-chron-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 12px 6px;
+  border-right: 1px solid var(--ares-line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+.ares-chron-cell:last-child { border-right: 0; }
+.ares-chron-cell::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 10px; right: 10px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.45), transparent);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.ares-chron-cell.ares-live::before { opacity: 1; }
+.ares-chron-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ares-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ares-chron-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ares-text);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+.ares-chron-sub {
+  font-size: 9px;
+  color: var(--ares-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+.ares-chron-value .ares-day { color: #fde68a; }
+.ares-chron-value .ares-night { color: #93c5fd; }
+.ares-chron-cell.ares-clock-accent { background: linear-gradient(180deg, rgba(56, 189, 248, 0.08), transparent); }
+.ares-chron-cell.ares-clock-accent .ares-chron-value { color: #7dd3fc; }
+.ares-chron-cell.ares-clock-mars .ares-chron-value { color: #ffb08a; }
+.ares-chron-earth { flex: 0 0 120px; }
+
+/* ---------- Right-hand Mission Control panel ---------- */
+#ares-panel {
+  position: fixed;
+  top: 76px;
+  right: 16px;
+  bottom: 82px;
+  width: 400px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(9, 14, 25, 0.995), rgba(5, 9, 17, 0.99));
+  border: 1px solid var(--ares-line-strong);
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  color: var(--ares-text);
+  transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 200ms ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+#ares-panel.ares-panel-collapsed {
+  transform: translateX(calc(100% + 24px));
+  opacity: 0;
+  pointer-events: none;
+}
+.ares-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--ares-line);
+  background: linear-gradient(180deg, rgba(255, 107, 61, 0.08), transparent);
+}
+.ares-brand-mark {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 30% 25%, #ff9a72, #c2410c 62%, #7c2d12);
+  box-shadow: 0 0 18px rgba(255, 107, 61, 0.35);
+  font-size: 15px; font-weight: 900; color: #fff;
+  letter-spacing: -0.05em;
+}
+.ares-brand-text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.ares-brand-text strong { font-size: 13px; letter-spacing: 0.05em; }
+.ares-brand-text small { font-size: 9.5px; color: var(--ares-dim); letter-spacing: 0.04em; }
+.ares-panel-head .ares-spacer { flex: 1; }
+.ares-icon-btn {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--ares-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ares-dim);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 120ms ease;
+}
+.ares-icon-btn:hover { color: #fff; border-color: var(--ares-line-strong); background: rgba(56, 189, 248, 0.12); }
+
+.ares-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--ares-line);
+  background: rgba(255, 255, 255, 0.015);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ares-tabs::-webkit-scrollbar { display: none; }
+.ares-tab {
+  flex: 1 1 0;
+  min-width: 58px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ares-dim);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 7px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 120ms ease;
+}
+.ares-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+.ares-tab.active {
+  color: #fff;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.06));
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.3);
+}
+.ares-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+}
+.ares-panel-body::-webkit-scrollbar { width: 7px; }
+.ares-panel-body::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 4px; }
+.ares-section { display: none; }
+.ares-section.active { display: block; animation: aresFade 180ms ease; }
+@keyframes aresFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Panel primitives ---------- */
+.ares-block {
+  background: var(--ares-bg-soft);
+  border: 1px solid var(--ares-line);
+  border-radius: 11px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.ares-block-title {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ares-dim);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ares-block-title::before {
+  content: "";
+  width: 3px; height: 10px; border-radius: 2px;
+  background: linear-gradient(180deg, var(--ares-cyan), var(--ares-violet));
+}
+.ares-note { font-size: 10px; line-height: 1.45; color: var(--ares-dim); }
+.ares-mono { font-family: var(--ares-mono); }
+.ares-dim { color: var(--ares-dim); }
+.ares-cyan { color: var(--ares-cyan); }
+.ares-green { color: var(--ares-green); }
+.ares-amber { color: var(--ares-amber); }
+.ares-red { color: var(--ares-red); }
+
+.ares-search {
+  position: relative;
+  margin-bottom: 9px;
+}
+.ares-search input {
+  width: 100%;
+  padding: 9px 10px 9px 30px;
+  border-radius: 9px;
+  border: 1px solid var(--ares-line);
+  background: rgba(2, 6, 14, 0.7);
+  color: #fff;
+  font-size: 11px;
+  outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.ares-search input:focus { border-color: rgba(56, 189, 248, 0.6); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
+.ares-search::before {
+  content: "⌕";
+  position: absolute;
+  left: 10px; top: 7px;
+  color: var(--ares-dim);
+  font-size: 14px;
+}
+.ares-subtabs { display: flex; gap: 4px; margin-bottom: 9px; }
+.ares-subtab {
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: 7px;
+  border: 1px solid var(--ares-line);
+  background: transparent;
+  color: var(--ares-dim);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.ares-subtab.active { color: #fff; border-color: rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.1); }
+
+.ares-btn {
+  border: 1px solid var(--ares-line-strong);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--ares-text);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 7px 9px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.ares-btn:hover { background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.5); color: #fff; }
+.ares-btn:disabled { opacity: 0.45; cursor: wait; }
+.ares-btn.ares-primary {
+  background: linear-gradient(180deg, #f97316, #c2410c);
+  border-color: rgba(255, 154, 114, 0.6);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.25);
+}
+.ares-btn.ares-primary:hover { filter: brightness(1.08); }
+.ares-btn.ares-cyan { background: linear-gradient(180deg, #0ea5e9, #0369a1); border-color: rgba(56, 189, 248, 0.6); color: #fff; }
+.ares-btn.ares-danger { color: #fecaca; border-color: rgba(239, 68, 68, 0.45); }
+.ares-btn.ares-danger:hover { background: rgba(239, 68, 68, 0.15); }
+.ares-btn.ares-small { padding: 5px 7px; font-size: 9px; }
+.ares-btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.ares-btn-row .ares-btn { flex: 1 1 auto; }
+
+.ares-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.ares-field { display: flex; flex-direction: column; gap: 3px; }
+.ares-field label {
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ares-dim);
+}
+.ares-field input, .ares-field select {
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--ares-line);
+  background: rgba(2, 6, 14, 0.7);
+  color: #fff;
+  font-family: var(--ares-mono);
+  font-size: 11px;
+  outline: none;
+}
+.ares-field input:focus, .ares-field select:focus { border-color: rgba(56, 189, 248, 0.55); }
+.ares-field select { font-family: inherit; }
+.ares-slider-row { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.ares-slider-row label { font-size: 9px; color: var(--ares-dim); min-width: 78px; }
+.ares-slider-row input[type=range] { flex: 1; accent-color: var(--ares-cyan); height: 3px; }
+.ares-slider-row output { font-family: var(--ares-mono); font-size: 9.5px; color: var(--ares-cyan); min-width: 32px; text-align: right; }
+
+/* ---------- Atlas cards ---------- */
+.ares-card {
+  border: 1px solid var(--ares-line);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.55);
+  padding: 8px;
+  margin-bottom: 7px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+}
+.ares-card:hover { border-color: rgba(56, 189, 248, 0.36); background: rgba(20, 32, 55, 0.75); transform: translateY(-1px); }
+.ares-card-top { display: flex; align-items: flex-start; gap: 7px; }
+.ares-card-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 3px; flex: 0 0 auto;
+  box-shadow: 0 0 8px currentColor;
+}
+.ares-card-title { font-size: 11px; font-weight: 700; line-height: 1.25; }
+.ares-card-sub { font-size: 9px; color: var(--ares-dim); line-height: 1.35; margin-top: 1px; }
+.ares-badge {
+  margin-left: auto;
+  font-size: 7.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 5px;
+  border-radius: 5px;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  background: rgba(255, 255, 255, 0.04);
+}
+.ares-badge.active { color: var(--ares-green); }
+.ares-badge.completed { color: var(--ares-dim); }
+.ares-badge.failed { color: var(--ares-red); }
+.ares-badge.proposed { color: var(--ares-cyan); }
+.ares-card-figure {
+  margin-top: 5px;
+  font-size: 9px;
+  color: #c7d2fe;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(167, 139, 250, 0.08);
+  border-left: 2px solid rgba(167, 139, 250, 0.55);
+  line-height: 1.35;
+}
+.ares-card-actions { display: flex; gap: 5px; margin-top: 6px; }
+.ares-card-actions .ares-btn { flex: 1; }
+.ares-card-detail {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--ares-line);
+  font-size: 10px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+.ares-card-detail strong { color: #fff; }
+.ares-card-detail .ares-significance { margin-top: 5px; color: #a5b4c8; }
+.ares-empty { text-align: center; color: var(--ares-dim); font-size: 10px; padding: 18px 8px; line-height: 1.5; }
+
+/* ---------- Mineral chips ---------- */
+.ares-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.ares-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--ares-line);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 8.5px;
+  font-weight: 700;
+  color: var(--ares-dim);
+  cursor: pointer;
+  user-select: none;
+  transition: all 120ms ease;
+}
+.ares-chip .ares-chip-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px currentColor; }
+.ares-chip.on { color: #fff; border-color: currentColor; background: rgba(255, 255, 255, 0.06); }
+.ares-chip.off { opacity: 0.4; }
+
+.ares-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 7px; }
+.ares-stat {
+  background: rgba(2, 6, 14, 0.55);
+  border: 1px solid var(--ares-line);
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+}
+.ares-stat-value { font-family: var(--ares-mono); font-size: 13px; font-weight: 700; line-height: 1.1; }
+.ares-stat-label { font-size: 7.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ares-dim); margin-top: 2px; }
+
+.ares-legend { display: flex; flex-direction: column; gap: 4px; margin-top: 7px; }
+.ares-legend-row { display: flex; align-items: center; gap: 7px; font-size: 9px; color: #cbd5e1; }
+.ares-legend-swatch { width: 13px; height: 7px; border-radius: 2px; box-shadow: 0 0 6px currentColor; }
+
+/* ---------- Scout ---------- */
+.ares-outcome {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 9px;
+  border-radius: 9px;
+  border: 1px solid var(--ares-line);
+  background: rgba(2, 6, 14, 0.55);
+  margin-bottom: 8px;
+}
+.ares-outcome-icon { font-size: 16px; }
+.ares-outcome-title { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; }
+.ares-outcome-sub { font-size: 9px; color: var(--ares-dim); line-height: 1.35; margin-top: 1px; }
+.ares-outcome.optimal { border-color: rgba(34, 197, 94, 0.45); background: rgba(34, 197, 94, 0.07); }
+.ares-outcome.infeasible { border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.07); }
+.ares-outcome.working { border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.06); }
+
+.ares-metric-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 8px; }
+.ares-metric {
+  background: rgba(2, 6, 14, 0.5);
+  border: 1px solid var(--ares-line);
+  border-radius: 8px;
+  padding: 6px 7px;
+}
+.ares-metric .k { font-size: 7.5px; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ares-dim); }
+.ares-metric .v { font-family: var(--ares-mono); font-size: 12px; font-weight: 700; margin-top: 2px; }
+
+.ares-timeline { display: flex; align-items: center; gap: 6px; margin: 7px 0; }
+.ares-timeline input[type=range] { flex: 1; accent-color: var(--ares-orange); }
+.ares-timeline .ares-step-label { font-family: var(--ares-mono); font-size: 9px; color: var(--ares-dim); min-width: 60px; text-align: right; }
+
+.ares-chart-wrap {
+  background: rgba(2, 6, 14, 0.55);
+  border: 1px solid var(--ares-line);
+  border-radius: 9px;
+  padding: 6px;
+  margin-bottom: 8px;
+}
+.ares-chart-title { font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ares-dim); margin-bottom: 3px; display: flex; justify-content: space-between; }
+.ares-chart-wrap canvas { width: 100%; height: auto; display: block; border-radius: 4px; }
+.ares-proof {
+  font-size: 9.5px;
+  line-height: 1.45;
+  color: #cbd5e1;
+  border-left: 2px solid var(--ares-green);
+  padding: 6px 8px;
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: 0 7px 7px 0;
+}
+.ares-proof.bad { border-left-color: var(--ares-red); background: rgba(239, 68, 68, 0.05); }
+.ares-source-line { font-size: 8.5px; color: var(--ares-dim); line-height: 1.4; margin-top: 6px; }
+.ares-source-line b { color: #cbd5e1; font-weight: 600; }
+
+/* ---------- GDS jobs ---------- */
+.ares-job {
+  border: 1px solid var(--ares-line);
+  border-radius: 8px;
+  padding: 6px 7px;
+  margin-top: 5px;
+  background: rgba(2, 6, 14, 0.45);
+  font-size: 9px;
+}
+.ares-job-top { display: flex; align-items: center; gap: 5px; }
+.ares-job-state { font-size: 7.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.ares-job-state.completed { color: var(--ares-green); }
+.ares-job-state.running { color: var(--ares-cyan); }
+.ares-job-state.failed, .ares-job-state.aborted { color: var(--ares-red); }
+.ares-job-state.queued { color: var(--ares-amber); }
+.ares-job-note { color: var(--ares-dim); margin-top: 3px; line-height: 1.35; }
+.ares-job-files a { color: var(--ares-cyan); text-decoration: none; display: block; margin-top: 2px; }
+.ares-job-files a:hover { text-decoration: underline; }
+
+/* ---------- Clock tab ---------- */
+.ares-clock-hero {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.11), rgba(167, 139, 250, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.24);
+  margin-bottom: 8px;
+}
+.ares-clock-hero .big { font-family: var(--ares-mono); font-size: 28px; font-weight: 800; letter-spacing: 0.02em; color: #fff; line-height: 1; }
+.ares-clock-hero .small { font-family: var(--ares-mono); font-size: 10px; color: var(--ares-dim); }
+.ares-clock-list { display: flex; flex-direction: column; gap: 5px; }
+.ares-clock-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 9.5px;
+}
+.ares-clock-row .k { color: var(--ares-dim); }
+.ares-clock-row .v { font-family: var(--ares-mono); color: #fff; font-weight: 600; text-align: right; }
+
+/* ---------- Tooltip enrichment ---------- */
+#hover-tooltip.ares-tooltip {
+  pointer-events: auto !important;
+  max-width: 390px !important;
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+#hover-tooltip.ares-tooltip::-webkit-scrollbar { width: 6px; }
+#hover-tooltip.ares-tooltip::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 3px; }
+.ares-tt-details {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+.ares-tt-figure {
+  border-left: 2px solid #a78bfa;
+  padding: 5px 0 5px 8px;
+  margin-bottom: 7px;
+  background: linear-gradient(90deg, rgba(167, 139, 250, 0.09), transparent);
+  border-radius: 0 6px 6px 0;
+}
+.ares-tt-figure .name { font-size: 10.5px; font-weight: 800; color: #ddd6fe; }
+.ares-tt-figure .role { font-size: 8.5px; color: #a5b4fc; margin-top: 1px; }
+.ares-tt-figure .bio { font-size: 9.5px; color: #cbd5e1; line-height: 1.45; margin-top: 4px; }
+.ares-tt-significance { font-size: 9.5px; color: #cbd5e1; line-height: 1.45; }
+.ares-tt-significance b { color: #fbbf24; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+.ares-tt-actions { display: flex; gap: 5px; margin-top: 7px; }
+.ares-tt-actions .ares-btn { flex: 1; font-size: 8.5px; padding: 5px 6px; }
+.ares-tt-meta { font-size: 8.5px; color: #94a3b8; margin-top: 5px; line-height: 1.4; }
+
+/* ---------- Toggle button ---------- */
+#ares-panel-toggle {
+  position: fixed;
+  top: 76px;
+  right: 16px;
+  z-index: 1090;
+  border: 1px solid rgba(255, 107, 61, 0.45);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(30, 18, 12, 0.95), rgba(15, 10, 8, 0.9));
+  color: #ffd7c7;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 9px 11px;
+  cursor: pointer;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+  display: none;
+}
+#ares-panel-toggle:hover { background: rgba(249, 115, 22, 0.2); }
+#ares-panel-toggle.visible { display: block; }
+
+/* ---------- Toast ---------- */
+#ares-toast {
+  position: fixed;
+  bottom: 92px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 3000;
+  background: rgba(8, 13, 24, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 9px;
+  padding: 8px 13px;
+  font-size: 10px;
+  color: #e2e8f0;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  max-width: 480px;
+  text-align: center;
+}
+#ares-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#ares-toast.error { border-color: rgba(239, 68, 68, 0.55); color: #fecaca; }
+
+/* ---------- Pick cursor ---------- */
+body.ares-picking, body.ares-picking #three-canvas, body.ares-picking #flat-canvas { cursor: crosshair !important; }
+.ares-pick-banner {
+  position: fixed;
+  top: 136px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2500;
+  background: rgba(8, 13, 24, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 10px;
+  color: #e0f2fe;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  display: none;
+}
+.ares-pick-banner.show { display: block; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1380px) {
+  #ares-chronometer { right: 16px; left: 356px; }
+  #ares-panel { top: 136px; bottom: 82px; width: 370px; }
+  #ares-panel-toggle { top: 136px; }
+}
+@media (max-width: 1000px) {
+  #ares-chronometer { top: 70px; left: 352px; right: 10px; overflow-x: auto; }
+  .ares-chron-cell { min-width: 108px; }
+  #ares-panel { top: 10px; right: 10px; bottom: 10px; width: min(400px, calc(100vw - 20px)); }
+  #ares-panel-toggle { top: 132px; right: 10px; }
+  #ares-panel.ares-panel-collapsed { transform: translateX(calc(100% + 20px)); }
+  .ares-pick-banner { top: 128px; }
+}
+@media (max-width: 720px) {
+  #ares-chronometer { display: none; }
+  #ares-panel { top: 8px; bottom: 8px; }
+  #ares-panel-toggle { top: 84px; }
+}

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mars 3D - Planetary Explorer (NASA PDS / ODE / GDS)</title>
+  <link rel="stylesheet" href="/mission_control.css?v=ares10">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <style>
     :root {
@@ -1586,7 +1587,7 @@
           metalness: 0.2
         });
         const pinMesh = new THREE.Mesh(pinGeo, pinMat);
-        pinMesh.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.016)));
+        pinMesh.position.copy(normal.clone().multiplyScalar(0.016));
         pinMesh.castShadow = true;
         pinMesh.userData = lm;
 
@@ -1594,7 +1595,7 @@
         const stemGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.018, 8);
         const stemMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
         const stemMesh = new THREE.Mesh(stemGeo, stemMat);
-        stemMesh.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.008)));
+        stemMesh.position.copy(normal.clone().multiplyScalar(0.008));
         stemMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
         stemMesh.castShadow = true;
 
@@ -1607,10 +1608,13 @@
           opacity: 0.55
         });
         const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-        ringMesh.position.copy(pos);
+        ringMesh.position.set(0, 0, 0);
         ringMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
 
         const beaconGroup = new THREE.Group();
+        beaconGroup.position.copy(pos);
+        // Pivot at the surface so ARES-OS can scale the pin without moving it.
+        beaconGroup.userData.aresLandmarkPin = true;
         beaconGroup.add(pinMesh);
         beaconGroup.add(stemMesh);
         beaconGroup.add(ringMesh);
@@ -2685,6 +2689,9 @@
           document.getElementById('tt-category').textContent = displayData.category;
           document.getElementById('tt-coords').textContent = `${Math.abs(displayData.lat).toFixed(2)}° ${displayData.lat >= 0 ? 'N' : 'S'}, ${Math.abs(displayData.lon).toFixed(2)}° ${displayData.lon >= 0 ? 'E' : 'W'}${displayData.elevation_m !== undefined ? ` • ${Number(displayData.elevation_m).toLocaleString()} m` : ''}`;
           document.getElementById('tt-desc').innerHTML = displayData.description;
+          if (typeof window.aresRenderTooltipDetails === 'function') {
+            window.aresRenderTooltipDetails(displayData);
+          }
 
           tooltip.style.left = `${e.clientX + 12}px`;
           tooltip.style.top = `${e.clientY + 12}px`;
@@ -3376,5 +3383,6 @@
     loadEVARoute('m20_perseverance', false); // Initialize route metrics without hijacking camera view
     animate();
   </script>
+  <script src="/mission_control.js?v=ares10"></script>
 </body>
 </html>

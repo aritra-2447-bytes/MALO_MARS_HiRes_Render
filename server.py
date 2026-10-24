@@ -23,6 +23,23 @@ import mimetypes
 import time
 import math
 
+# ARES-OS science services (standard library; optional numpy/rasterio for DEMs)
+_HERE = os.path.dirname(os.path.abspath(__file__))
+for _p in (_HERE, os.path.abspath(os.path.join(_HERE, '..', '..'))):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+try:
+    from ares import catalog as ares_catalog
+    from ares import mars_time as ares_time
+    from ares import dem as ares_dem
+    from ares import scouting as ares_scouting
+    from ares import ode as ares_ode
+    from ares import gds_jobs as ares_gds
+    ARES_AVAILABLE = True
+except Exception as _ares_exc:  # pragma: no cover
+    ARES_AVAILABLE = False
+    ARES_IMPORT_ERROR = str(_ares_exc)
+
 PORT = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else 8083))
 CURRENT_FILE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -328,6 +345,47 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
+    def do_POST(self):
+        parsed = urllib.parse.urlsplit(self.path)
+        path = parsed.path
+        try:
+            length = int(self.headers.get("Content-Length", "0") or 0)
+            raw = self.rfile.read(length) if length else b"{}"
+            body = json.loads(raw.decode("utf-8")) if raw else {}
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": f"Invalid JSON body: {exc}"}, status_code=400)
+            return
+
+        if path == "/api/scouting/plan":
+            try:
+                start = body.get("start") or {"lat": body.get("start_lat", 18.4446), "lon": body.get("start_lon", 77.4508)}
+                target = body.get("target") or {"lat": body.get("target_lat", 18.51), "lon": body.get("target_lon", 77.35)}
+                result = ares_scouting.plan(
+                    start, target,
+                    size_deg=body.get("size_deg"),
+                    resolution_m=float(body.get("resolution_m", 20.0)),
+                    prefer=body.get("prefer", "ctx"),
+                    max_iterations=int(body.get("max_iterations", 14)),
+                    sensor_radius_m=float(body.get("sensor_radius_m", 260.0)),
+                    start_known_radius_m=float(body.get("start_known_radius_m", 320.0)),
+                )
+                self.send_json_response(result)
+            except Exception as exc:
+                self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+            return
+
+        if path == "/api/nasa/gds/jobs":
+            try:
+                params = dict(body)
+                params["action"] = "submit"
+                job = ares_gds.MANAGER.submit(params)
+                self.send_json_response({"status": "success", "job": job})
+            except Exception as exc:
+                self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+            return
+
+        self.send_json_response({"status": "error", "message": "Not found"}, status_code=404)
+
     def do_GET(self):
         parsed = urllib.parse.urlsplit(self.path)
         path = parsed.path
@@ -343,9 +401,9 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(FAVICON_SVG)
             return
 
-        # Landmarks
+        # Landmarks (enriched with biographies, significance and atlas records)
         if path == "/api/landmarks":
-            self.send_json_response({"status": "success", "landmarks": MARS_LANDMARKS})
+            self.handle_landmarks(query)
             return
 
         # Preset EVA Routes
@@ -386,6 +444,61 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         # Mars Solar Ephemeris & Day/Night Terminator (Allison & McEwen Mars24)
         if path == "/api/mars/ephemeris":
             self.handle_mars_ephemeris(query)
+            return
+
+        # Local solar time at an arbitrary longitude (cursor chronometer)
+        if path == "/api/mars/time":
+            self.handle_mars_time(query)
+            return
+
+        # Historical atlas: complete mission registry and discovered landmarks
+        if path in ("/api/atlas/missions", "/api/rover/registry"):
+            self.send_json_response({
+                "status": "success",
+                "count": len(ares_catalog.HISTORICAL_MISSIONS),
+                "missions": ares_catalog.mission_payload(),
+                "figures": ares_catalog.FIGURES,
+                "source": "NASA PDS / IAU Gazetteer / mission archives",
+            })
+            return
+        if path == "/api/atlas/landmarks":
+            self.send_json_response({
+                "status": "success",
+                "count": len(ares_catalog.LANDMARKS),
+                "landmarks": ares_catalog.landmark_payload(),
+                "source": "IAU Gazetteer / NASA PDS ODE feature catalogue",
+            })
+            return
+        if path == "/api/atlas/figures":
+            self.send_json_response({"status": "success", "figures": ares_catalog.FIGURES})
+            return
+
+        # Aqueous mineral distribution (CRISM / OMEGA)
+        if path == "/api/minerals":
+            self.handle_minerals(query)
+            return
+
+        # DEM & >30 degree slope-hazard analysis
+        if path == "/api/terrain/slope":
+            self.handle_slope(query)
+            return
+        if path == "/api/terrain/stac":
+            self.handle_stac(query)
+            return
+
+        # Cooperative informative path planning (scouting-ipp)
+        if path == "/api/scouting/plan":
+            self.handle_scouting(query)
+            return
+
+        # Async NASA PDS GDS job control (MOLA PEDR)
+        if path == "/api/nasa/gds/jobs":
+            self.handle_gds_jobs(query)
+            return
+
+        # ODE feature catalogue (featureclasses / featurenames / featuredata)
+        if path == "/api/nasa/features":
+            self.handle_ode_features(query)
             return
 
         super().do_GET()
@@ -461,9 +574,199 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Cache-Control", "public, max-age=600")
+        self.send_header("Cache-Control", "no-store, max-age=0")
+        self.send_header("Pragma", "no-cache")
         self.end_headers()
         self.wfile.write(body)
+
+    # ------------------------------------------------------------------
+    # ARES-OS atlas, minerals, terrain, scouting, and chronometer endpoints
+    # ------------------------------------------------------------------
+    def handle_landmarks(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "success", "landmarks": MARS_LANDMARKS})
+            return
+        try:
+            merged = []
+            seen = set()
+            for lm in MARS_LANDMARKS:
+                item = dict(lm)
+                item["lon_east"] = round(item["lon"] % 360.0, 4)
+                item.setdefault("significance", item.get("description", ""))
+                item["source"] = "NASA Mars Trek / IAU"
+                merged.append(item)
+                seen.add(item["id"])
+                seen.add(item["name"].lower())
+            figures = ares_catalog.FIGURES
+            for lm in ares_catalog.landmark_payload():
+                if lm["id"] in seen or lm["name"].lower() in seen:
+                    continue
+                item = {
+                    "id": lm["id"],
+                    "name": lm["name"],
+                    "lat": lm["lat"],
+                    "lon": lm["lon"],
+                    "lon_east": lm["lon_east"],
+                    "elevation_m": lm.get("elevation_m", 0),
+                    "category": lm.get("category", "landmark"),
+                    "description": lm.get("significance", ""),
+                    "significance": lm.get("significance", ""),
+                    "namesake": lm.get("namesake") or figures.get(lm.get("figure")),
+                    "diameter_km": lm.get("diameter_km"),
+                    "source": "IAU Gazetteer / NASA PDS",
+                }
+                merged.append(item)
+                seen.add(item["id"])
+                seen.add(item["name"].lower())
+            self.send_json_response({
+                "status": "success",
+                "count": len(merged),
+                "landmarks": merged,
+                "source": "NASA Mars Trek, IAU Gazetteer, NASA PDS ODE",
+            })
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+
+    def handle_minerals(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "error", "message": "ares package unavailable"}, status_code=500)
+            return
+        try:
+            payload = ares_catalog.mineral_payload()
+            lat = query.get("lat", [None])[0]
+            lon = query.get("lon", [None])[0]
+            instrument = (query.get("instrument", ["CRISM"])[0] or "CRISM").upper()
+            radius = float(query.get("radius", [0.6])[0])
+            if lat is not None and lon is not None:
+                ode = ares_ode.products(
+                    float(lat), float(lon), radius=radius, instrument=instrument,
+                    product_type=query.get("pt", [None])[0], limit=int(query.get("limit", [12])[0])
+                )
+                payload["ode_query"] = ode
+                payload["query_center"] = {"lat": float(lat), "lon": float(lon)}
+            payload["status"] = "success"
+            self.send_json_response(payload)
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+
+    def handle_slope(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "error", "message": "ares package unavailable"}, status_code=500)
+            return
+        try:
+            lat = float(query.get("lat", [18.4446])[0])
+            lon = float(query.get("lon", [77.4508])[0])
+            size_deg = float(query.get("size", [0.06])[0])
+            resolution = float(query.get("resolution", [20.0])[0])
+            prefer = (query.get("prefer", ["ctx"])[0] or "ctx").lower()
+            n = query.get("n", [None])[0]
+            n = int(n) if n is not None else None
+            result = ares_dem.slope_grid(lat, lon, size_deg=size_deg,
+                                         resolution_m=resolution, prefer=prefer, n=n)
+            self.send_json_response(result)
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+
+    def handle_stac(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "error", "message": "ares package unavailable"}, status_code=500)
+            return
+        try:
+            lat = float(query.get("lat", [18.4446])[0])
+            lon = float(query.get("lon", [77.4508])[0])
+            size_deg = float(query.get("size", [0.2])[0])
+            self.send_json_response(ares_dem.stac_catalog(lat, lon, size_deg))
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+
+    def handle_scouting(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "error", "message": "ares package unavailable"}, status_code=500)
+            return
+        try:
+            start = {
+                "lat": float(query.get("start_lat", [18.4446])[0]),
+                "lon": float(query.get("start_lon", [77.4508])[0]),
+            }
+            target = {
+                "lat": float(query.get("target_lat", [18.51])[0]),
+                "lon": float(query.get("target_lon", [77.35])[0]),
+            }
+            result = ares_scouting.plan(
+                start, target,
+                size_deg=float(query.get("size", [0])[0]) or None,
+                resolution_m=float(query.get("resolution", [20.0])[0]),
+                prefer=(query.get("prefer", ["ctx"])[0] or "ctx").lower(),
+                max_iterations=int(query.get("max_iterations", [14])[0]),
+                sensor_radius_m=float(query.get("sensor_radius", [260.0])[0]),
+                start_known_radius_m=float(query.get("start_known_radius", [320.0])[0]),
+            )
+            self.send_json_response(result)
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+
+    def handle_gds_jobs(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "error", "message": "ares package unavailable"}, status_code=500)
+            return
+        try:
+            action = (query.get("action", ["list"])[0] or "list").lower()
+            if action == "submit":
+                params = {k: v[0] for k, v in query.items() if k != "action"}
+                job = ares_gds.MANAGER.submit(params)
+                self.send_json_response({"status": "success", "job": job})
+            elif action == "status":
+                job_id = query.get("jobid", [""])[0]
+                job = ares_gds.MANAGER.get(job_id)
+                if not job:
+                    self.send_json_response({"status": "error", "message": "Unknown job id"}, status_code=404)
+                else:
+                    self.send_json_response({"status": "success", "job": job})
+            elif action == "abort":
+                job_id = query.get("jobid", [""])[0]
+                job = ares_gds.MANAGER.abort(job_id)
+                if not job:
+                    self.send_json_response({"status": "error", "message": "Unknown job id"}, status_code=404)
+                else:
+                    self.send_json_response({"status": "success", "job": job})
+            else:
+                self.send_json_response({"status": "success", "jobs": ares_gds.MANAGER.list()})
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+
+    def handle_ode_features(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "error", "message": "ares package unavailable"}, status_code=500)
+            return
+        try:
+            kind = (query.get("query", ["featureclasses"])[0] or "featureclasses").lower()
+            if kind == "featureclasses":
+                self.send_json_response(ares_ode.feature_classes())
+            elif kind == "featurenames":
+                fc = query.get("featureclass", [None])[0]
+                limit = int(query.get("limit", [500])[0])
+                self.send_json_response(ares_ode.feature_names(fc, limit))
+            elif kind == "featuredata":
+                name = query.get("featurename", [""])[0]
+                self.send_json_response(ares_ode.feature_data(name))
+            else:
+                self.send_json_response({"status": "error", "message": "Unsupported feature query"}, status_code=400)
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
+
+    def handle_mars_time(self, query):
+        if not ARES_AVAILABLE:
+            self.send_json_response({"status": "error", "message": "ares package unavailable"}, status_code=500)
+            return
+        try:
+            lon = float(query.get("lon", [0.0])[0])
+            dt = None
+            if query.get("utc"):
+                import datetime
+                dt = datetime.datetime.fromisoformat(query["utc"][0].replace("Z", "+00:00"))
+            self.send_json_response(ares_time.time_at_longitude(dt, lon))
+        except Exception as exc:
+            self.send_json_response({"status": "error", "message": str(exc)}, status_code=500)
 
     def handle_ode_proxy(self, query):
         try:
@@ -471,69 +774,64 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             center_lon = float(query.get("lon", [77.58])[0])
             radius = float(query.get("radius", [0.4])[0])
             instrument = query.get("instrument", ["CTX"])[0].upper()
-
+            pt = query.get("pt", [None])[0]
+            limit = int(query.get("limit", [15])[0])
+            if ARES_AVAILABLE:
+                payload = ares_ode.products(
+                    center_lat, center_lon, radius=radius, instrument=instrument,
+                    product_type=pt, limit=limit
+                )
+                self.send_json_response(payload)
+                return
+            # Fallback (standard-library only, no ares package)
             lon_360 = (center_lon + 360.0) % 360.0
             min_lat = max(-90.0, center_lat - radius)
             max_lat = min(90.0, center_lat + radius)
             west_lon = max(0.0, lon_360 - radius)
             east_lon = min(360.0, lon_360 + radius)
-
             if instrument == "HIRISE":
-                ihid, iid, pt = "MRO", "HiRISE", "RDR"
+                ihid, iid, pt2 = "MRO", "HiRISE", "RDR"
             elif instrument == "CRISM":
-                ihid, iid, pt = "MRO", "CRISM", "TRDR"
+                ihid, iid, pt2 = "MRO", "CRISM", "TRDR"
+            elif instrument == "OMEGA":
+                ihid, iid, pt2 = "MEX", "OMEGA", "DDR"
             else:
-                ihid, iid, pt = "MRO", "CTX", "EDR"
-
-            cache_key = f"ode_{ihid}_{iid}_{pt}_{min_lat:.2f}_{max_lat:.2f}_{west_lon:.2f}_{east_lon:.2f}"
-            now = time.time()
-            if cache_key in CACHE and (now - CACHE[cache_key][0]) < CACHE_TTL:
-                self.send_json_response(CACHE[cache_key][1])
-                return
-
+                ihid, iid, pt2 = "MRO", "CTX", "EDR"
             ode_url = (
                 f"https://oderest.rsl.wustl.edu/live2/?target=mars&query=product&results=compf"
-                f"&ihid={ihid}&iid={iid}&pt={pt}"
+                f"&ihid={ihid}&iid={iid}&pt={pt2}"
                 f"&minlat={min_lat:.3f}&maxlat={max_lat:.3f}"
                 f"&westernlon={west_lon:.3f}&easternlon={east_lon:.3f}"
-                f"&limit=15&output=json"
+                f"&limit={limit}&output=json"
             )
-
             req = urllib.request.Request(ode_url, headers={"User-Agent": "NASA-MarsExplorer/2.0"})
             with urllib.request.urlopen(req, timeout=12) as resp:
                 ode_data = json.loads(resp.read().decode("utf-8"))
-
             products = ode_data.get("ODEResults", {}).get("Products", {}).get("Product", [])
             if isinstance(products, dict):
                 products = [products]
             elif isinstance(products, str):
                 products = []
-
             results = []
             for p in products:
-                geom = p.get("Footprint_geometry", "")
                 pdsid = p.get("pdsid", "")
                 results.append({
                     "pdsid": pdsid,
                     "instrument": iid,
                     "host": ihid,
-                    "pt": pt,
-                    "geometry_wkt": geom,
+                    "pt": pt2,
+                    "geometry_wkt": p.get("Footprint_geometry", ""),
                     "browse_url": f"/api/nasa/browse?pdsid={pdsid}",
                     "nasa_ode_url": f"https://ode.rsl.wustl.edu/mars/product/?pdsid={pdsid}"
                 })
-
-            response_payload = {
+            self.send_json_response({
                 "status": "success",
                 "instrument": instrument,
                 "center": {"lat": center_lat, "lon": center_lon},
                 "bounds": {"minlat": min_lat, "maxlat": max_lat, "westlon": west_lon, "eastlon": east_lon},
                 "count": len(results),
-                "products": results
-            }
-
-            CACHE[cache_key] = (now, response_payload)
-            self.send_json_response(response_payload)
+                "products": results,
+            })
         except Exception as e:
             self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
 
@@ -966,94 +1264,76 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
 
     def handle_mars_ephemeris(self, query):
         """
-        Allison & McEwen (2000) NASA Mars24 Ephemeris Formulation
-        Calculates Mars Sol Date (MSD), Coordinated Mars Time (MTC),
-        Areocentric Solar Longitude (Ls), Subsolar Coordinates, and Solar Irradiance.
+        Allison & McEwen (2000) Mars24 ephemeris plus live mission clocks.
+        Returns MSD, MTC, Ls, seasons, subsolar point, Perseverance and
+        Curiosity mission sols / local true solar time, and (optionally) the
+        local solar time at a cursor longitude.
         """
         try:
             import datetime
             dt_utc = datetime.datetime.now(datetime.timezone.utc)
-
-            # 1. Julian Date
-            jd_ut = 2440587.5 + (dt_utc.timestamp() / 86400.0)
-            jd_tt = jd_ut + (69.184 / 86400.0)
-            d2000 = jd_tt - 2451545.0
-
-            # 2. Mars Mean Anomaly M
-            M = (19.3870 + 0.52402075 * d2000) % 360.0
-            M_rad = math.radians(M)
-
-            # 3. Angle of Fictitious Mean Sun
-            alpha_fms = (270.3863 + 0.52403840 * d2000) % 360.0
-
-            # 4. Planetary Perturbations & Equation of Center
-            pbs = (
-                (10.691 + 3.0e-7 * d2000) * math.sin(M_rad)
-                + 0.623 * math.sin(2 * M_rad)
-                + 0.050 * math.sin(3 * M_rad)
-                + 0.005 * math.sin(4 * M_rad)
-                + 0.0005 * math.sin(5 * M_rad)
-            )
-
-            # 5. Areocentric Solar Longitude Ls
-            Ls = (alpha_fms + pbs) % 360.0
-
-            # 6. Equation of Time
-            eot_deg = (
-                (2.861 / 360.0) * math.sin(2 * math.radians(Ls))
-                - 0.071 * math.sin(4 * math.radians(Ls))
-                + 0.002 * math.sin(6 * math.radians(Ls))
-                - pbs
-            )
-
-            # 7. Mars Sol Date (MSD)
-            msd = ((jd_tt - 2451549.5) / 1.027491252) + 44796.0 - 0.00096
-
-            # 8. Coordinated Mars Time (MTC)
-            mtc_hours = (24.0 * msd) % 24.0
-
-            # Subsolar point (Mars obliquity = 25.19 deg)
-            subsolar_lat = math.degrees(math.asin(math.sin(math.radians(25.19)) * math.sin(math.radians(Ls))))
-            subsolar_lon = (12.0 - mtc_hours) * 15.0 - eot_deg
-            while subsolar_lon > 180: subsolar_lon -= 360
-            while subsolar_lon < -180: subsolar_lon += 360
-
-            # Solar Distance (AU) and surface solar irradiance (W/m^2)
-            r_sun_au = 1.5236 * (1.0 - 0.0934**2) / (1.0 + 0.0934 * math.cos(M_rad))
-            solar_irradiance = round(1361.0 / (r_sun_au ** 2), 1)
-
-            # Martian Season
-            if Ls < 90:
-                season = "Northern Spring / Southern Autumn"
-            elif Ls < 180:
-                season = "Northern Summer / Southern Winter"
-            elif Ls < 270:
-                season = "Northern Autumn / Southern Spring"
+            if query.get("utc"):
+                dt_utc = datetime.datetime.fromisoformat(query["utc"][0].replace("Z", "+00:00"))
+            cursor_lon = None
+            if query.get("lon"):
+                cursor_lon = float(query["lon"][0])
+            if ARES_AVAILABLE:
+                payload = ares_time.ephemeris(dt_utc, cursor_lon=cursor_lon)
             else:
-                season = "Northern Winter / Southern Summer"
-
-            mtc_h = int(mtc_hours)
-            mtc_m = int((mtc_hours * 60) % 60)
-            mtc_s = int((mtc_hours * 3600) % 60)
-
-            payload = {
-                "status": "success",
-                "earth_utc": dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
-                "mars_sol_date": round(msd, 2),
-                "sol_number": int(msd),
-                "mtc_time": f"{mtc_h:02d}:{mtc_m:02d}:{mtc_s:02d}",
-                "solar_longitude_Ls": round(Ls, 2),
-                "season": season,
-                "solar_irradiance_wm2": solar_irradiance,
-                "subsolar_point": {
-                    "lat": round(subsolar_lat, 2),
-                    "lon": round(subsolar_lon, 2)
-                }
-            }
-
+                payload = self._fallback_ephemeris(dt_utc)
             self.send_json_response(payload)
         except Exception as e:
             self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
+
+    def _fallback_ephemeris(self, dt_utc):
+        jd_ut = 2440587.5 + (dt_utc.timestamp() / 86400.0)
+        jd_tt = jd_ut + (69.184 / 86400.0)
+        d2000 = jd_tt - 2451545.0
+        M = (19.3870 + 0.52402075 * d2000) % 360.0
+        M_rad = math.radians(M)
+        alpha_fms = (270.3863 + 0.52403840 * d2000) % 360.0
+        pbs = (
+            (10.691 + 3.0e-7 * d2000) * math.sin(M_rad)
+            + 0.623 * math.sin(2 * M_rad)
+            + 0.050 * math.sin(3 * M_rad)
+            + 0.005 * math.sin(4 * M_rad)
+            + 0.0005 * math.sin(5 * M_rad)
+        )
+        Ls = (alpha_fms + pbs) % 360.0
+        eot_deg = (
+            (2.861 / 360.0) * math.sin(2 * math.radians(Ls))
+            - 0.071 * math.sin(4 * math.radians(Ls))
+            + 0.002 * math.sin(6 * math.radians(Ls))
+            - pbs
+        )
+        msd = ((jd_tt - 2451549.5) / 1.027491252) + 44796.0 - 0.00096
+        mtc_hours = (24.0 * msd) % 24.0
+        subsolar_lat = math.degrees(math.asin(math.sin(math.radians(25.19)) * math.sin(math.radians(Ls))))
+        subsolar_lon = (12.0 - mtc_hours) * 15.0 - eot_deg
+        while subsolar_lon > 180: subsolar_lon -= 360
+        while subsolar_lon < -180: subsolar_lon += 360
+        if Ls < 90:
+            season = "Northern Spring / Southern Autumn"
+        elif Ls < 180:
+            season = "Northern Summer / Southern Winter"
+        elif Ls < 270:
+            season = "Northern Autumn / Southern Spring"
+        else:
+            season = "Northern Winter / Southern Summer"
+        mtc_h = int(mtc_hours)
+        mtc_m = int((mtc_hours * 60) % 60)
+        mtc_s = int((mtc_hours * 3600) % 60)
+        return {
+            "status": "success",
+            "earth_utc": dt_utc.strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "mars_sol_date": round(msd, 2),
+            "sol_number": int(msd),
+            "mtc_time": f"{mtc_h:02d}:{mtc_m:02d}:{mtc_s:02d}",
+            "solar_longitude_Ls": round(Ls, 2),
+            "season": season,
+            "solar_irradiance_wm2": round(1361.0 / (1.5236 ** 2), 1),
+            "subsolar_point": {"lat": round(subsolar_lat, 2), "lon": round(subsolar_lon, 2)},
+        }
 
 
 class ThreadingServer(socketserver.ThreadingMixIn, http.server.HTTPServer):

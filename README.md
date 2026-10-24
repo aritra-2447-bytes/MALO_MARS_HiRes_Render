@@ -4,6 +4,8 @@ A high-resolution Mars planetary visualization platform, scientific GIS engine, 
 
 Synthesized from NASA Mars Trek Level 5 global data (MGS MOLA + MEX HRSC Color Hillshade Blend at 200 m/px, 134.2 Megapixels).
 
+**ARES-OS Mission Control** is the science and autonomy layer built on top of the explorer: a historical Mars atlas with namesake biographies, aqueous-mineral target overlays, real USGS DEM slope-hazard analysis, live Mars chronometry, and a cooperative follower/scout informative path planner with optimality proofs and convergence charts.
+
 ---
 
 ## 🌟 Key Capabilities & Architectural Highlights
@@ -11,7 +13,7 @@ Synthesized from NASA Mars Trek Level 5 global data (MGS MOLA + MEX HRSC Color H
 | Subsystem / Capability | Technical Implementation | Purpose & Benefit |
 |------------------------|--------------------------|-------------------|
 | **3D Planetary Globe** | WebGL2 / Three.js on Mars 2000 Sphere ($R = 3,396.19\text{ km}$) with real-time decontourification shader | High-fidelity interactive globe visualization with smooth OrbitControls physics and inertia damping |
-| **Surface Detail & Zoom Control** | Distance clamped at orbital threshold (`minDistance = 1.28`, ~950 km altitude) | Strict camera altitude limiting prevents texture pixelation and maintains crisp crater topography |
+| **Surface Detail & Zoom Control** | Distance clamped at orbital threshold (`minDistance = 1.08`, ~270 km altitude) | Strict camera altitude limiting prevents texture pixelation and maintains crisp crater topography |
 | **2D Research Flat Map** | GPU/Canvas-accelerated high-resolution equirectangular map with clamped scale ($1.0\times - 3.5\times$) | Research-grade flat map section with fluid drag-pan navigation and synchronized rover drive tracks |
 | **Single-Line Rover Pathways** | Razor-sharp continuous cartographic pathways (`THREE.Line`, `linewidth: 2`, `opacity: 0.95`) | Replaced bulky 3D tube geometries; paths sit directly on terrain without obscuring geological features |
 | **Precision Point Landing Markers** | Scale-invariant discrete circular points (`THREE.Points`, `sizeAttenuation: false`, `size: 7`) | Replaced large 3D spheres, needle stems, and 30 km wide ground rings; unblocks view of rover starting tracks |
@@ -25,12 +27,44 @@ Synthesized from NASA Mars Trek Level 5 global data (MGS MOLA + MEX HRSC Color H
 
 ---
 
+## 🛰️ ARES-OS Mission Control
+
+Open the **ARES-OS** panel on the right side of the explorer. The six-cell chronometer strip across the top reports MTC, MSD, Ls/season, Perseverance and Curiosity local solar times, the cursor's local solar time, and Earth UTC.
+
+| Tab | What it does |
+|-----|--------------|
+| **Atlas** | Searchable registry of 18 historical landers/rovers and 48 IAU landmarks. Hover any marker for its namesake biography and scientific significance; expand a card for the full mission dossier, then fly to the site. |
+| **Minerals** | Eight aqueous-mineral classes (Fe/Mg and Al phyllosilicates, poly/monohydrated sulfates, carbonates, hydrated silica, hematite, chlorides) draped as an additive equirectangular probability layer. Toggle classes, opacity, site rings, and query live CRISM/OMEGA/HiRISE footprints through NASA PDS ODE. |
+| **Terrain** | Real USGS Astrogeology STAC COG DTM analysis (CTX ~20 m/px or HiRISE ~1 m/px). Classifies 0–15° safe, 15–30° caution, and >30° no-go cells; renders a 3D hazard patch, a local hazard mini-map, vertical exaggeration, and brightness/contrast/saturation controls. Also submits asynchronous MOLA PEDR jobs to the NASA PDS Geosciences Node. |
+| **Scout** | Cooperative follower/scout informative path planning. The follower solves a feasible route on known terrain; the scout chooses information-gain viewpoints and reveals a connected sensor swath along each sortie. The panel reports feasible vs. optimistic route length, optimality gap, known-terrain fraction, scout distance/sorties, an animated local AOI map, an elevation/slope profile, and a cost-convergence chart. Certificates of optimality or infeasibility are shown explicitly. |
+| **Clock** | Full Mars24 readout: MSD, MTC, Ls, equation of time, subsolar point, solar irradiance, and local solar time/phase for Perseverance and Curiosity. The cursor readout updates as you move over the globe or flat map. |
+
+### Cooperative scouting method
+1. Read a DEM window, compute slope at native resolution, then block-aggregate to the planning grid (mean elevation, max slope).
+2. Build an optimistic route with A* on the full terrain model; this is a lower bound for any feasible route.
+3. Build a feasible route using only terrain already revealed by the scout; unrevealed cells are impassable/unknown.
+4. Score candidate scout viewpoints by unknown-cell gain and connectivity, reveal the sensor swath along the flight leg, and repeat until the feasible and optimistic costs converge.
+5. Emit `OPTIMAL_PROVEN`, `INFEASIBILITY_PROVEN`, or `MAX_ITERATIONS` with the corresponding proof text and convergence history.
+
+### Optional full-DEM mode
+The backend is standard-library-first. Without `numpy`/`rasterio`, ARES-OS uses a deterministic MOLA-anchored fractal fallback for slope analysis. Install the optional scientific stack to read real USGS CTX/HiRISE COG DTMs over HTTP range requests:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install numpy rasterio
+.venv/bin/python server.py 8000
+```
+
+Real-DEM responses identify their source (for example `USGS STAC CTX DTM`) and include the STAC item id and native resolution. Network access is required for STAC, ODE, GDS, and browse-image queries; the rest of the app works offline.
+
+---
+
 ## 🚀 System Architecture & Modules
 
 ### 1. Interactive 3D Planetary Globe & Viewport Limiting
 - **Geodetic Coordinate Mapping**: Converts Martian geodetic latitude and longitude ($\phi, \lambda$) directly into 3D Cartesian coordinates on the Mars IAU 2000 reference sphere ($R = 3,396.19\text{ km}$).
 - **Decontourification Shader Architecture**: Custom GLSL shader smooths elevation stepping artifacts across color-coded hillshade mosaics.
-- **Strict Camera Altitude Clamping**: `controls.minDistance` is enforced at `1.28` (~950 km above surface datum). Fly-to animations clamp via `safeDist = Math.max(controls.minDistance, targetDist)`, eliminating texture over-magnification and terrain pixelation.
+- **Strict Camera Altitude Clamping**: `controls.minDistance` is enforced at `1.08` (~270 km above surface datum). Fly-to animations clamp via `safeDist = Math.max(controls.minDistance, targetDist)`, eliminating texture over-magnification and terrain pixelation.
 - **Deep Space Celestial Starfield**: Procedurally generated stars mapped onto a distant celestial sphere.
 
 ### 2. High-Precision 2D Research Flat Map
@@ -97,6 +131,14 @@ The unified backend (`server.py` / `dataset/web_app_gpu/serve.py`) exposes the f
 | `/api/nasa/ode` | `GET` | `lat`, `lon`, `radius`, `instrument` | Queries NASA PDS ODE REST API for orbital observation footprints (CTX, HiRISE, CRISM). |
 | `/api/nasa/browse` | `GET` | `pdsid` | Streams cached high-resolution browse images from NASA PDS archives. |
 | `/api/nasa/mola-elevation` | `GET` | `lat`, `lon`, `box` | Retrieves granular MOLA PEDR laser altimetry point clouds from NASA PDS GDS. |
+| `/api/atlas/missions` | `GET` | None | Historical mission registry with exact coordinates, status, namesake biography, and scientific significance. |
+| `/api/atlas/landmarks` | `GET` | None | Curated IAU landmark registry enriched with namesake biographies and geology notes. |
+| `/api/minerals` | `GET` | `lat`, `lon`, `radius`, `instrument` (optional) | Aqueous-mineral classes and target sites; optional proximity filter. |
+| `/api/terrain/slope` | `GET` | `lat`, `lon`, `size`, `resolution`, `prefer`, `n` | Real USGS STAC COG DTM window, slope grid, 0–15/15–30/>30° hazard classes, and source metadata. |
+| `/api/scouting/plan` | `GET`/`POST` | `start_lat`, `start_lon`, `target_lat`, `target_lon`, `sensor_radius`, `max_iterations` | Cooperative follower/scout IPP with feasible and optimistic paths, convergence history, and proofs. |
+| `/api/mars/time` | `GET` | `lon` | Cursor-local Mars time, LMST/LTST, solar elevation, and MTC. |
+| `/api/nasa/features` | `GET` | `query`, `featurename` | NASA PDS ODE feature/geometry query proxy. |
+| `/api/nasa/gds/jobs` | `GET` | `action=submit\|status\|list\|abort`, `jobid`, bbox (`minlat`, `maxlat`, `westernlon`, `easternlon`) | Asynchronous MOLA PEDR job manager with state, notes, and result files. |
 
 ---
 
@@ -132,15 +174,21 @@ y_pixel = row * 256
 ## ⚡ Quick Start & Verification
 
 ### 1. Requirements
-- Python 3.8+ (Zero external packages required for runtime — runs entirely on the Python standard library!)
+- Python 3.8+ (standard-library runtime)
 - Modern WebGL2-compatible browser (Chrome, Firefox, Safari, Edge)
+- Optional for real DEM slope analysis: `numpy` + `rasterio` (see the ARES-OS section)
 
 ### 2. Launching the Application
 ```bash
-# Start the unified multi-threaded server on port 8083 (or any custom port)
+# Zero-dependency mode (synthetic terrain fallback)
 python3 server.py 8083
+
+# Full ARES-OS mode with real USGS DEM windows
+python3 -m venv .venv
+.venv/bin/pip install numpy rasterio
+.venv/bin/python server.py 8000
 ```
-Open your browser at: **`http://localhost:8083`**
+Open **`http://localhost:8083`** for zero-dependency mode, or **`http://localhost:8000`** after the full-DEM setup above. The explorer loads immediately; open the **ARES-OS** panel on the right and use the Atlas, Minerals, Terrain, Scout, and Clock tabs. The same backend can be started from the deployment copy with `python3 dataset/web_app_gpu/serve.py 8000`; it resolves the shared `ares/` package automatically.
 
 ### 3. Running Automated Test Suites
 ```bash
@@ -148,7 +196,7 @@ Open your browser at: **`http://localhost:8083`**
 python3 dataset/web_app_gpu/test_gpu_app.py
 
 # Verify Python syntax across all modules
-python3 -m compileall dataset/ server.py
+python3 -m compileall ares/ dataset/ server.py
 ```
 
 ---
@@ -157,6 +205,7 @@ python3 -m compileall dataset/ server.py
 
 ```
 .
+├── ares/                                     # ARES-OS science package (catalog, Mars24, DEM, IPP, ODE, GDS)
 ├── server.py                                  # Unified multi-threaded server & NASA REST API backend
 ├── render.yaml                                # Turnkey deployment configuration for Render.com
 ├── requirements.txt                           # Optional Python dependencies (runtime is zero-dependency)
@@ -169,7 +218,9 @@ python3 -m compileall dataset/ server.py
 │   │
 │   ├── web_app_gpu/                           # 🚀 MAIN APPLICATION: 3D Planetary Explorer & GPU Engine
 │   │   ├── index.html                         # Interactive 3D globe (Three.js), ephemeris HUD, docks & shaders
-│   │   ├── serve.py                           # Standalone multi-threaded server
+│   │   ├── mission_control.js                 # ARES-OS UI, overlays, charts, hover cards & map picking
+│   │   ├── mission_control.css                # ARES-OS panel, chronometer, atlas/scout styling
+│   │   ├── serve.py                           # Standalone multi-threaded server (shared ares/ package)
 │   │   ├── test_gpu_app.py                    # Automated test suite for 3D/2D apps, GeoJSON & server
 │   │   ├── mars_mola_base_2k.jpg              # Tier 1 instant 2K LOD base texture (~400 KB)
 │   │   ├── mars_mola_4k.jpg                   # Tier 2 sharp 4K planetary surface map (~1.9 MB)

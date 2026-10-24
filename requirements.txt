@@ -1,3 +1,7 @@
 # Zero external dependencies required - runs completely on standard library!
 # Pillow is optional if you wish to run tile generation utilities on the server
 Pillow>=9.0.0
+
+# Optional ARES-OS full-DEM mode: real USGS CTX/HiRISE COG range reads
+numpy>=1.26
+rasterio>=1.3
