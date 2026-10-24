@@ -388,16 +388,6 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_mars_ephemeris(query)
             return
 
-        # Targeted High-Resolution Inset Patches (Level 6 100m/px + Landing Insets)
-        if path == "/api/insets":
-            self.handle_insets(query)
-            return
-
-        # Level 6 LOD Pyramid Info & Grid Specifications
-        if path == "/api/tiles/l6/info":
-            self.handle_l6_info(query)
-            return
-
         super().do_GET()
 
     def translate_path(self, path):
@@ -406,12 +396,6 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
 
         if clean_path in ("/", "\\"):
             return os.path.join(GPU_DIR, "index.html")
-
-        if clean_path.startswith("/insets/") or clean_path.startswith("\\insets\\"):
-            rel = clean_path[len("/insets/"):].lstrip("/\\")
-            candidate = os.path.join(GPU_DIR, "insets", rel)
-            if os.path.exists(candidate):
-                return candidate
 
         if clean_path.startswith("/data/") or clean_path.startswith("\\data\\"):
             rel = clean_path[len("/data/"):].lstrip("/\\")
@@ -1070,36 +1054,6 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json_response(payload)
         except Exception as e:
             self.send_json_response({"status": "error", "message": str(e)}, status_code=500)
-
-    def handle_insets(self, query):
-        """
-        Serves metadata for high-resolution Level 6 (100 m/px) landing site insets.
-        """
-        meta_file = os.path.join(GPU_DIR, "insets", "insets_metadata.json")
-        if os.path.exists(meta_file):
-            try:
-                with open(meta_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                self.send_json_response(data)
-                return
-            except Exception as e:
-                pass
-        self.send_json_response({"status": "error", "message": "Inset metadata unavailable"}, 404)
-
-    def handle_l6_info(self, query):
-        """
-        Returns grid and resolution specs for the 32K Level 6 LOD Pyramid.
-        """
-        info = {
-            "status": "success",
-            "layer": "Level 6 (32K Composite / 100 m/px)",
-            "composite_dimensions": {"width": 32768, "height": 16384, "megapixels": 536.87},
-            "grid": {"columns": 128, "rows": 64, "total_tiles": 8192, "tile_size_px": 256},
-            "resolution": "100 m/pixel (~0.010986 deg/px)",
-            "coverage": {"lat": [-90, 90], "lon": [-180, 180]},
-            "insets_count": 5
-        }
-        self.send_json_response(info)
 
 
 class ThreadingServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
