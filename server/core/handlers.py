@@ -33,11 +33,77 @@ class APIHandler:
 
     def handle_rover_missions(self):
         """GET /api/rover/missions - Returns historical rover traverse data."""
+        missions = [dict(m) for m in HISTORICAL_ROVER_MISSIONS]
+        try:
+            rt_file = os.path.join(self.dirs["DATA_DIR"], "rover_traverses.json")
+            if os.path.exists(rt_file):
+                with open(rt_file, "r", encoding="utf-8") as f_rt:
+                    rt_data = json.load(f_rt)
+                for m in missions:
+                    mid = m.get("id")
+                    if mid in rt_data and "track" in rt_data[mid] and not m.get("actual_path"):
+                        m["actual_path"] = rt_data[mid]["track"]
+        except Exception:
+            pass
         return {
             "status": "success",
-            "count": len(HISTORICAL_ROVER_MISSIONS),
-            "missions": HISTORICAL_ROVER_MISSIONS
+            "count": len(missions),
+            "missions": missions
         }
+
+    def handle_rover_traverses(self, query):
+        """GET /api/rover/traverses - Returns continuous high-density rover tracks."""
+        rover_id = query.get("rover", [None])[0]
+        json_path = os.path.join(self.dirs["DATA_DIR"], "rover_traverses.json")
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if rover_id and rover_id in data:
+                return {"status": "success", "mission": data[rover_id]}
+            else:
+                return {"status": "success", "missions": data}
+        except Exception as e:
+            return {"status": "error", "message": str(e), "status_code": 500}
+
+    def handle_ipp_presets(self):
+        """GET /api/ipp/presets - Returns ARES-OS Scouting-IPP presets."""
+        try:
+            from ipp_engine import IPP_PRESETS
+            return {"status": "success", "presets": list(IPP_PRESETS.values())}
+        except Exception as e:
+            return {"status": "error", "message": str(e), "status_code": 500}
+
+    def handle_ipp_terrain_grid(self, query):
+        """GET /api/ipp/terrain-grid - Returns IPP terrain elevation and hazard grids."""
+        preset = query.get("preset", ["jezero"])[0]
+        try:
+            from ipp_engine import AresScoutPlanner
+            planner = AresScoutPlanner(preset)
+            return planner.get_terrain_payload()
+        except Exception as e:
+            return {"status": "error", "message": str(e), "status_code": 500}
+
+    def handle_ipp_scout_plan(self, params):
+        """GET/POST /api/ipp/scout-plan - Runs ARES-OS scout informative path planning."""
+        preset = params.get("preset", ["jezero"])
+        if isinstance(preset, list):
+            preset = preset[0] if preset else "jezero"
+        max_iter = params.get("max_iterations", [10])
+        if isinstance(max_iter, list):
+            max_iter = int(max_iter[0]) if max_iter else 10
+        else:
+            max_iter = int(max_iter)
+        swath = params.get("swath_radius", [3.5])
+        if isinstance(swath, list):
+            swath = float(swath[0]) if swath else 3.5
+        else:
+            swath = float(swath)
+        try:
+            from ipp_engine import AresScoutPlanner
+            planner = AresScoutPlanner(preset)
+            return planner.run_scout_ipp(max_iterations=max_iter, swath_radius_cells=swath)
+        except Exception as e:
+            return {"status": "error", "message": str(e), "status_code": 500}
 
     def handle_eva_plan(self, query):
         """GET /api/eva/plan - Plans EVA route with hazard and metabolic analysis."""
@@ -76,6 +142,14 @@ class APIHandler:
             return self.handle_eva_presets()
         elif path == "/api/rover/missions":
             return self.handle_rover_missions()
+        elif path == "/api/rover/traverses":
+            return self.handle_rover_traverses(query)
+        elif path == "/api/ipp/presets":
+            return self.handle_ipp_presets()
+        elif path == "/api/ipp/terrain-grid":
+            return self.handle_ipp_terrain_grid(query)
+        elif path == "/api/ipp/scout-plan":
+            return self.handle_ipp_scout_plan(query)
         elif path == "/api/eva/plan":
             return self.handle_eva_plan(query)
         elif path == "/api/mars/ephemeris":

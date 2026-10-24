@@ -261,7 +261,38 @@ def run_tests():
             assert resp.status == 200
             assert resp.headers.get("Access-Control-Allow-Origin") == "*"
 
-        print("  PASS: Live server HTTP requests, API routes, CORS, and textures verified.")
+        # 11. Rover Traverses API
+        with urllib.request.urlopen(f"{base_url}/api/rover/traverses", timeout=5) as resp:
+            assert resp.status == 200
+            data = json.loads(resp.read().decode("utf-8"))
+            assert data.get("status") == "success"
+            assert "missions" in data
+
+        # 12. ARES-OS Scouting IPP API (presets, terrain-grid, scout-plan)
+        with urllib.request.urlopen(f"{base_url}/api/ipp/presets", timeout=5) as resp:
+            assert resp.status == 200
+            data = json.loads(resp.read().decode("utf-8"))
+            assert data.get("status") == "success"
+            assert len(data.get("presets", [])) >= 1
+
+        with urllib.request.urlopen(f"{base_url}/api/ipp/terrain-grid?preset=jezero", timeout=5) as resp:
+            assert resp.status == 200
+            data = json.loads(resp.read().decode("utf-8"))
+            assert data.get("status") == "success"
+            assert data.get("grid_size") == 64
+
+        post_req = urllib.request.Request(
+            f"{base_url}/api/ipp/scout-plan",
+            data=json.dumps({"preset": "jezero", "max_iterations": 5}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(post_req, timeout=10) as resp:
+            assert resp.status == 200
+            data = json.loads(resp.read().decode("utf-8"))
+            assert data.get("status") == "success"
+            assert "proof_status" in data
+
+        print("  PASS: Live server HTTP requests, API routes, CORS, textures, traverses, and IPP verified.")
     finally:
         httpd.shutdown()
         httpd.server_close()

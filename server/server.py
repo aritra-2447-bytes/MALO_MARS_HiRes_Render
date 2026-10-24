@@ -86,6 +86,24 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
+    def do_POST(self):
+        try:
+            parsed = urllib.parse.urlsplit(self.path)
+            path = parsed.path
+            if path == "/api/ipp/scout-plan":
+                content_length = int(self.headers.get("Content-Length", 0))
+                body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+                try:
+                    params = json.loads(body)
+                except Exception:
+                    params = {}
+                result = self.api_handler.handle_ipp_scout_plan(params)
+                self.send_json_response(result)
+                return
+            self.send_error(404, "Not Found")
+        except Exception as e:
+            self.send_error(500, f"Internal Server Error: {e}")
+
     def do_GET(self):
         try:
             parsed = urllib.parse.urlsplit(self.path)
