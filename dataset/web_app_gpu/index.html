@@ -738,7 +738,7 @@
       <!-- 3D Globe Layer Selector Menu -->
       <div class="layer-menu-container" id="layer-menu-container">
         <button class="pill-btn" id="btn-layer-menu" title="Select 3D Globe Surface Layer">
-          🗂️ Globe Layer: <span id="current-layer-name" style="color:var(--accent-cyan); margin-left:2px;">MOLA Topo</span> <span style="font-size:9px; margin-left:2px;">▼</span>
+          🗂️ Globe Layer: <span id="current-layer-name" style="color:var(--accent-cyan); margin-left:2px;">Zoom 5 Tiles</span> <span style="font-size:9px; margin-left:2px;">▼</span>
         </button>
         <div class="layer-dropdown-menu" id="layer-dropdown">
           <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-dim); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
@@ -747,21 +747,21 @@
           </div>
 
           <!-- Option 1: MOLA Color Topography -->
-          <div class="layer-menu-item active" data-layer="mola" id="layer-opt-mola">
+          <div class="layer-menu-item" data-layer="mola" id="layer-opt-mola">
             <div style="display:flex; flex-direction:column; gap:2px;">
               <span class="layer-item-title">🎨 MOLA Color Elevation</span>
               <span class="layer-item-desc">NASA MOLA + HRSC Color Shaded (8K LOD)</span>
             </div>
-            <span class="layer-indicator" style="color:var(--accent-cyan);">●</span>
+            <span class="layer-indicator">○</span>
           </div>
 
           <!-- Option 2: Zoom 5 Surface Tiles -->
-          <div class="layer-menu-item" data-layer="zoom5" id="layer-opt-zoom5">
+          <div class="layer-menu-item active" data-layer="zoom5" id="layer-opt-zoom5">
             <div style="display:flex; flex-direction:column; gap:2px;">
               <span class="layer-item-title">📷 Zoom 5 Surface Tiles</span>
               <span class="layer-item-desc">NASA Mars Trek 64×32 Grayscale Tiles</span>
             </div>
-            <span class="layer-indicator">○</span>
+            <span class="layer-indicator" style="color:var(--accent-cyan);">●</span>
           </div>
 
           <!-- Option 3: Zoom 5 Overlay Blend -->
@@ -1109,8 +1109,8 @@
       roughness: 1.0,
       metalness: 0.0,
       color: 0xd0d0d0,
-      transparent: true,
-      opacity: 0.0,
+      transparent: false,
+      opacity: 1.0,
       polygonOffset: true,
       polygonOffsetFactor: -1,
       polygonOffsetUnits: -1
@@ -1181,12 +1181,13 @@
     const marsGlobe = new THREE.Mesh(sphereGeo, marsMaterial);
     marsGlobe.castShadow = true;
     marsGlobe.receiveShadow = true;
+    marsGlobe.visible = false;
     scene.add(marsGlobe);
 
     const zoom5Globe = new THREE.Mesh(zoom5Geo, zoom5Material);
     zoom5Globe.castShadow = true;
     zoom5Globe.receiveShadow = true;
-    zoom5Globe.visible = false;
+    zoom5Globe.visible = true;
     scene.add(zoom5Globe);
 
     // Progressive Texture Pipeline (LOD) for 3D Globe Layers
@@ -1196,23 +1197,35 @@
     let zoom5Tex2k = null;
     let zoom5Tex8k = null;
     let zoom5Loading = false;
+    let molaLoading = false;
 
-    // Load MOLA 2K Base -> 8K Master
-    textureLoader.load('/mars_mola_base_2k.jpg', (tex2k) => {
-      molaTex2k = tex2k;
-      if (!marsMaterial.map) {
-        marsMaterial.map = tex2k;
-        marsMaterial.needsUpdate = true;
+    // Progressive Loader for MOLA Color Elevation
+    function loadMolaTextures(onReady) {
+      if (molaTex8k) {
+        if (onReady) onReady();
+        return;
       }
-      textureLoader.load('/mars_mola_8k.jpg', (tex8k) => {
-        tex8k.generateMipmaps = true;
-        tex8k.minFilter = THREE.LinearMipmapLinearFilter;
-        tex8k.magFilter = THREE.LinearFilter;
-        molaTex8k = tex8k;
-        marsMaterial.map = tex8k;
-        marsMaterial.needsUpdate = true;
+      if (molaLoading) return;
+      molaLoading = true;
+
+      textureLoader.load('/mars_mola_base_2k.jpg', (tex2k) => {
+        molaTex2k = tex2k;
+        if (!marsMaterial.map) {
+          marsMaterial.map = tex2k;
+          marsMaterial.needsUpdate = true;
+        }
+        if (onReady) onReady();
+        textureLoader.load('/mars_mola_8k.jpg', (tex8k) => {
+          tex8k.generateMipmaps = true;
+          tex8k.minFilter = THREE.LinearMipmapLinearFilter;
+          tex8k.magFilter = THREE.LinearFilter;
+          molaTex8k = tex8k;
+          marsMaterial.map = tex8k;
+          marsMaterial.needsUpdate = true;
+          molaLoading = false;
+        });
       });
-    });
+    }
 
     // Progressive Loader for Zoom 5 Surface Tiles
     function loadZoom5Textures(onReady) {
@@ -1242,17 +1255,25 @@
       });
     }
 
-    // Pre-cache Zoom 5 preview in background
+    // Default layer: Immediately load Zoom 5 Surface Tiles
+    loadZoom5Textures();
+
+    // Pre-cache MOLA elevation textures in background for instant switching
     setTimeout(() => {
-      loadZoom5Textures();
+      loadMolaTextures();
     }, 800);
 
-    let currentGlobeLayer = 'mola'; // 'mola' | 'zoom5' | 'overlay'
+    let currentGlobeLayer = 'zoom5'; // 'zoom5' | 'mola' | 'overlay'
     let overlayOpacity = 0.65;
 
     function setGlobeLayer(layer) {
       currentGlobeLayer = layer;
-      loadZoom5Textures();
+      if (layer === 'zoom5' || layer === 'overlay') {
+        loadZoom5Textures();
+      }
+      if (layer === 'mola' || layer === 'overlay') {
+        loadMolaTextures();
+      }
 
       const layerNameEl = document.getElementById('current-layer-name');
       const overlayControls = document.getElementById('layer-overlay-controls');
@@ -1275,6 +1296,11 @@
         marsGlobe.visible = true;
         marsMaterial.opacity = 1.0;
         marsMaterial.transparent = false;
+        if (molaTex8k) {
+          marsMaterial.map = molaTex8k;
+        } else if (molaTex2k) {
+          marsMaterial.map = molaTex2k;
+        }
         marsMaterial.needsUpdate = true;
 
         zoom5Globe.visible = false;
@@ -1285,6 +1311,8 @@
         if (overlayControls) overlayControls.style.display = 'none';
 
         marsGlobe.visible = false;
+        marsMaterial.opacity = 0.0;
+        marsMaterial.needsUpdate = true;
 
         zoom5Globe.visible = true;
         zoom5Material.opacity = 1.0;
@@ -1302,6 +1330,11 @@
         marsGlobe.visible = true;
         marsMaterial.opacity = 1.0;
         marsMaterial.transparent = false;
+        if (molaTex8k) {
+          marsMaterial.map = molaTex8k;
+        } else if (molaTex2k) {
+          marsMaterial.map = molaTex2k;
+        }
         marsMaterial.needsUpdate = true;
 
         zoom5Globe.visible = true;
