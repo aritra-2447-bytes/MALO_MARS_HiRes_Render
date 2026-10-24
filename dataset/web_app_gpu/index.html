@@ -205,6 +205,74 @@
       color: white;
     }
 
+    /* 3D Globe Layer Selector Menu */
+    .layer-menu-container {
+      position: relative;
+    }
+
+    .layer-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 270px;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 10px;
+      z-index: 250;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+    }
+
+    .layer-dropdown-menu.open {
+      display: block;
+    }
+
+    .layer-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all 0.15s;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+
+    .layer-menu-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .layer-menu-item.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent-cyan);
+    }
+
+    .layer-item-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .layer-item-desc {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .layer-indicator {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .layer-menu-item.active .layer-indicator {
+      color: var(--accent-cyan);
+    }
+
     /* Fullscreen Viewport */
     #viewport-container {
       position: relative;
@@ -409,9 +477,11 @@
       transition: all 0.2s;
     }
 
-    .landing-card:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.2);
+    .landing-card:hover,
+    .landing-card.card-hover-active {
+      background: rgba(56, 189, 248, 0.16) !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
     }
 
     .status-pill {
@@ -664,6 +734,55 @@
       </div>
       <button class="pill-btn active" id="btn-mode-3d">🌐 3D Earth-Style Globe</button>
       <button class="pill-btn" id="btn-mode-2d">🗺️ 2D Flat Map</button>
+
+      <!-- 3D Globe Layer Selector Menu -->
+      <div class="layer-menu-container" id="layer-menu-container">
+        <button class="pill-btn" id="btn-layer-menu" title="Select 3D Globe Surface Layer">
+          🗂️ Globe Layer: <span id="current-layer-name" style="color:var(--accent-cyan); margin-left:2px;">MOLA Topo</span> <span style="font-size:9px; margin-left:2px;">▼</span>
+        </button>
+        <div class="layer-dropdown-menu" id="layer-dropdown">
+          <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-dim); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <span>3D Globe Surface Layers</span>
+            <span style="font-size:9px; color:var(--accent-orange); background:rgba(244,162,97,0.15); padding:1px 6px; border-radius:4px;">Level 5 WMTS</span>
+          </div>
+
+          <!-- Option 1: MOLA Color Topography -->
+          <div class="layer-menu-item active" data-layer="mola" id="layer-opt-mola">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="layer-item-title">🎨 MOLA Color Elevation</span>
+              <span class="layer-item-desc">NASA MOLA + HRSC Color Shaded (8K LOD)</span>
+            </div>
+            <span class="layer-indicator" style="color:var(--accent-cyan);">●</span>
+          </div>
+
+          <!-- Option 2: Zoom 5 Surface Tiles -->
+          <div class="layer-menu-item" data-layer="zoom5" id="layer-opt-zoom5">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="layer-item-title">📷 Zoom 5 Surface Tiles</span>
+              <span class="layer-item-desc">NASA Mars Trek 64×32 Grayscale Tiles</span>
+            </div>
+            <span class="layer-indicator">○</span>
+          </div>
+
+          <!-- Option 3: Zoom 5 Overlay Blend -->
+          <div class="layer-menu-item" data-layer="overlay" id="layer-opt-overlay">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span class="layer-item-title">✨ Zoom 5 Overlay Blend</span>
+              <span class="layer-item-desc">Zoom 5 Layer overlaid on MOLA Topo</span>
+            </div>
+            <span class="layer-indicator">○</span>
+          </div>
+
+          <!-- Overlay Opacity Slider -->
+          <div id="layer-overlay-controls" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--text-dim); margin-bottom:5px;">
+              <span>Overlay Opacity:</span>
+              <span id="layer-opacity-val" style="color:var(--accent-orange); font-weight:bold;">65%</span>
+            </div>
+            <input type="range" id="layer-opacity-slider" min="0" max="100" value="65" style="width:100%; accent-color:var(--accent-orange); cursor:pointer;">
+          </div>
+        </div>
+      </div>
       <button class="pill-btn" id="btn-toggle-decontour" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
       <button class="pill-btn" id="btn-toggle-drawer">📍 Destinations</button>
       <button class="pill-btn active" id="btn-toggle-solar" title="Toggle Real-Time Astronomical Sun Position & Surface Shadows">☀️ Live Sun Shadows</button>
@@ -749,6 +868,8 @@
               <option value="msl_curiosity">Curiosity (Gale Mt Sharp • Live Sol 5021+ • 38.1 km)</option>
               <option value="mer_opportunity">Opportunity (Meridiani Planum • Sol 5,111 • 45.2 km)</option>
               <option value="mer_spirit">Spirit (Gusev Columbia Hills • Sol 2,210 • 7.7 km)</option>
+              <option value="cnsa_zhurong">Zhurong (Utopia Planitia • Sol 358 • 1.9 km)</option>
+              <option value="pathfinder_sojourner">Sojourner (Ares Vallis • Sol 83 • ~131 m)</option>
             </optgroup>
             <optgroup label="Human EVA Expeditions">
               <option value="jezero_delta_traverse">Jezero Delta Human Walkback</option>
@@ -863,7 +984,7 @@
     controls.dampingFactor = 0.06;
     controls.rotateSpeed = 0.65;
     controls.zoomSpeed = 0.9;
-    controls.minDistance = 1.03;
+    controls.minDistance = 1.28; // Enforced minimum distance to strictly prevent surface texture pixelation
     controls.maxDistance = 8.5;
     controls.enablePan = false;
 
@@ -907,6 +1028,20 @@
       ctx.fillRect(0, 0, 64, 64);
       return new THREE.CanvasTexture(canvas);
     }
+
+    // High-Precision Discrete Point Texture for Landing Sites & Waypoints
+    function createPointDotTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      ctx.beginPath();
+      ctx.arc(16, 16, 12, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      return new THREE.CanvasTexture(canvas);
+    }
+    const pointDotTexture = createPointDotTexture();
 
     const starsGeo = new THREE.BufferGeometry();
     const starCount = 2400;
@@ -969,67 +1104,221 @@
       metalness: 0.04
     });
 
-    // Custom GPU Decontourification Pipeline (removes contour banding artifacts & sharpens MOLA ridges)
-    marsMaterial.onBeforeCompile = (shader) => {
-      shader.uniforms.u_decontour = decontourUniforms.u_decontour;
-      shader.uniforms.u_sharpness = decontourUniforms.u_sharpness;
-      shader.uniforms.u_contrast = decontourUniforms.u_contrast;
-      shader.uniforms.u_texelSize = decontourUniforms.u_texelSize;
+    const zoom5Geo = new THREE.SphereGeometry(MARS_RADIUS * 1.0003, 128, 64);
+    const zoom5Material = new THREE.MeshStandardMaterial({
+      roughness: 1.0,
+      metalness: 0.0,
+      color: 0xd0d0d0,
+      transparent: true,
+      opacity: 0.0,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1
+    });
 
-      shader.fragmentShader = `
-        uniform float u_decontour;
-        uniform float u_sharpness;
-        uniform float u_contrast;
-        uniform vec2 u_texelSize;
-      ` + shader.fragmentShader;
+    // Custom GPU Decontourification Pipeline (removes contour banding artifacts & sharpens ridges)
+    function setupDecontourPipeline(material, isGrayscale = false) {
+      material.onBeforeCompile = (shader) => {
+        shader.uniforms.u_decontour = decontourUniforms.u_decontour;
+        shader.uniforms.u_sharpness = decontourUniforms.u_sharpness;
+        shader.uniforms.u_contrast = decontourUniforms.u_contrast;
+        shader.uniforms.u_texelSize = decontourUniforms.u_texelSize;
 
-      shader.fragmentShader = shader.fragmentShader.replace(
-        '#include <map_fragment>',
-        `
-        #ifdef USE_MAP
-          vec4 texColor = texture2D(map, vUv);
-          if (u_decontour > 0.5) {
-            // High-precision 5-tap cross convolution decontour filter
-            vec4 cU = texture2D(map, vUv + vec2(0.0, u_texelSize.y));
-            vec4 cD = texture2D(map, vUv - vec2(0.0, u_texelSize.y));
-            vec4 cL = texture2D(map, vUv - vec2(u_texelSize.x, 0.0));
-            vec4 cR = texture2D(map, vUv + vec2(u_texelSize.x, 0.0));
+        shader.fragmentShader = `
+          uniform float u_decontour;
+          uniform float u_sharpness;
+          uniform float u_contrast;
+          uniform vec2 u_texelSize;
+        ` + shader.fragmentShader;
 
-            // Laplacian second-derivative operator for ridge extraction
-            vec4 laplacian = 4.0 * texColor - (cU + cD + cL + cR);
-            // Continuous bilateral anti-banding blend
-            vec4 smoothed = (cU + cD + cL + cR) * 0.25;
-            texColor = mix(texColor, smoothed, 0.22);
-            texColor += laplacian * (u_sharpness * 0.35);
-
+        const contrastBlock = isGrayscale
+          ? `
+            // Dim & uniform geomorphology contrast centered on dim mean (prevents overexposure/hotspots)
+            texColor.rgb = (texColor.rgb - 0.35) * (u_contrast * 0.92) + 0.35;
+            texColor.rgb *= 0.970;
+            texColor = clamp(texColor, 0.0, 1.0);
+          `
+          : `
             // Contrast enhancement for geomorphology
             texColor.rgb = (texColor.rgb - 0.5) * u_contrast + 0.5;
             texColor = clamp(texColor, 0.0, 1.0);
-          }
-          diffuseColor *= texColor;
-        #endif
-        `
-      );
-    };
+          `;
+
+        shader.fragmentShader = shader.fragmentShader.replace(
+          '#include <map_fragment>',
+          `
+          #ifdef USE_MAP
+            vec4 texColor = texture2D(map, vUv);
+            if (u_decontour > 0.5) {
+              // High-precision 5-tap cross convolution decontour filter
+              vec4 cU = texture2D(map, vUv + vec2(0.0, u_texelSize.y));
+              vec4 cD = texture2D(map, vUv - vec2(0.0, u_texelSize.y));
+              vec4 cL = texture2D(map, vUv - vec2(u_texelSize.x, 0.0));
+              vec4 cR = texture2D(map, vUv + vec2(u_texelSize.x, 0.0));
+
+              // Laplacian second-derivative operator for ridge extraction
+              vec4 laplacian = 4.0 * texColor - (cU + cD + cL + cR);
+              // Continuous bilateral anti-banding blend
+              vec4 smoothed = (cU + cD + cL + cR) * 0.25;
+              texColor = mix(texColor, smoothed, 0.22);
+              texColor += laplacian * (u_sharpness * 0.35);
+
+              ` + contrastBlock + `
+            } else if (` + (isGrayscale ? "true" : "false") + `) {
+              // When decontour is off, preserve dim & uniform illumination
+              texColor.rgb *= 0.970;
+            }
+            diffuseColor *= texColor;
+          #endif
+          `
+        );
+      };
+    }
+
+    setupDecontourPipeline(marsMaterial, false);
+    setupDecontourPipeline(zoom5Material, true);
 
     const marsGlobe = new THREE.Mesh(sphereGeo, marsMaterial);
     marsGlobe.castShadow = true;
     marsGlobe.receiveShadow = true;
     scene.add(marsGlobe);
 
-    // Progressive Texture: 2K Fast -> 8K Master
+    const zoom5Globe = new THREE.Mesh(zoom5Geo, zoom5Material);
+    zoom5Globe.castShadow = true;
+    zoom5Globe.receiveShadow = true;
+    zoom5Globe.visible = false;
+    scene.add(zoom5Globe);
+
+    // Progressive Texture Pipeline (LOD) for 3D Globe Layers
     const textureLoader = new THREE.TextureLoader();
+    let molaTex2k = null;
+    let molaTex8k = null;
+    let zoom5Tex2k = null;
+    let zoom5Tex8k = null;
+    let zoom5Loading = false;
+
+    // Load MOLA 2K Base -> 8K Master
     textureLoader.load('/mars_mola_base_2k.jpg', (tex2k) => {
-      marsMaterial.map = tex2k;
-      marsMaterial.needsUpdate = true;
+      molaTex2k = tex2k;
+      if (!marsMaterial.map) {
+        marsMaterial.map = tex2k;
+        marsMaterial.needsUpdate = true;
+      }
       textureLoader.load('/mars_mola_8k.jpg', (tex8k) => {
         tex8k.generateMipmaps = true;
         tex8k.minFilter = THREE.LinearMipmapLinearFilter;
         tex8k.magFilter = THREE.LinearFilter;
+        molaTex8k = tex8k;
         marsMaterial.map = tex8k;
         marsMaterial.needsUpdate = true;
       });
     });
+
+    // Progressive Loader for Zoom 5 Surface Tiles
+    function loadZoom5Textures(onReady) {
+      if (zoom5Tex8k) {
+        if (onReady) onReady();
+        return;
+      }
+      if (zoom5Loading) return;
+      zoom5Loading = true;
+
+      textureLoader.load('/mars_zoom5_base_2k.jpg', (tex2k) => {
+        zoom5Tex2k = tex2k;
+        if (!zoom5Material.map) {
+          zoom5Material.map = tex2k;
+          zoom5Material.needsUpdate = true;
+        }
+        if (onReady) onReady();
+        textureLoader.load('/mars_zoom5_8k.jpg', (tex8k) => {
+          tex8k.generateMipmaps = true;
+          tex8k.minFilter = THREE.LinearMipmapLinearFilter;
+          tex8k.magFilter = THREE.LinearFilter;
+          zoom5Tex8k = tex8k;
+          zoom5Material.map = tex8k;
+          zoom5Material.needsUpdate = true;
+          zoom5Loading = false;
+        });
+      });
+    }
+
+    // Pre-cache Zoom 5 preview in background
+    setTimeout(() => {
+      loadZoom5Textures();
+    }, 800);
+
+    let currentGlobeLayer = 'mola'; // 'mola' | 'zoom5' | 'overlay'
+    let overlayOpacity = 0.65;
+
+    function setGlobeLayer(layer) {
+      currentGlobeLayer = layer;
+      loadZoom5Textures();
+
+      const layerNameEl = document.getElementById('current-layer-name');
+      const overlayControls = document.getElementById('layer-overlay-controls');
+
+      // Update UI menu items
+      document.querySelectorAll('.layer-menu-item').forEach(item => {
+        const isMatch = item.getAttribute('data-layer') === layer;
+        item.classList.toggle('active', isMatch);
+        const ind = item.querySelector('.layer-indicator');
+        if (ind) {
+          ind.textContent = isMatch ? '●' : '○';
+          ind.style.color = isMatch ? 'var(--accent-cyan)' : 'var(--text-dim)';
+        }
+      });
+
+      if (layer === 'mola') {
+        if (layerNameEl) layerNameEl.textContent = 'MOLA Topo';
+        if (overlayControls) overlayControls.style.display = 'none';
+
+        marsGlobe.visible = true;
+        marsMaterial.opacity = 1.0;
+        marsMaterial.transparent = false;
+        marsMaterial.needsUpdate = true;
+
+        zoom5Globe.visible = false;
+        zoom5Material.opacity = 0.0;
+        zoom5Material.needsUpdate = true;
+      } else if (layer === 'zoom5') {
+        if (layerNameEl) layerNameEl.textContent = 'Zoom 5 Tiles';
+        if (overlayControls) overlayControls.style.display = 'none';
+
+        marsGlobe.visible = false;
+
+        zoom5Globe.visible = true;
+        zoom5Material.opacity = 1.0;
+        zoom5Material.transparent = false;
+        if (zoom5Tex8k) {
+          zoom5Material.map = zoom5Tex8k;
+        } else if (zoom5Tex2k) {
+          zoom5Material.map = zoom5Tex2k;
+        }
+        zoom5Material.needsUpdate = true;
+      } else if (layer === 'overlay') {
+        if (layerNameEl) layerNameEl.textContent = 'Zoom 5 Overlay';
+        if (overlayControls) overlayControls.style.display = 'block';
+
+        marsGlobe.visible = true;
+        marsMaterial.opacity = 1.0;
+        marsMaterial.transparent = false;
+        marsMaterial.needsUpdate = true;
+
+        zoom5Globe.visible = true;
+        zoom5Material.transparent = true;
+        zoom5Material.opacity = overlayOpacity;
+        if (zoom5Tex8k) {
+          zoom5Material.map = zoom5Tex8k;
+        } else if (zoom5Tex2k) {
+          zoom5Material.map = zoom5Tex2k;
+        }
+        zoom5Material.needsUpdate = true;
+      }
+
+      if (typeof applyLightingState === 'function') {
+        applyLightingState();
+      }
+    }
 
     // Atmosphere Mesh
     const atmosGeo = new THREE.SphereGeometry(MARS_RADIUS * 1.018, 64, 32);
@@ -1101,7 +1390,7 @@
       return item.category === 'polar_cap' ? POLAR_CAP_CAM_DIST : DEFAULT_LANDMARK_CAM_DIST;
     }
 
-    // Google Earth Smooth Fly-To
+    // High-Precision Smooth Planetary Fly-To
     let isTransitioning = false;
     let transitionStart = 0;
     let transitionDuration = 1200;
@@ -1114,7 +1403,8 @@
       transitionStart = performance.now();
       startCamPos.copy(camera.position);
 
-      const targetSurface = latLonToVector3(lat, lon, targetDist);
+      const safeDist = Math.max(controls.minDistance, targetDist);
+      const targetSurface = latLonToVector3(lat, lon, safeDist);
       targetCamPos.copy(targetSurface);
       controls.target.set(0, 0, 0);
 
@@ -1269,6 +1559,12 @@
       while (markersGroup.children.length > 0) markersGroup.remove(markersGroup.children[0]);
 
       list.forEach(lm => {
+        if (lm.category === 'landing_site') {
+          // Landing sites are rendered by renderLandingSiteMarkers as crisp points.
+          // Omit here to prevent overlapping blobs/rings covering rover pathways.
+          return;
+        }
+
         const pos = latLonToVector3(lm.lat, lm.lon, MARS_RADIUS * 1.002);
         const normal = pos.clone().normalize();
 
@@ -1341,16 +1637,16 @@
 
     // --- Landing Site Markers (Audited Active, Completed, Failed & Proposed Missions) ---
     const DEFAULT_LANDING_SITES = [
-      { id: "m20_perseverance", name: "Perseverance (Mars 2020)", station: "Octavia E. Butler Landing", site: "Octavia E. Butler Landing, Jezero Crater", lat: 18.4446, lon: 77.4508, elevation_m: -2570, status: "Active", type: "rover", year: 2021, agency: "NASA" },
-      { id: "msl_curiosity", name: "Curiosity (MSL)", station: "Bradbury Landing", site: "Bradbury Landing, Aeolis Palus, Gale Crater", lat: -4.5895, lon: 137.4417, elevation_m: -4501, status: "Active", type: "rover", year: 2012, agency: "NASA" },
-      { id: "mer_opportunity", name: "Opportunity (MER-B)", station: "Challenger Memorial Station", site: "Challenger Memorial Station, Eagle Crater, Meridiani Planum", lat: -1.9462, lon: -5.5266, elevation_m: -1390, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
-      { id: "mer_spirit", name: "Spirit (MER-A)", station: "Columbia Memorial Station", site: "Columbia Memorial Station, Gusev Crater", lat: -14.5684, lon: 175.4726, elevation_m: -1910, status: "Completed", type: "rover", year: 2004, agency: "NASA" },
-      { id: "cnsa_zhurong", name: "Zhurong (Tianwen-1)", station: "Zhurong Landing Site", site: "Southern Utopia Planitia", lat: 25.0660, lon: 109.9250, elevation_m: -4099, status: "Completed", type: "rover", year: 2021, agency: "CNSA" },
+      { id: "m20_perseverance", name: "Perseverance (Mars 2020)", station: "Octavia E. Butler Landing", site: "Octavia E. Butler Landing, Jezero Crater", final_site: "Belva Crater Rim / Neretva Vallis", lat: 18.4446, lon: 77.4508, elevation_m: -2570, status: "Active", type: "rover", year: 2021, agency: "NASA", total_odometry_km: 28.4, sol_range: "Sol 0 – Sol 1,120+" },
+      { id: "msl_curiosity", name: "Curiosity (MSL)", station: "Bradbury Landing", site: "Bradbury Landing, Aeolis Palus, Gale Crater", final_site: "Gediz Vallis Debris Flow Ridge", lat: -4.5895, lon: 137.4417, elevation_m: -4501, status: "Active", type: "rover", year: 2012, agency: "NASA", total_odometry_km: 32.8, sol_range: "Sol 0 – Sol 4,100+" },
+      { id: "mer_opportunity", name: "Opportunity (MER-B)", station: "Challenger Memorial Station", site: "Challenger Memorial Station, Eagle Crater, Meridiani Planum", final_site: "Perseverance Valley (Endeavour Crater Rim)", lat: -1.9488, lon: -5.5258, elevation_m: -1390, status: "Completed", type: "rover", year: 2004, agency: "NASA", total_odometry_km: 45.16, sol_range: "Sol 1 – Sol 5,111" },
+      { id: "mer_spirit", name: "Spirit (MER-A)", station: "Columbia Memorial Station", site: "Columbia Memorial Station, Gusev Crater", final_site: "Troy Silica Sands (Home Plate)", lat: -14.5658, lon: 175.4758, elevation_m: -1910, status: "Completed", type: "rover", year: 2004, agency: "NASA", total_odometry_km: 7.73, sol_range: "Sol 1 – Sol 2,210" },
+      { id: "cnsa_zhurong", name: "Zhurong (Tianwen-1)", station: "Zhurong Landing Site", site: "Southern Utopia Planitia", final_site: "Southern Utopia Hibernation Site", lat: 25.0833, lon: 109.9084, elevation_m: -4099, status: "Completed", type: "rover", year: 2021, agency: "CNSA", total_odometry_km: 1.92, sol_range: "Sol 1 – Sol 358" },
       { id: "insight_lander", name: "InSight Lander", station: "Homestead Hollow Station", site: "Homestead Hollow Station, Elysium Planitia", lat: 4.5020, lon: 135.6230, elevation_m: -2613, status: "Completed", type: "lander", year: 2018, agency: "NASA" },
       { id: "phoenix_landing_site", name: "Phoenix Lander", station: "Green Valley Station", site: "Green Valley Station, Vastitas Borealis", lat: 68.2188, lon: -125.7492, elevation_m: -4130, status: "Completed", type: "lander", year: 2008, agency: "NASA" },
       { id: "viking1_lander", name: "Viking 1 Lander", station: "Thomas Mutch Memorial Station", site: "Thomas Mutch Memorial Station, Chryse Planitia", lat: 22.4800, lon: -47.9700, elevation_m: -3627, status: "Completed", type: "lander", year: 1976, agency: "NASA" },
       { id: "viking2_lander", name: "Viking 2 Lander", station: "Gerald Soffen Memorial Station", site: "Gerald Soffen Memorial Station, Utopia Planitia", lat: 48.2690, lon: 134.0100, elevation_m: -3820, status: "Completed", type: "lander", year: 1976, agency: "NASA" },
-      { id: "pathfinder_sojourner", name: "Mars Pathfinder (Sojourner)", station: "Carl Sagan Memorial Station", site: "Carl Sagan Memorial Station, Ares Vallis", lat: 19.0900, lon: -33.5200, elevation_m: -3682, status: "Completed", type: "lander", year: 1997, agency: "NASA" },
+      { id: "pathfinder_sojourner", name: "Mars Pathfinder (Sojourner)", station: "Carl Sagan Memorial Station", site: "Carl Sagan Memorial Station, Ares Vallis", final_site: "Yogi Rock & Barnacle Bill Vicinity", lat: 19.1300, lon: -33.2200, elevation_m: -3682, status: "Completed", type: "rover", year: 1997, agency: "NASA", total_odometry_km: 0.13, sol_range: "Sol 1 – Sol 83" },
       { id: "beagle2_lander", name: "Beagle 2 (Mars Express)", station: "Isidis Planitia Station", site: "Isidis Planitia Station, Isidis Planitia", lat: 11.5265, lon: 90.4295, elevation_m: -3610, status: "Failed", type: "lander", year: 2003, agency: "ESA" },
       { id: "mars_3_lander", name: "Mars 3 Lander", station: "Ptolemaeus Station", site: "Ptolemaeus Station, Sirenum Fossae", lat: -45.0400, lon: -157.9800, elevation_m: 1500, status: "Failed", type: "lander", year: 1971, agency: "USSR" },
       { id: "mars_6_lander", name: "Mars 6 Lander", station: "Margaritifer Impact Site", site: "Margaritifer Impact Site, Margaritifer Terra", lat: -23.9000, lon: -19.8000, elevation_m: -800, status: "Failed", type: "lander", year: 1974, agency: "USSR" },
@@ -1371,46 +1667,28 @@
       }
 
       sites.forEach(site => {
-        const pos = latLonToVector3(site.lat, site.lon, MARS_RADIUS * 1.0015);
-        const normal = pos.clone().normalize();
+        const pos = latLonToVector3(site.lat, site.lon, MARS_RADIUS * 1.0008);
         const colorHex = getStatusColor(site.status);
 
         const beaconGroup = new THREE.Group();
 
-        // 1. High-Fidelity Status-Colored Pin Head Sphere
-        const headGeo = new THREE.SphereGeometry(0.0055, 16, 16);
-        const headMat = new THREE.MeshStandardMaterial({
+        // 1. Clean, razor-sharp point marker (replaces bulky blob spheres, stems & rings)
+        const ptGeo = new THREE.BufferGeometry().setFromPoints([pos]);
+        const ptMat = new THREE.PointsMaterial({
           color: colorHex,
-          emissive: colorHex,
-          emissiveIntensity: 0.75,
-          roughness: 0.25,
-          metalness: 0.2
-        });
-        const pinHead = new THREE.Mesh(headGeo, headMat);
-        const pinHeight = 0.014;
-        pinHead.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
-        beaconGroup.add(pinHead);
-
-        // 2. High-Contrast Slender White Stem
-        const stemGeo = new THREE.CylinderGeometry(0.00045, 0.00045, pinHeight, 8);
-        const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const stem = new THREE.Mesh(stemGeo, stemMat);
-        stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
-        stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
-        beaconGroup.add(stem);
-
-        // 3. Ground Target Ring
-        const ringGeo = new THREE.RingGeometry(0.005, 0.009, 32);
-        const ringMat = new THREE.MeshBasicMaterial({
-          color: colorHex,
-          side: THREE.DoubleSide,
+          size: 7,
+          sizeAttenuation: false,
+          map: pointDotTexture,
           transparent: true,
-          opacity: 0.85
+          alphaTest: 0.1
         });
-        const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
-        ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
-        beaconGroup.add(ring);
+        const pointObj = new THREE.Points(ptGeo, ptMat);
+
+        // 2. Invisible small bounding sphere for raycasting & mouse interaction
+        const hitGeo = new THREE.SphereGeometry(0.0008, 8, 8);
+        const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+        const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+        hitMesh.position.copy(pos);
 
         const siteData = {
           type: 'lander',
@@ -1428,8 +1706,11 @@
         };
 
         beaconGroup.userData = siteData;
-        pinHead.userData = siteData;
-        ring.userData = siteData;
+        pointObj.userData = siteData;
+        hitMesh.userData = siteData;
+
+        beaconGroup.add(pointObj);
+        beaconGroup.add(hitMesh);
 
         beaconGroup.visible = featureVisibility[site.id] !== false;
         window.landingSiteMarkersGroup.add(beaconGroup);
@@ -1442,11 +1723,11 @@
       if (!window.landingSiteMarkersGroup) return;
       window.landingSiteMarkersGroup.children.forEach(group => {
         if (group.userData?.missionId === missionId || group.userData?.id === missionId) {
-          group.children.forEach(mesh => {
-            if (mesh.geometry instanceof THREE.RingGeometry) {
-              mesh.scale.set(1.5, 1.5, 1.5);
-            } else if (mesh.geometry instanceof THREE.SphereGeometry) {
-              mesh.scale.set(1.3, 1.3, 1.3);
+          group.children.forEach(child => {
+            if (child.isPoints && child.material) {
+              child.material.size = 11;
+            } else if (child.scale) {
+              child.scale.set(1.4, 1.4, 1.4);
             }
           });
         }
@@ -1456,8 +1737,12 @@
     function resetLandingMarkersScale() {
       if (!window.landingSiteMarkersGroup) return;
       window.landingSiteMarkersGroup.children.forEach(group => {
-        group.children.forEach(mesh => {
-          mesh.scale.set(1.0, 1.0, 1.0);
+        group.children.forEach(child => {
+          if (child.isPoints && child.material) {
+            child.material.size = 7;
+          } else if (child.scale) {
+            child.scale.set(1.0, 1.0, 1.0);
+          }
         });
       });
     }
@@ -1489,6 +1774,21 @@
         });
       }
 
+      // If rover traverses data is available, enrich landing sites with authoritative start/end and odometry
+      if (roverTraversesData) {
+        items.forEach(item => {
+          const mNorm = normalizeMissionId(item.id);
+          const tData = roverTraversesData[mNorm] || roverTraversesData[item.id];
+          if (tData) {
+            if (tData.touchdown?.name) item.station = tData.touchdown.name;
+            if (tData.final?.name) item.final_site = tData.final.name;
+            if (tData.odometry_km) item.total_odometry_km = tData.odometry_km;
+            if (tData.sol_range) item.sol_range = tData.sol_range;
+            if (tData.summary) item.summary = tData.summary;
+          }
+        });
+      }
+
       // Sort order: 1. Active, 2. Completed, 3. Failed, 4. Proposed
       const statusOrder = { 'Active': 1, 'Completed': 2, 'Failed': 3, 'Proposed': 4 };
       items.sort((a, b) => {
@@ -1516,26 +1816,39 @@
         const statusHex = getStatusColorHexStr(item.status);
         const isChecked = featureVisibility[item.id] !== false;
 
+        let travelText = '';
+        if (item.type === 'rover' && (item.station || item.site)) {
+          const fromName = item.station || item.site;
+          const toName = item.final_site || 'Final Rest Site';
+          travelText = `
+            <div style="font-size:10.5px; color:#cbd5e1; margin-top:3px; display:flex; align-items:center; gap:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <span style="color:#22c55e;">📍 ${fromName}</span>
+              <span style="color:#38bdf8;">➔</span>
+              <span style="color:#38bdf8;">🏁 ${toName}</span>
+            </div>
+          `;
+        }
+
         let subParts = [];
-        if (item.station) subParts.push(item.station);
-        else if (item.site) subParts.push(item.site);
-        if (item.total_odometry_km) subParts.push(`${item.total_odometry_km} km`);
+        if (item.total_odometry_km) subParts.push(`📏 ${item.total_odometry_km} km`);
+        if (item.sol_range) subParts.push(`⏳ ${item.sol_range}`);
         subParts.push(`${Number(item.lat).toFixed(2)}°, ${Number(item.lon).toFixed(2)}°`);
         if (item.elevation_m !== undefined) subParts.push(`${Number(item.elevation_m).toLocaleString()} m`);
         const subtext = subParts.join(' • ');
 
         card.innerHTML = `
-          <div style="display:flex; align-items:center; gap:8px; width:100%; min-width:0;">
-            <input type="checkbox" ${isChecked ? 'checked' : ''} data-feature-id="${item.id}" class="landing-vis-chk" title="Toggle visibility" style="cursor:pointer; accent-color:${statusHex}; flex-shrink:0;">
-            <div class="legend-color-dot" style="background:${statusHex}; flex-shrink:0;"></div>
+          <div style="display:flex; align-items:flex-start; gap:8px; width:100%; min-width:0;">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} data-feature-id="${item.id}" class="landing-vis-chk" title="Toggle visibility" style="cursor:pointer; accent-color:${statusHex}; flex-shrink:0; margin-top:3px;">
+            <div class="legend-color-dot" style="background:${statusHex}; flex-shrink:0; margin-top:5px;"></div>
             <div style="flex:1; min-width:0; cursor:pointer;" class="landing-info-action" title="Click to fly to site">
               <div style="display:flex; align-items:center; gap:6px; justify-content:space-between;">
-                <span class="dest-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px;" title="${item.name}">${item.name}</span>
+                <span class="dest-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; font-weight:600;" title="${item.name}">${item.name}</span>
                 <span class="status-pill ${statusClass}" style="flex-shrink:0;">${item.status}</span>
               </div>
-              <div class="dest-sub" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${subtext}">${subtext}</div>
+              ${travelText}
+              <div class="dest-sub" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10px; color:#94a3b8; margin-top:2px;" title="${subtext}">${subtext}</div>
             </div>
-            <button class="pill-btn landing-fly-btn" style="padding:2px 8px; font-size:10px; flex-shrink:0;" title="Fly to location">Fly</button>
+            <button class="pill-btn landing-fly-btn" style="padding:2px 8px; font-size:10px; flex-shrink:0; margin-top:2px;" title="Fly to location">Fly</button>
           </div>
         `;
 
@@ -1589,13 +1902,17 @@
         // Hover corridor & marker highlight
         card.onmouseenter = () => {
           if (featureVisibility[item.id] !== false) {
+            hoveredMissionId = item.id;
             highlightMissionCorridor(item.id, item.status);
             highlightLandingMarker(item.id);
+            card.classList.add('card-hover-active');
           }
         };
         card.onmouseleave = () => {
           clearCorridorHighlight();
           resetLandingMarkersScale();
+          hoveredMissionId = null;
+          card.classList.remove('card-hover-active');
         };
 
         listContainer.appendChild(card);
@@ -1646,38 +1963,19 @@
         }
 
         if (geom.type === 'LineString' && Array.isArray(geom.coordinates)) {
-          // Convert [lon, lat, elev] to 3D vectors
-          const curvePoints = geom.coordinates.map(c =>
-            latLonToVector3(c[1], c[0], MARS_RADIUS + ((c[2] || 0) / 3396190.0) * 1.5 + 0.0006)
+          // Convert [lon, lat, elev] to 3D surface vectors
+          const linePoints = geom.coordinates.map(c =>
+            latLonToVector3(c[1], c[0], MARS_RADIUS * 1.0006)
           );
 
-          if (curvePoints.length > 1) {
-            // Emissive 3D Tube
-            const curve = new THREE.CatmullRomCurve3(curvePoints);
-            const segments = Math.max(32, curvePoints.length * 4);
-            const radius = props.type === 'rover_traverse' ? 0.0004 : 0.00055;
-            const tubeGeo = new THREE.TubeGeometry(curve, segments, radius, 8, false);
-            const tubeMat = new THREE.MeshStandardMaterial({
-              color: colorHex,
-              emissive: colorHex,
-              emissiveIntensity: 0.45,
-              transparent: true,
-              opacity: 0.95,
-              roughness: 0.4,
-              metalness: 0.2
-            });
-            const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
-            tubeMesh.userData = { feature, type: 'traverse_tube', missionId: props.id, name: props.name };
-            astroPathsGroup.add(tubeMesh);
-
-            // Sub-surface line
-            const lineGeo = new THREE.BufferGeometry().setFromPoints(
-              geom.coordinates.map(c => latLonToVector3(c[1], c[0], MARS_RADIUS * 1.0005))
-            );
+          if (linePoints.length > 1) {
+            // Clean, razor-sharp single-line cartographic pathway
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
             const lineMat = new THREE.LineBasicMaterial({
               color: colorHex,
               transparent: true,
-              opacity: 0.7
+              opacity: 0.95,
+              linewidth: 2
             });
             const lineMesh = new THREE.Line(lineGeo, lineMat);
             lineMesh.userData = { feature, type: 'surface_line', missionId: props.id, name: props.name };
@@ -1697,65 +1995,276 @@
       renderDrawerLandings(data);
     }
 
-    // --- Dynamic Corridor Highlighting on Hover ---
+    // --- Dynamic Corridor Highlighting on Hover & Rover Landing Sites Tracks ---
     let hoveredMissionId = null;
+    let roverTraversesData = null;
+    const traverseCache = new Map();
+
+    function normalizeMissionId(mId) {
+      if (!mId) return null;
+      const aliases = {
+        'zhurong_tianwen1': 'cnsa_zhurong',
+        'phoenix_lander': 'phoenix_landing_site',
+        'viking_1': 'viking1_lander',
+        'viking_2': 'viking2_lander',
+        'beagle_2': 'beagle2_lander'
+      };
+      return aliases[mId] || mId;
+    }
+
+    async function loadRoverTraversesData() {
+      try {
+        const resp = await fetch('/data/rover_traverses.json');
+        if (resp.ok) {
+          roverTraversesData = await resp.json();
+          traverseCache.clear();
+          // Update drawer items with rich odometry
+          if (typeof renderDrawerLandings === 'function') {
+            renderDrawerLandings(DEFAULT_LANDING_SITES);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load /data/rover_traverses.json:", err);
+      }
+    }
+
+    function createEllipsePoints(lat0, lon0, a_km, b_km, az_deg = 0, numSegments = 64) {
+      const kmPerDeg = 3396.19 * Math.PI / 180.0;
+      const aDeg = a_km / kmPerDeg;
+      const bDeg = b_km / kmPerDeg;
+      const azRad = az_deg * (Math.PI / 180.0);
+      const cosLat = Math.max(0.05, Math.cos(lat0 * (Math.PI / 180.0)));
+
+      const pts = [];
+      const altitude = MARS_RADIUS * 1.002;
+      for (let i = 0; i <= numSegments; i++) {
+        const theta = (2 * Math.PI * i) / numSegments;
+        const u = aDeg * Math.cos(theta);
+        const v = bDeg * Math.sin(theta);
+        const dLat = u * Math.cos(azRad) - v * Math.sin(azRad);
+        const dLon = (u * Math.sin(azRad) + v * Math.cos(azRad)) / cosLat;
+        const pt = latLonToVector3(lat0 + dLat, lon0 + dLon, altitude);
+        pts.push(pt);
+      }
+      return pts;
+    }
+
+    function calculateMarsDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 3396.19;
+      const dLat = (lat2 - lat1) * (Math.PI / 180.0);
+      const dLon = (lon2 - lon1) * (Math.PI / 180.0);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * (Math.PI / 180.0)) * Math.cos(lat2 * (Math.PI / 180.0)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
 
     function clearCorridorHighlight() {
       resetLandingMarkersScale();
       while (corridorHighlightGroup.children.length > 0) {
-        const mesh = corridorHighlightGroup.children[0];
-        if (mesh.geometry) mesh.geometry.dispose();
-        if (mesh.material) mesh.material.dispose();
-        corridorHighlightGroup.remove(mesh);
+        corridorHighlightGroup.remove(corridorHighlightGroup.children[0]);
       }
+      document.querySelectorAll('.landing-card').forEach(c => c.classList.remove('card-hover-active'));
     }
 
-    function highlightMissionCorridor(missionId, status) {
+    function highlightMissionCorridor(rawMissionId, status) {
       clearCorridorHighlight();
+      if (!rawMissionId) return;
+      const missionId = normalizeMissionId(rawMissionId);
 
-      let actualPath = null;
-      // 1. Check in astroPathsData
-      if (astroPathsData && astroPathsData.features) {
-        const feat = astroPathsData.features.find(f => f.properties?.id === missionId && f.geometry?.type === 'LineString');
-        if (feat && feat.geometry.coordinates) {
-          actualPath = feat.geometry.coordinates.map(c => ({ lon: c[0], lat: c[1], elev: c[2] || 0 }));
+      // Highlight sidebar card in drawer if visible
+      document.querySelectorAll('.landing-card').forEach(c => {
+        if (c.dataset.missionId === rawMissionId || c.dataset.missionId === missionId) {
+          c.classList.add('card-hover-active');
+        } else {
+          c.classList.remove('card-hover-active');
         }
-      }
-
-      // 2. Check in historicalMissions
-      if (!actualPath && historicalMissions) {
-        const m = historicalMissions.find(h => h.id === missionId);
-        if (m) {
-          if (m.actual_path && m.actual_path.length > 1) {
-            actualPath = m.actual_path;
-          } else if (m.waypoints && m.waypoints.length > 1) {
-            actualPath = m.waypoints.map(wp => ({ lon: wp.lon, lat: wp.lat, elev: wp.elev_m || 0 }));
-          }
-        }
-      }
-
-      if (!actualPath || actualPath.length < 2) return;
-
-      const colorHex = getStatusColor(status || 'Active');
-      const highlightPoints = actualPath.map(p =>
-        latLonToVector3(p.lat, p.lon, MARS_RADIUS + ((p.elev || 0) / 3396190.0) * 1.5 + 0.002)
-      );
-
-      const curve = new THREE.CatmullRomCurve3(highlightPoints);
-      const segments = Math.min(320, Math.max(48, highlightPoints.length * 4));
-      const tubeGeo = new THREE.TubeGeometry(curve, segments, 0.0006, 8, false);
-      const tubeMat = new THREE.MeshStandardMaterial({
-        color: colorHex,
-        emissive: colorHex,
-        emissiveIntensity: 0.85,
-        transparent: true,
-        opacity: 0.95
       });
 
-      const mesh = new THREE.Mesh(tubeGeo, tubeMat);
-      mesh.userData = { type: 'corridor_highlight', missionId };
-      corridorHighlightGroup.add(mesh);
+      // 1. Retrieve pre-built cached 3D group for instantaneous 60 FPS performance
+      if (traverseCache.has(missionId)) {
+        const cached = traverseCache.get(missionId);
+        cached.visible = true;
+        corridorHighlightGroup.add(cached);
+        return;
+      }
+
+      const group = new THREE.Group();
+      group.userData = { missionId, type: 'corridor_highlight_group' };
+
+      const tData = (roverTraversesData && (roverTraversesData[missionId] || roverTraversesData[rawMissionId])) || null;
+
+      // 2. Mobile Rover Traverse Track ("from where to where they traveled")
+      if (tData && tData.type === 'rover' && tData.track && tData.track.length >= 2) {
+        const pts = tData.track;
+        const highlightPoints = pts.map(p =>
+          latLonToVector3(p.lat, p.lon, MARS_RADIUS + ((p.elev_m || 0) / 3396190.0) * 1.5 + 0.002)
+        );
+
+        const cyanColorHex = 0x38bdf8;
+        const odometry = tData.odometry_km || 1.0;
+        const isMicro = odometry < 0.5; // Sojourner (~0.13 km)
+        const tubeRadius = isMicro ? 0.00012 : (odometry < 5.0 ? 0.00028 : (odometry < 15.0 ? 0.00038 : 0.00048));
+        const pinHeight = 0.013;
+        const pinHeadRadius = 0.0024;
+
+        // Clean, crisp single-line rover pathway along actual drive coordinates
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(highlightPoints);
+        const lineMat = new THREE.LineBasicMaterial({
+          color: cyanColorHex,
+          transparent: true,
+          opacity: 0.95,
+          linewidth: 2
+        });
+        const lineMesh = new THREE.Line(lineGeo, lineMat);
+        const trackDesc = `🚀 <b>Landing Point:</b> ${tData.touchdown?.name || 'Touchdown'} ➔ 🏁 <b>Point Traveled:</b> ${tData.final?.name || 'Final Location'}<br><b>Odometry:</b> ${tData.odometry_km} km • <b>Duration:</b> ${tData.sol_range}`;
+        lineMesh.userData = {
+          missionId,
+          type: 'surface_line',
+          name: `${tData.name} Cumulative Drive Traverse`,
+          category: 'ROVER DRIVE TRAVERSE TRACK',
+          description: trackDesc
+        };
+        group.add(lineMesh);
+
+        // Touchdown Point Marker (Clean Emerald Point directly on track start)
+        const startPos = highlightPoints[0];
+        const tdPtGeo = new THREE.BufferGeometry().setFromPoints([startPos]);
+        const tdPtMat = new THREE.PointsMaterial({
+          color: 0x22c55e,
+          size: 8,
+          sizeAttenuation: false,
+          map: pointDotTexture,
+          transparent: true,
+          alphaTest: 0.1
+        });
+        const tdHead = new THREE.Points(tdPtGeo, tdPtMat);
+        tdHead.userData = {
+          name: `Landing Point: ${tData.touchdown?.name || 'Touchdown Point'}`,
+          category: 'ROVER LANDING POINT',
+          description: `📍 <b>Landing Point (Touchdown):</b> ${tData.touchdown?.name || 'Touchdown Station'}<br><b>Landing Sol:</b> Sol ${tData.touchdown?.sol ?? 0}<br><b>Elevation:</b> ${tData.touchdown?.elev_m ?? -1390} m MOLA<br>Touchdown site where the mission began on Mars before traveling ${tData.odometry_km} km.`,
+          lat: tData.touchdown?.lat,
+          lon: tData.touchdown?.lon,
+          elevation_m: tData.touchdown?.elev_m,
+          missionId,
+          type: 'touchdown_marker'
+        };
+        group.add(tdHead);
+
+        const tdHitGeo = new THREE.SphereGeometry(0.0008, 8, 8);
+        const tdHitMat = new THREE.MeshBasicMaterial({ visible: false });
+        const tdStem = new THREE.Mesh(tdHitGeo, tdHitMat);
+        tdStem.position.copy(startPos);
+        tdStem.userData = tdHead.userData;
+        group.add(tdStem);
+
+        // Destination / Final Stop Marker (Clean Cyan Point at Point Traveled)
+        const endPos = highlightPoints[highlightPoints.length - 1];
+        const endPtGeo = new THREE.BufferGeometry().setFromPoints([endPos]);
+        const endPtMat = new THREE.PointsMaterial({
+          color: 0x38bdf8,
+          size: 8,
+          sizeAttenuation: false,
+          map: pointDotTexture,
+          transparent: true,
+          alphaTest: 0.1
+        });
+        const endHead = new THREE.Points(endPtGeo, endPtMat);
+        endHead.userData = {
+          name: `Point Traveled: ${tData.final?.name || 'Final Extent'}`,
+          category: 'POINT IT TRAVELED TO',
+          description: `🏁 <b>Point It Traveled To:</b> ${tData.final?.name || 'Final Location'}<br><b>Final Sol:</b> Sol ${tData.final?.sol ?? 'End'}<br><b>Cumulative Odometry:</b> ${tData.odometry_km} km<br>Final resting / active science site reached from the landing point across Martian terrain.`,
+          lat: tData.final?.lat,
+          lon: tData.final?.lon,
+          elevation_m: tData.final?.elev_m,
+          missionId,
+          type: 'final_stop_marker'
+        };
+        group.add(endHead);
+
+        const endHitGeo = new THREE.SphereGeometry(0.0008, 8, 8);
+        const endHitMat = new THREE.MeshBasicMaterial({ visible: false });
+        const endStem = new THREE.Mesh(endHitGeo, endHitMat);
+        endStem.position.copy(endPos);
+        endStem.userData = endHead.userData;
+        group.add(endStem);
+
+        // Major Milestone Discovery Waypoints (Subtle Golden Points along the track)
+        if (tData.milestones && Array.isArray(tData.milestones)) {
+          tData.milestones.slice(1, -1).forEach(m => {
+            const mPos = latLonToVector3(m.lat, m.lon, MARS_RADIUS * 1.0006);
+            const mPtGeo = new THREE.BufferGeometry().setFromPoints([mPos]);
+            const mPtMat = new THREE.PointsMaterial({
+              color: 0xf59e0b,
+              size: 5,
+              sizeAttenuation: false,
+              map: pointDotTexture,
+              transparent: true,
+              alphaTest: 0.1
+            });
+            const mHead = new THREE.Points(mPtGeo, mPtMat);
+            mHead.userData = {
+              name: m.name,
+              category: 'SCIENTIFIC MILESTONE',
+              description: `⭐ <b>${m.name}</b><br>Science milestone stop along ${tData.name}'s route (${m.lat.toFixed(4)}°, ${m.lon.toFixed(4)}°).`,
+              lat: m.lat,
+              lon: m.lon,
+              missionId,
+              type: 'milestone_marker'
+            };
+            group.add(mHead);
+
+            const mHitGeo = new THREE.SphereGeometry(0.0005, 8, 8);
+            const mHitMat = new THREE.MeshBasicMaterial({ visible: false });
+            const mStem = new THREE.Mesh(mHitGeo, mHitMat);
+            mStem.position.copy(mPos);
+            mStem.userData = mHead.userData;
+            group.add(mStem);
+          });
+        }
+
+      // 3. Fallback: Check astroPathsData / historicalMissions
+      } else {
+        let actualPath = null;
+        if (astroPathsData && astroPathsData.features) {
+          const feat = astroPathsData.features.find(f => (f.properties?.id === missionId || f.properties?.id === rawMissionId) && f.geometry?.type === 'LineString');
+          if (feat && feat.geometry.coordinates) {
+            actualPath = feat.geometry.coordinates.map(c => ({ lon: c[0], lat: c[1], elev: c[2] || 0 }));
+          }
+        }
+        if (!actualPath && historicalMissions) {
+          const m = historicalMissions.find(h => h.id === missionId || h.id === rawMissionId);
+          if (m) {
+            if (m.actual_path && m.actual_path.length > 1) {
+              actualPath = m.actual_path;
+            } else if (m.waypoints && m.waypoints.length > 1) {
+              actualPath = m.waypoints.map(wp => ({ lon: wp.lon, lat: wp.lat, elev: wp.elev_m || 0 }));
+            }
+          }
+        }
+
+        if (actualPath && actualPath.length >= 2) {
+          const highlightPoints = actualPath.map(p =>
+            latLonToVector3(p.lat, p.lon, MARS_RADIUS * 1.0006)
+          );
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(highlightPoints);
+          const lineMat = new THREE.LineBasicMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.95,
+            linewidth: 2
+          });
+          const mesh = new THREE.Line(lineGeo, lineMat);
+          mesh.userData = { type: 'corridor_highlight', missionId };
+          group.add(mesh);
+        }
+      }
+
+      traverseCache.set(missionId, group);
+      corridorHighlightGroup.add(group);
     }
+
 
     // --- High-Visibility 3D Tube Traverse & Historical Rover Path Geometry ---
     let historicalMissions = [];
@@ -1844,67 +2353,53 @@
 
         const pinGroup = new THREE.Group();
 
-        // Miniature Pin Head
-        const headRadius = (isStart || isEnd) ? 0.0016 : 0.0010;
-        const headGeo = new THREE.SphereGeometry(headRadius, 16, 16);
-        const headMat = new THREE.MeshBasicMaterial({ color: colorHex });
-        const head = new THREE.Mesh(headGeo, headMat);
-        const pinHeight = (isStart || isEnd) ? 0.0055 : 0.0035;
-        head.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
-        pinGroup.add(head);
-
-        // Slender Needle Stem
-        const stemGeo = new THREE.CylinderGeometry(0.00015, 0.00015, pinHeight, 8);
-        const stemMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
-        const stem = new THREE.Mesh(stemGeo, stemMat);
-        stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
-        stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
-        pinGroup.add(stem);
-
-        // Delicate Sub-Surface Target Dot (tiny, non-overlapping)
-        const dotGeo = new THREE.CircleGeometry((isStart || isEnd) ? 0.0012 : 0.0007, 16);
-        const dotMat = new THREE.MeshBasicMaterial({
+        // Precision point marker directly on track (no bulky stems, spheres or ground discs)
+        const wpPtGeo = new THREE.BufferGeometry().setFromPoints([pos]);
+        const wpPtMat = new THREE.PointsMaterial({
           color: colorHex,
-          side: THREE.DoubleSide,
+          size: (isStart || isEnd) ? 7 : 4,
+          sizeAttenuation: false,
+          map: pointDotTexture,
           transparent: true,
-          opacity: 0.65
+          alphaTest: 0.1
         });
-        const dot = new THREE.Mesh(dotGeo, dotMat);
-        dot.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
-        dot.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
-        pinGroup.add(dot);
+        const wpPoint = new THREE.Points(wpPtGeo, wpPtMat);
+
+        const hitGeo = new THREE.SphereGeometry(0.0006, 8, 8);
+        const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+        const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+        hitMesh.position.copy(pos);
+
+        const wpData = {
+          name: wp.name || `Waypoint ${idx + 1}`,
+          category: isStart ? 'LANDING SITE' : (isEnd ? 'DESTINATION' : 'WAYPOINT'),
+          lat: wp.lat,
+          lon: wp.lon,
+          type: 'landing_site'
+        };
+        pinGroup.userData = wpData;
+        wpPoint.userData = wpData;
+        hitMesh.userData = wpData;
+
+        pinGroup.add(wpPoint);
+        pinGroup.add(hitMesh);
 
         routesGroup.add(pinGroup);
       });
 
-      // 2. High-Precision Cartographic Continuous Drive Ribbon
+      // 2. High-Precision Cartographic Single-Line Pathway
       const pathNodes = (actualPath && actualPath.length > 1) ? actualPath : samples;
-      const curvePoints = pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0012));
 
-      if (curvePoints.length > 1) {
-        // Crisp, delicate 3D tube hugging the Martian terrain (radius 0.00035 = ~1.2 km scale width)
-        const curve = new THREE.CatmullRomCurve3(curvePoints);
-        const tubeSegments = Math.min(480, Math.max(96, curvePoints.length * 2));
-        const tubeRadius = isRover ? 0.00032 : 0.00045;
-        const tubeGeo = new THREE.TubeGeometry(curve, tubeSegments, tubeRadius, 8, false);
-        const tubeMat = new THREE.MeshStandardMaterial({
-          color: isRover ? 0x00f0ff : 0xfbbf24,
-          roughness: 0.3,
-          metalness: 0.8,
-          emissive: isRover ? 0x0284c7 : 0xd97706,
-          emissiveIntensity: 0.55
-        });
-        const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
-        routesGroup.add(tubeMesh);
-
-        // Surface track line (razor-sharp high-contrast line right on terrain)
+      if (pathNodes && pathNodes.length > 1) {
+        // Razor-sharp single-line pathway hugging the terrain (no bulky tubes)
         const trackGeo = new THREE.BufferGeometry().setFromPoints(
-          pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0004))
+          pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0006))
         );
         const trackMat = new THREE.LineBasicMaterial({
-          color: isRover ? 0x38bdf8 : 0xfde047,
+          color: isRover ? 0x00f0ff : 0xfbbf24,
           transparent: true,
-          opacity: 0.95
+          opacity: 0.95,
+          linewidth: 2
         });
         const trackLine = new THREE.Line(trackGeo, trackMat);
         routesGroup.add(trackLine);
@@ -2009,6 +2504,8 @@
 
     // --- Raycaster Hover Card Detection & Corridor Highlighting ---
     const raycaster = new THREE.Raycaster();
+    raycaster.params.Line = { threshold: 0.005 };
+    raycaster.params.Points = { threshold: 0.005 };
     const mouse = new THREE.Vector2();
 
     window.addEventListener('mousemove', (e) => {
@@ -2046,18 +2543,27 @@
       // 3. Landing site markers
       if (window.landingSiteMarkersGroup) {
         window.landingSiteMarkersGroup.traverse(child => {
-          if (child.isMesh && (child.userData?.type === 'lander' || child.userData?.name)) {
+          if ((child.isMesh || child.isPoints) && (child.userData?.type === 'lander' || child.userData?.name)) {
             interactivePins.push(child);
           }
         });
       }
 
-      // 4. Rover traverse tubes & waypoint pins
+      // 4. Rover traverse tracks & waypoint points
       routesGroup.traverse(child => {
-        if (child.isMesh && (child.userData?.type === 'traverse_tube' || child.userData?.type === 'landing_site' || child.userData?.name)) {
+        if ((child.isMesh || child.isPoints) && (child.userData?.type === 'traverse_tube' || child.userData?.type === 'landing_site' || child.userData?.name)) {
           interactivePins.push(child);
         }
       });
+
+      // 5. Dynamic corridor highlight pins (touchdown, final stop, milestone pins, dotted displacement line, beads, sprite)
+      if (corridorHighlightGroup) {
+        corridorHighlightGroup.traverse(child => {
+          if ((child.isMesh || child.isLine || child.isPoints || child.isSprite) && child.userData && child.userData.name) {
+            interactivePins.push(child);
+          }
+        });
+      }
 
       const intersects = raycaster.intersectObjects(interactivePins);
 
@@ -2066,7 +2572,30 @@
         const userData = hitObj.userData || {};
         let displayData = null;
 
-        if (userData.feature) {
+        if (userData.type === 'touchdown_marker' || userData.type === 'final_stop_marker' || userData.type === 'milestone_marker') {
+          displayData = {
+            name: userData.name,
+            lat: userData.lat || 0,
+            lon: userData.lon || 0,
+            elevation_m: userData.elevation_m || 0,
+            status: 'Completed',
+            category: userData.category || 'TRAVERSE WAYPOINT',
+            description: userData.description || '',
+            missionId: userData.missionId
+          };
+        } else if (userData.type === 'traverse_tube' || userData.type === 'lander_ellipse') {
+          const ptLatLon = vector3ToLatLon(intersects[0].point);
+          displayData = {
+            name: userData.name,
+            lat: userData.lat !== undefined ? userData.lat : ptLatLon.lat,
+            lon: userData.lon !== undefined ? userData.lon : ptLatLon.lon,
+            elevation_m: userData.elevation_m || 0,
+            status: 'Completed',
+            category: userData.category || (userData.type === 'traverse_tube' ? 'ROVER DRIVE TRAVERSE TRACK' : 'EDL TARGET ZONE'),
+            description: userData.description || '',
+            missionId: userData.missionId
+          };
+        } else if (userData.feature) {
           const props = userData.feature.properties || {};
           const geom = userData.feature.geometry || {};
 
@@ -2091,14 +2620,43 @@
             missionId: props.id
           };
         } else if (userData.type === 'lander' || userData.type === 'landing_site' || userData.site) {
+          const mNorm = normalizeMissionId(userData.missionId || userData.id);
+          const tData = roverTraversesData ? (roverTraversesData[mNorm] || roverTraversesData[userData.missionId]) : null;
+          let desc = userData.description || `${userData.name} Landing Site`;
+          let cat = (userData.category || 'LANDING SITE').toUpperCase();
+          if (tData) {
+            cat = tData.type === 'rover' ? 'MOBILE ROVER TRAVERSE' : 'STATIONARY LANDER (EDL ZONE)';
+            if (tData.type === 'rover') {
+              desc = `
+                <div style="font-weight:700; color:#38bdf8; font-size:12px; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                  <span>🚀</span> <span>${tData.touchdown?.name || 'Touchdown'}</span>
+                  <span style="color:#22c55e;">➔</span>
+                  <span>${tData.final?.name || 'Final Stop'}</span>
+                </div>
+                <div style="font-size:11px; color:#cbd5e1; margin-bottom:4px; padding:3px 6px; background:rgba(255,255,255,0.06); border-radius:4px;">
+                  <b>Cumulative Odometry:</b> <span style="color:#38bdf8; font-weight:700;">${tData.odometry_km} km</span> • <b>Duration:</b> <span style="color:#fde047;">${tData.sol_range}</span>
+                </div>
+                <div style="font-size:11px; color:#94a3b8; line-height:1.38;">${tData.summary}</div>
+              `;
+            } else if (tData.ellipse) {
+              desc = `
+                <div style="font-weight:700; color:#38bdf8; font-size:12px; margin-bottom:4px;">🎯 Targeted EDL Ellipse: ${tData.ellipse.semi_major_km * 2} × ${tData.ellipse.semi_minor_km * 2} km</div>
+                <div style="font-size:11px; color:#cbd5e1; margin-bottom:4px; padding:3px 6px; background:rgba(255,255,255,0.06); border-radius:4px;">
+                  <b>Station Memorial:</b> <span style="color:#ffffff;">${tData.touchdown?.name || userData.station_name || 'Touchdown Station'}</span>
+                </div>
+                <div style="font-size:11px; color:#94a3b8; line-height:1.38;">${tData.summary}</div>
+              `;
+            }
+          }
+
           displayData = {
             name: userData.name,
             lat: userData.lat || 0,
             lon: userData.lon || 0,
             elevation_m: userData.elevation_m || 0,
             status: userData.status || 'Completed',
-            category: (userData.category || 'LANDING SITE').toUpperCase(),
-            description: userData.description || `${userData.name} Landing Site`,
+            category: cat,
+            description: desc,
             missionId: userData.missionId
           };
         } else if (userData.name) {
@@ -2121,7 +2679,7 @@
           document.getElementById('tt-name').innerHTML = `${displayData.name} ${statusBadge}`;
           document.getElementById('tt-category').textContent = displayData.category;
           document.getElementById('tt-coords').textContent = `${Math.abs(displayData.lat).toFixed(2)}° ${displayData.lat >= 0 ? 'N' : 'S'}, ${Math.abs(displayData.lon).toFixed(2)}° ${displayData.lon >= 0 ? 'E' : 'W'}${displayData.elevation_m !== undefined ? ` • ${Number(displayData.elevation_m).toLocaleString()} m` : ''}`;
-          document.getElementById('tt-desc').textContent = displayData.description;
+          document.getElementById('tt-desc').innerHTML = displayData.description;
 
           tooltip.style.left = `${e.clientX + 12}px`;
           tooltip.style.top = `${e.clientY + 12}px`;
@@ -2181,12 +2739,17 @@
       });
       if (window.landingSiteMarkersGroup) {
         window.landingSiteMarkersGroup.traverse(child => {
-          if (child.isMesh && (child.userData?.type === 'lander' || child.userData?.name)) clickablePins.push(child);
+          if ((child.isMesh || child.isPoints) && (child.userData?.type === 'lander' || child.userData?.name)) clickablePins.push(child);
         });
       }
       if (astroPathsGroup) {
         astroPathsGroup.traverse(child => {
           if (child.isMesh && (child.userData?.type === 'traverse_tube' || child.userData?.feature)) clickablePins.push(child);
+        });
+      }
+      if (corridorHighlightGroup) {
+        corridorHighlightGroup.traverse(child => {
+          if ((child.isMesh || child.isLine || child.isPoints || child.isSprite) && child.userData && (child.userData.name || child.userData.lat !== undefined)) clickablePins.push(child);
         });
       }
 
@@ -2252,14 +2815,24 @@
     // Reset North Up
     document.getElementById('btn-compass').onclick = () => flyToCoordinate(0, 0, 3.2);
 
-    // Zoom
+    // Zoom with strictly enforced distance and scale boundaries (prevents surface pixelation)
     document.getElementById('btn-zoom-in').onclick = () => {
-      camera.position.multiplyScalar(0.85);
-      if (camera.position.length() < controls.minDistance) camera.position.setLength(controls.minDistance);
+      if (appMode === '2D') {
+        flatZoom = Math.min(3.5, flatZoom * 1.25);
+        draw2DFlat();
+      } else {
+        camera.position.multiplyScalar(0.85);
+        if (camera.position.length() < controls.minDistance) camera.position.setLength(controls.minDistance);
+      }
     };
     document.getElementById('btn-zoom-out').onclick = () => {
-      camera.position.multiplyScalar(1.18);
-      if (camera.position.length() > controls.maxDistance) camera.position.setLength(controls.maxDistance);
+      if (appMode === '2D') {
+        flatZoom = Math.max(1.0, flatZoom / 1.25);
+        draw2DFlat();
+      } else {
+        camera.position.multiplyScalar(1.18);
+        if (camera.position.length() > controls.maxDistance) camera.position.setLength(controls.maxDistance);
+      }
     };
 
     // Toggle Mode
@@ -2267,17 +2840,20 @@
       appMode = mode;
       const btn3D = document.getElementById('btn-mode-3d');
       const btn2D = document.getElementById('btn-mode-2d');
+      const layerMenuContainer = document.getElementById('layer-menu-container');
 
       if (mode === '3D') {
         threeCanvas.style.display = 'block';
         flatCanvas.style.display = 'none';
         btn3D.classList.add('active');
         btn2D.classList.remove('active');
+        if (layerMenuContainer) layerMenuContainer.style.display = 'block';
       } else {
         threeCanvas.style.display = 'none';
         flatCanvas.style.display = 'block';
         btn3D.classList.remove('active');
         btn2D.classList.add('active');
+        if (layerMenuContainer) layerMenuContainer.style.display = 'none';
         init2DFlatCanvas();
       }
     }
@@ -2367,8 +2943,88 @@
             }
           });
         }
+
+        // Render 2D hover corridor & landing-to-destination dotted mark line
+        if (hoveredMissionId && roverTraversesData) {
+          const mNorm = normalizeMissionId(hoveredMissionId);
+          const tData = roverTraversesData[mNorm] || roverTraversesData[hoveredMissionId];
+          if (tData) {
+            const to2D = (lon, lat) => ({
+              x: drawX + ((lon + 180.0) / 360.0) * drawW,
+              y: drawY + ((90.0 - lat) / 180.0) * drawH
+            });
+
+            if (tData.type === 'rover' && tData.track && tData.track.length >= 2) {
+              const startCoord = tData.touchdown || tData.track[0];
+              const endCoord = tData.final || tData.track[tData.track.length - 1];
+              const pStart = to2D(startCoord.lon, startCoord.lat);
+              const pEnd = to2D(endCoord.lon, endCoord.lat);
+
+              // 1. Continuous drive path (from landing point to point traveled)
+              ctx.save();
+              ctx.beginPath();
+              ctx.strokeStyle = '#38bdf8';
+              ctx.lineWidth = 3.0;
+              ctx.shadowColor = '#38bdf8';
+              ctx.shadowBlur = 6;
+              tData.track.forEach((pt, idx) => {
+                const p = to2D(pt.lon, pt.lat);
+                if (idx === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+              });
+              ctx.stroke();
+              ctx.restore();
+
+              // 3. Touchdown / Landing Point marker (clean green point)
+              ctx.beginPath();
+              ctx.arc(pStart.x, pStart.y, 3.5, 0, 2 * Math.PI);
+              ctx.fillStyle = '#22c55e';
+              ctx.fill();
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = 1.0;
+              ctx.stroke();
+
+              // 4. Point it traveled marker (clean cyan point)
+              ctx.beginPath();
+              ctx.arc(pEnd.x, pEnd.y, 3.5, 0, 2 * Math.PI);
+              ctx.fillStyle = '#38bdf8';
+              ctx.fill();
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = 1.0;
+              ctx.stroke();
+            }
+          }
+        }
       }
     }
+
+    // Interactive 2D Navigation with Clamped Zoom (Max 3.5x strictly prevents surface pixelation)
+    let isDraggingFlat = false;
+    let flatStartX = 0, flatStartY = 0;
+
+    flatCanvas.addEventListener('mousedown', (e) => {
+      isDraggingFlat = true;
+      flatStartX = e.clientX - flatPanX;
+      flatStartY = e.clientY - flatPanY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDraggingFlat || appMode !== '2D') return;
+      flatPanX = e.clientX - flatStartX;
+      flatPanY = e.clientY - flatStartY;
+      draw2DFlat();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDraggingFlat = false;
+    });
+
+    flatCanvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.15 : 0.87;
+      flatZoom = Math.max(1.0, Math.min(3.5, flatZoom * factor));
+      draw2DFlat();
+    }, { passive: false });
 
     // --- Dynamic Live Mars24 Ephemeris Engine (Allison & McEwen 2000 Formulation) ---
     function computeLiveMarsEphemeris(targetDate = new Date()) {
@@ -2482,32 +3138,126 @@
     };
 
     // Toggle Realistic Solar Terminator & Sun Position
-    document.getElementById('btn-toggle-solar').onclick = () => {
-      solarTerminatorActive = !solarTerminatorActive;
-      const btn = document.getElementById('btn-toggle-solar');
-      btn.classList.toggle('active', solarTerminatorActive);
+    // --- Grayscale Hemisphere Equalization Lighting with Legacy Fallback ---
+    let useEqualizedGrayscaleLighting = true;
+
+    const LIGHTING_CONFIG = {
+      // Equalized mode: ensures both hemispheres (Jezero Crater & Olympus Mons) are equally bright
+      equalizedGrayscale: {
+        solar: { ambient: 0.52, headlight: 0.42, sun: 1.15, emissiveHex: 0x222222 },
+        uniform: { ambient: 1.05, headlight: 0.55, sun: 0.0, emissiveHex: 0x000000 }
+      },
+      // Standard MOLA baseline
+      molaStandard: {
+        solar: { ambient: 0.48, headlight: 0.22, sun: 1.35, emissiveHex: 0x000000 },
+        uniform: { ambient: 0.85, headlight: 0.35, sun: 1.20, emissiveHex: 0x000000 }
+      },
+      // Complete legacy fallback config (preserves original behavior if needed)
+      legacyFallback: {
+        solar: { ambient: 0.48, headlight: 0.22, sun: 1.35, emissiveHex: 0x000000 },
+        uniform: { ambient: 0.85, headlight: 0.35, sun: 1.20, emissiveHex: 0x000000 }
+      }
+    };
+
+    function applyLightingState() {
+      const isGrayscale = (currentGlobeLayer === 'zoom5' || currentGlobeLayer === 'overlay');
+      const cfg = (isGrayscale && useEqualizedGrayscaleLighting)
+        ? LIGHTING_CONFIG.equalizedGrayscale
+        : (useEqualizedGrayscaleLighting ? LIGHTING_CONFIG.molaStandard : LIGHTING_CONFIG.legacyFallback);
+
+      const modeCfg = solarTerminatorActive ? cfg.solar : cfg.uniform;
+
+      ambientLight.intensity = modeCfg.ambient;
+      cameraHeadlight.intensity = modeCfg.headlight;
+      sunLight.intensity = modeCfg.sun;
 
       if (solarTerminatorActive) {
-        // True physical ephemeris mode: Sun positioned directly at subsolar point with dynamic shadows
-        ambientLight.intensity = 0.48; // Ambient radiance preserves crater/topography readability
-        cameraHeadlight.intensity = 0.22;
-        sunLight.intensity = 1.35;
         sunLight.castShadow = true;
-        const sunPos = latLonToVector3(currentEphemeris.subsolar_point.lat, currentEphemeris.subsolar_point.lon, 6.0);
-        sunLight.position.copy(sunPos);
+        if (currentEphemeris && currentEphemeris.subsolar_point) {
+          const sunPos = latLonToVector3(currentEphemeris.subsolar_point.lat, currentEphemeris.subsolar_point.lon, 6.0);
+          sunLight.position.copy(sunPos);
+        }
         document.getElementById('eph-shadows').textContent = "REAL-TIME ASTRONOMICAL SUN";
         document.getElementById('eph-shadows').style.color = "var(--accent-yellow)";
       } else {
-        // Uniform global illumination mode
-        ambientLight.intensity = 0.85;
-        cameraHeadlight.intensity = 0.35;
-        sunLight.intensity = 1.2;
         sunLight.castShadow = false;
         sunLight.position.set(6, 4, 5);
         document.getElementById('eph-shadows').textContent = "FULL UNIFORM ILLUMINATION";
         document.getElementById('eph-shadows').style.color = "var(--accent-green)";
       }
+
+      // Emissive night-fill calibration for grayscale globe
+      if (typeof zoom5Material !== 'undefined' && zoom5Material) {
+        zoom5Material.emissive.setHex(modeCfg.emissiveHex);
+        if (zoom5Material.map && modeCfg.emissiveHex !== 0x000000) {
+          zoom5Material.emissiveMap = zoom5Material.map;
+        } else if (modeCfg.emissiveHex === 0x000000) {
+          zoom5Material.emissiveMap = null;
+        }
+        zoom5Material.needsUpdate = true;
+      }
+    }
+
+    // Fallback toggle available globally: window.toggleGrayscaleLightingEqualizer(false) restores legacy lighting immediately
+    window.toggleGrayscaleLightingEqualizer = function(enable) {
+      useEqualizedGrayscaleLighting = enable !== undefined ? !!enable : !useEqualizedGrayscaleLighting;
+      applyLightingState();
+      console.log(`[Mars3D] Grayscale Lighting Equalizer: ${useEqualizedGrayscaleLighting ? 'ACTIVE (Balanced)' : 'LEGACY FALLBACK'}`);
+      return useEqualizedGrayscaleLighting;
     };
+    window.restoreLegacyLighting = function() {
+      return window.toggleGrayscaleLightingEqualizer(false);
+    };
+
+    document.getElementById('btn-toggle-solar').onclick = () => {
+      solarTerminatorActive = !solarTerminatorActive;
+      const btn = document.getElementById('btn-toggle-solar');
+      btn.classList.toggle('active', solarTerminatorActive);
+      applyLightingState();
+    };
+
+    // Apply initial lighting state
+    applyLightingState();
+
+    // Layer Selection Menu Interactions
+    const btnLayerMenu = document.getElementById('btn-layer-menu');
+    const layerDropdown = document.getElementById('layer-dropdown');
+    if (btnLayerMenu && layerDropdown) {
+      btnLayerMenu.onclick = (e) => {
+        e.stopPropagation();
+        layerDropdown.classList.toggle('open');
+      };
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#layer-menu-container')) {
+          layerDropdown.classList.remove('open');
+        }
+      });
+
+      document.querySelectorAll('.layer-menu-item').forEach(item => {
+        item.onclick = (e) => {
+          e.stopPropagation();
+          const selected = item.getAttribute('data-layer');
+          setGlobeLayer(selected);
+          if (selected !== 'overlay') {
+            layerDropdown.classList.remove('open');
+          }
+        };
+      });
+    }
+
+    const overlaySlider = document.getElementById('layer-opacity-slider');
+    const overlayValLabel = document.getElementById('layer-opacity-val');
+    if (overlaySlider) {
+      overlaySlider.oninput = (e) => {
+        overlayOpacity = parseFloat(e.target.value) / 100.0;
+        if (overlayValLabel) overlayValLabel.textContent = `${Math.round(overlayOpacity * 100)}%`;
+        if (currentGlobeLayer === 'overlay') {
+          zoom5Material.opacity = overlayOpacity;
+          zoom5Material.needsUpdate = true;
+        }
+      };
+    }
 
     // Toggle Real-Time Decontourification (Anti-Banding & Ridge Sharpening)
     const btnDecontour = document.getElementById('btn-toggle-decontour');
@@ -2517,6 +3267,7 @@
       btnDecontour.classList.toggle('active', decontourActive);
       decontourUniforms.u_decontour.value = decontourActive ? 1.0 : 0.0;
       marsMaterial.needsUpdate = true;
+      zoom5Material.needsUpdate = true;
       const statusEl = document.getElementById('eph-decontour');
       if (statusEl) {
         statusEl.textContent = decontourActive ? "SMOOTH REAL-TIME ACTIVE" : "RAW DISCRETE MESH";
@@ -2544,8 +3295,8 @@
 
       // Pulsing corridor highlight animation
       if (corridorHighlightGroup.children.length > 0) {
-        const pulse = 0.55 + 0.35 * Math.sin(performance.now() * 0.006);
-        corridorHighlightGroup.children.forEach(c => {
+        const pulse = 0.65 + 0.35 * Math.sin(performance.now() * 0.006);
+        corridorHighlightGroup.traverse(c => {
           if (c.material && c.material.emissiveIntensity !== undefined) {
             c.material.emissiveIntensity = pulse;
           }
@@ -2612,6 +3363,7 @@
     renderLandingSiteMarkers(DEFAULT_LANDING_SITES);
     renderDrawerLandings(DEFAULT_LANDING_SITES);
     loadAstroPaths();
+    loadRoverTraversesData();
     updateLiveMarsEphemeris();
     setInterval(updateLiveMarsEphemeris, 1000); // 1-second live clock update
     loadEVARoute('m20_perseverance', false); // Initialize route metrics without hijacking camera view

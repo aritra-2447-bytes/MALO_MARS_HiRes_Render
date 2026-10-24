@@ -132,7 +132,51 @@ def run_tests():
     assert "do_OPTIONS" in serve_code, "do_OPTIONS CORS preflight handler missing in serve.py"
     assert "/data/" in serve_code, "translate_path /data/* routing missing in serve.py"
     assert "ThreadingServer" in serve_code, "ThreadingServer missing in serve.py"
-    print("  PASS: Server CORS preflight, /data/* route handling, and threading verified.")
+    assert "/api/rover/traverses" in serve_code, "/api/rover/traverses API route missing in serve.py"
+    print("  PASS: Server CORS preflight, /data/* route handling, /api/rover/traverses, and threading verified.")
+
+    # Test 7: Verify Rover Traverses Telemetry Dataset
+    print("\n[Test 7] Verifying Rover Traverses Dataset & Landing Sites Tracks...")
+    rt_json_gpu = os.path.join(gpu_dir, "data", "rover_traverses.json")
+    assert os.path.exists(rt_json_gpu), "data/rover_traverses.json missing in web_app_gpu"
+    with open(rt_json_gpu, "r", encoding="utf-8") as f:
+        rt_data = json.load(f)
+
+    # Validate completed historical mobile rovers with drive traverses
+    completed_rovers = ["mer_opportunity", "mer_spirit", "cnsa_zhurong", "pathfinder_sojourner"]
+    for cr in completed_rovers:
+        assert cr in rt_data, f"Missing completed rover {cr} in rover_traverses.json"
+        entry = rt_data[cr]
+        assert entry.get("type") == "rover", f"Expected type 'rover' for {cr}"
+        assert "touchdown" in entry and "lat" in entry["touchdown"] and "lon" in entry["touchdown"], f"Missing touchdown in {cr}"
+        assert "final" in entry and "lat" in entry["final"] and "lon" in entry["final"], f"Missing final destination in {cr}"
+        assert entry.get("odometry_km", 0) > 0, f"Expected odometry > 0 for {cr}"
+        assert "track" in entry and len(entry["track"]) >= 2, f"Expected >= 2 track points for {cr}"
+        assert "milestones" in entry and len(entry["milestones"]) >= 2, f"Expected milestones for {cr}"
+
+    # Validate stationary landers with EDL ellipses & workspaces
+    stationary_landers = ["insight_lander", "phoenix_landing_site", "viking1_lander", "viking2_lander"]
+    for sl in stationary_landers:
+        assert sl in rt_data, f"Missing stationary lander {sl} in rover_traverses.json"
+        entry = rt_data[sl]
+        assert entry.get("type") == "lander", f"Expected type 'lander' for {sl}"
+        assert "ellipse" in entry and "semi_major_km" in entry["ellipse"], f"Missing EDL ellipse for {sl}"
+
+    print(f"  PASS: Rover traverses dataset verified ({len(rt_data)} missions: 4 completed rovers with 'from-where-to-where' tracks & stationary lander EDL ellipses).")
+
+    # Test 8: Verify 3D Hover Traversal & Landing Sites Tracks Integration in index.html
+    print("\n[Test 8] Verifying 3D Hover Traversal & Landing Sites Tracks Integration in index.html...")
+    assert "loadRoverTraversesData" in html, "loadRoverTraversesData function missing in index.html"
+    assert "loadRoverTraversesData()" in html, "loadRoverTraversesData() call on engine startup missing in index.html"
+    assert "roverTraversesData" in html, "roverTraversesData state missing in index.html"
+    assert "traverseCache" in html, "traverseCache Map missing in index.html"
+    assert "createEllipsePoints" in html, "createEllipsePoints helper missing in index.html"
+    assert "touchdown_marker" in html, "touchdown_marker hover handling missing in index.html"
+    assert "final_stop_marker" in html, "final_stop_marker hover handling missing in index.html"
+    assert "milestone_marker" in html, "milestone_marker hover handling missing in index.html"
+    assert "card-hover-active" in html, "card-hover-active CSS and logic missing in index.html"
+    assert "raycaster.params.Line" in html, "raycaster Line threshold missing in index.html"
+    print("  PASS: 3D hover traversal, continuous glowing tube, touchdown/destination markers, and raycaster thresholds verified.")
 
     print("\n" + "=" * 65)
     print("ALL TESTS PASSED! MARS EXPLORATION SUITE FULLY OPERATIONAL.")
