@@ -671,21 +671,6 @@
       gap: 12px;
     }
 
-    /* 3D Rover Drive Simulation & Video Director Panel */
-    #rover-sim-panel {
-      position: absolute;
-      top: 60px;
-      right: 20px;
-      width: 440px;
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--accent-orange);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.2);
-      border-radius: 14px;
-      padding: 14px;
-      z-index: 120;
-    }
-
     /* NASA Modal */
     #product-modal {
       display: none;
@@ -800,73 +785,11 @@
       </div>
       <button class="pill-btn" id="btn-toggle-decontour" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
       <button class="pill-btn" id="btn-toggle-contour" title="Toggle Topographic Contour Lines: Renders real-time elevation isolines over Martian topography">📐 Topo Contours</button>
-      <button class="pill-btn" id="btn-rover-drive" style="background:linear-gradient(135deg, rgba(245,158,11,0.22), rgba(239,68,68,0.25)); border-color:var(--accent-orange); color:#fbbf24;" title="3D Rover Drive Simulation & Video Tour over Contour Terrain">🚜 3D Rover Drive</button>
       <button class="pill-btn" id="btn-toggle-drawer">📍 Destinations</button>
       <button class="pill-btn active" id="btn-toggle-solar" title="Toggle Real-Time Astronomical Sun Position & Surface Shadows">☀️ Live Sun Shadows</button>
       <button class="pill-btn" id="btn-scan-nasa">🛰️ Scan NASA Orbiters</button>
     </div>
   </header>
-
-  <!-- 3D Rover Drive Simulation & Video Director Panel -->
-  <div id="rover-sim-panel" style="display:none;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <div style="display:flex; align-items:center; gap:6px;">
-        <span style="font-size:14px;">🚜</span>
-        <span style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--accent-yellow);" id="sim-mission-name">Perseverance Rover Simulation</span>
-      </div>
-      <button id="sim-close-btn" class="pill-btn" style="padding:2px 8px; font-size:11px;">✕ Close</button>
-    </div>
-
-    <!-- Telemetry Strip -->
-    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; background:rgba(0,0,0,0.35); padding:6px 8px; border-radius:6px; margin-bottom:10px; font-size:11px;">
-      <div>
-        <div style="color:var(--text-dim); font-size:9px; text-transform:uppercase;">Traverse Sol</div>
-        <div style="font-weight:700; color:#fff;" id="sim-sol-val">Sol 1</div>
-      </div>
-      <div>
-        <div style="color:var(--text-dim); font-size:9px; text-transform:uppercase;">Distance</div>
-        <div style="font-weight:700; color:var(--accent-cyan);" id="sim-dist-val">0.00 km</div>
-      </div>
-      <div>
-        <div style="color:var(--text-dim); font-size:9px; text-transform:uppercase;">Elevation</div>
-        <div style="font-weight:700; color:var(--accent-orange);" id="sim-elev-val">-2,540 m</div>
-      </div>
-      <div>
-        <div style="color:var(--text-dim); font-size:9px; text-transform:uppercase;">Drive Speed</div>
-        <div style="font-weight:700; color:var(--accent-green);" id="sim-speed-val">4.2 cm/s</div>
-      </div>
-    </div>
-
-    <!-- Progress Scrubber -->
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-      <span style="font-size:10px; color:var(--text-dim);" id="sim-time-start">0%</span>
-      <input type="range" id="sim-progress-slider" min="0" max="1000" value="0" style="flex:1; accent-color:var(--accent-orange); cursor:pointer;">
-      <span style="font-size:10px; color:var(--text-dim);" id="sim-time-pct">0%</span>
-    </div>
-
-    <!-- Controls Toolbar -->
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-      <div style="display:flex; gap:6px; align-items:center;">
-        <button class="pill-btn active" id="sim-play-btn" style="min-width:65px;">❚❚ Pause</button>
-        <button class="pill-btn" id="sim-restart-btn">↺ Reset</button>
-        <select id="sim-speed-select" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:3px 8px; font-size:11px;">
-          <option value="1">1x Speed</option>
-          <option value="2" selected>2x Speed</option>
-          <option value="5">5x Speed</option>
-          <option value="10">10x Speed</option>
-        </select>
-      </div>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <select id="sim-cam-select" style="background:rgba(0,0,0,0.5); color:var(--accent-cyan); border:1px solid rgba(0,240,255,0.3); border-radius:12px; padding:3px 8px; font-size:11px;">
-          <option value="chase">🎥 Chase Cam</option>
-          <option value="cockpit">🎯 Forward Cam</option>
-          <option value="drone">🛸 Drone Cam</option>
-          <option value="free">🌐 Free Orbit</option>
-        </select>
-        <button class="pill-btn" id="sim-record-btn" style="background:rgba(239,68,68,0.25); border-color:#ef4444; color:#f87171;" title="Record WebM video of rover drive demo directly from canvas">🔴 Record Video</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Ephemeris Solar Intel Floating Panel -->
   <div id="ephemeris-panel" style="display:none;">
@@ -1062,7 +985,7 @@
     controls.dampingFactor = 0.06;
     controls.rotateSpeed = 0.65;
     controls.zoomSpeed = 0.9;
-    controls.minDistance = 1.08; // Close-up orbital perspective (~270 km altitude, matching NASA MRO low Mars orbit)
+    controls.minDistance = 1.28; // Close-up orbital perspective (~270 km altitude, matching NASA MRO low Mars orbit)
     controls.maxDistance = 8.5;
     controls.enablePan = false;
 
@@ -1520,9 +1443,9 @@
     }
 
     // Landmark & Destination Camera Zoom Distances
-    const DEFAULT_LANDMARK_CAM_DIST = 1.85; // Regional context zoom for large volcanoes & canyons (radius 1.0 = surface)
-    const LANDING_SITE_CAM_DIST = 1.15;     // Close-up orbital perspective (~500 km altitude) framing rover traverses in crisp detail
-    const POLAR_CAP_CAM_DIST = 2.40;        // Wide view for continental polar ice sheets
+    const DEFAULT_LANDMARK_CAM_DIST = 1.95; // Regional context zoom for large volcanoes & canyons (radius 1.0 = surface)
+    const LANDING_SITE_CAM_DIST = 1.35;     // Close-up orbital perspective (~500 km altitude) framing rover traverses in crisp detail
+    const POLAR_CAP_CAM_DIST = 2.45;        // Wide view for continental polar ice sheets
 
     function getLandmarkZoomDist(item) {
       if (!item) return DEFAULT_LANDMARK_CAM_DIST;
@@ -1977,12 +1900,6 @@
         if (item.elevation_m !== undefined) subParts.push(`${Number(item.elevation_m).toLocaleString()} m`);
         const subtext = subParts.join(' • ');
 
-        const mNorm = normalizeMissionId(item.id);
-        const hasTrack = !!(roverTraversesData && (roverTraversesData[mNorm] || roverTraversesData[item.id])?.track?.length >= 2);
-        const driveButtonHtml = hasTrack
-          ? `<button class="pill-btn landing-drive-btn" data-mission-id="${item.id}" style="padding:2px 6px; font-size:10px; background:rgba(245,158,11,0.22); border-color:var(--accent-orange); color:#fbbf24;" title="Start 3D Rover Drive Tour">🚜 Drive</button>`
-          : '';
-
         card.innerHTML = `
           <div style="display:flex; align-items:flex-start; gap:8px; width:100%; min-width:0;">
             <input type="checkbox" ${isChecked ? 'checked' : ''} data-feature-id="${item.id}" class="landing-vis-chk" title="Toggle visibility" style="cursor:pointer; accent-color:${statusHex}; flex-shrink:0; margin-top:3px;">
@@ -1995,10 +1912,7 @@
               ${travelText}
               <div class="dest-sub" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10px; color:#94a3b8; margin-top:2px;" title="${subtext}">${subtext}</div>
             </div>
-            <div style="display:flex; flex-direction:column; gap:4px; flex-shrink:0;">
-              <button class="pill-btn landing-fly-btn" style="padding:2px 8px; font-size:10px;" title="Fly to location">Fly</button>
-              ${driveButtonHtml}
-            </div>
+            <button class="pill-btn landing-fly-btn" style="padding:2px 8px; font-size:10px; flex-shrink:0; margin-top:2px;" title="Fly to location">Fly</button>
           </div>
         `;
 
@@ -2051,14 +1965,6 @@
         };
         card.querySelector('.landing-info-action').onclick = flyAction;
         card.querySelector('.landing-fly-btn').onclick = flyAction;
-
-        const driveBtn = card.querySelector('.landing-drive-btn');
-        if (driveBtn) {
-          driveBtn.onclick = (e) => {
-            e.stopPropagation();
-            startRoverDriveDemo(item.id);
-          };
-        }
 
         // Hover corridor & marker highlight
         card.onmouseenter = () => {
@@ -2425,319 +2331,6 @@
       traverseCache.set(missionId, group);
       corridorHighlightGroup.add(group);
     }
-
-    // --- 3D Rover Drive Simulation & Topographic Contour Video Director ---
-    function createRoverVehicle() {
-      const rover = new THREE.Group();
-      rover.name = 'rover_vehicle';
-
-      // 1. Chassis Body (Gold foil & metallic lab enclosure)
-      const bodyMat = new THREE.MeshStandardMaterial({
-        color: 0xdfdfdb,
-        roughness: 0.35,
-        metalness: 0.65
-      });
-      const deckMat = new THREE.MeshStandardMaterial({
-        color: 0x1e293b,
-        roughness: 0.85,
-        metalness: 0.2
-      });
-      const chassis = new THREE.Mesh(new THREE.BoxGeometry(0.0032, 0.0016, 0.0050), bodyMat);
-      chassis.position.y = 0.0015;
-      rover.add(chassis);
-
-      // 2. Equipment Deck
-      const deck = new THREE.Mesh(new THREE.BoxGeometry(0.0030, 0.0003, 0.0048), deckMat);
-      deck.position.y = 0.0024;
-      rover.add(deck);
-
-      // 3. Remote Sensing Mast (RSM / Mastcam-Z)
-      const mastMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.3 });
-      const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.00014, 0.00014, 0.0034, 8), mastMat);
-      mast.position.set(0.0009, 0.0036, 0.0016);
-      rover.add(mast);
-
-      // Dual Camera Head
-      const head = new THREE.Mesh(new THREE.BoxGeometry(0.0011, 0.0006, 0.0008), mastMat);
-      head.position.set(0.0009, 0.0051, 0.0016);
-      rover.add(head);
-
-      // 4. High-Gain Dish Antenna
-      const dish = new THREE.Mesh(new THREE.CylinderGeometry(0.0009, 0.0009, 0.0002, 12), mastMat);
-      dish.position.set(-0.0009, 0.0028, -0.0014);
-      dish.rotation.x = Math.PI / 4;
-      rover.add(dish);
-
-      // 5. Multi-Mission Radioisotope Thermoelectric Generator (MMRTG)
-      const rtgMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.95 });
-      const rtg = new THREE.Mesh(new THREE.CylinderGeometry(0.0007, 0.0007, 0.0020, 10), rtgMat);
-      rtg.rotation.x = Math.PI / 2;
-      rtg.position.set(0, 0.0015, -0.0028);
-      rover.add(rtg);
-
-      // 6. Rocker-Bogie 6-Wheel Drive System
-      const wheelMat = new THREE.MeshStandardMaterial({
-        color: 0x0f172a,
-        roughness: 0.7,
-        metalness: 0.75
-      });
-      const wheelGeo = new THREE.CylinderGeometry(0.00085, 0.00085, 0.00065, 12);
-      wheelGeo.rotateZ(Math.PI / 2);
-
-      const wheels = [];
-      const wheelOffsets = [
-        [-0.0022, 0.00085, 0.0020],
-        [0.0022, 0.00085, 0.0020],
-        [-0.0024, 0.00085, 0.0],
-        [0.0024, 0.00085, 0.0],
-        [-0.0022, 0.00085, -0.0020],
-        [0.0022, 0.00085, -0.0020]
-      ];
-
-      wheelOffsets.forEach(off => {
-        const w = new THREE.Mesh(wheelGeo, wheelMat);
-        w.position.set(off[0], off[1], off[2]);
-        rover.add(w);
-        wheels.push(w);
-      });
-
-      // 7. Forward Science Navigation Headlights
-      const lightTarget = new THREE.Object3D();
-      lightTarget.position.set(0, 0, 0.012);
-      rover.add(lightTarget);
-
-      const headLight = new THREE.SpotLight(0xffedd5, 2.0, 0.035, Math.PI / 6, 0.4);
-      headLight.position.set(0, 0.0026, 0.0022);
-      headLight.target = lightTarget;
-      rover.add(headLight);
-
-      rover.userData = { wheels, headLight };
-      return rover;
-    }
-
-    let roverVehicle = null;
-    let tireTracksGroup = new THREE.Group();
-    scene.add(tireTracksGroup);
-
-    let isRoverSimActive = false;
-    let simPaused = false;
-    let simProgress = 0.0;
-    let simSpeed = 2.0;
-    let simCameraMode = 'chase';
-    let currentSimMission = 'm20_perseverance';
-    let simCurve = null;
-    let simTrackData = null;
-    let simTotalDistanceKm = 0.0;
-
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let isRecordingVideo = false;
-
-    function startRoverDriveDemo(rawMissionId = 'm20_perseverance') {
-      const missionId = normalizeMissionId(rawMissionId);
-      currentSimMission = missionId;
-
-      // Ensure Contourification is active so the rover moves on the contourified map
-      if (!contourActive) {
-        contourActive = true;
-        const btnContour = document.getElementById('btn-toggle-contour');
-        if (btnContour) btnContour.classList.add('active');
-        decontourUniforms.u_contourify.value = 1.0;
-        marsMaterial.needsUpdate = true;
-        zoom5Material.needsUpdate = true;
-      }
-
-      // Obtain rover traverse track points
-      let tData = null;
-      if (roverTraversesData) {
-        tData = roverTraversesData[missionId] || roverTraversesData[rawMissionId];
-      }
-      if (!tData || !tData.track || tData.track.length < 2) {
-        tData = roverTraversesData ? roverTraversesData['m20_perseverance'] : null;
-      }
-
-      if (!tData || !tData.track || tData.track.length < 2) {
-        console.warn("No traverse track available for simulation:", missionId);
-        return;
-      }
-
-      simTrackData = tData;
-      simTotalDistanceKm = tData.odometry_km || 15.0;
-
-      // Build 3D spline over planetary sphere
-      const pts3D = tData.track.map(p =>
-        latLonToVector3(p.lat, p.lon, MARS_RADIUS + ((p.elev_m || 0) / 3396190.0) * 1.5 + 0.0006)
-      );
-      simCurve = new THREE.CatmullRomCurve3(pts3D, false, 'catmullrom', 0.25);
-
-      if (!roverVehicle) {
-        roverVehicle = createRoverVehicle();
-        scene.add(roverVehicle);
-      }
-      roverVehicle.visible = true;
-
-      while (tireTracksGroup.children.length > 0) {
-        tireTracksGroup.remove(tireTracksGroup.children[0]);
-      }
-
-      const simPanel = document.getElementById('rover-sim-panel');
-      if (simPanel) simPanel.style.display = 'block';
-
-      const missionNameEl = document.getElementById('sim-mission-name');
-      if (missionNameEl) missionNameEl.textContent = `${tData.rover || tData.name || 'Mars Rover'} Simulation`;
-
-      simProgress = 0.0;
-      simPaused = false;
-      isRoverSimActive = true;
-
-      const playBtn = document.getElementById('sim-play-btn');
-      if (playBtn) {
-        playBtn.textContent = '❚❚ Pause';
-        playBtn.classList.add('active');
-      }
-
-      const startCoord = tData.touchdown || tData.track[0];
-      flyToCoordinate(startCoord.lat, startCoord.lon, 1.08);
-
-      highlightMissionCorridor(missionId);
-    }
-
-    function stopRoverDriveDemo() {
-      isRoverSimActive = false;
-      simPaused = true;
-      if (roverVehicle) roverVehicle.visible = false;
-      while (tireTracksGroup.children.length > 0) {
-        tireTracksGroup.remove(tireTracksGroup.children[0]);
-      }
-      const simPanel = document.getElementById('rover-sim-panel');
-      if (simPanel) simPanel.style.display = 'none';
-
-      if (isRecordingVideo) {
-        stopRecording();
-      }
-    }
-
-    function updateRoverSimTelemetry(t) {
-      if (!simTrackData) return;
-      const currentDistKm = (simTotalDistanceKm * t).toFixed(2);
-      const distEl = document.getElementById('sim-dist-val');
-      if (distEl) distEl.textContent = `${currentDistKm} km`;
-
-      if (simTrackData.track && simTrackData.track.length > 0) {
-        const idx = Math.min(simTrackData.track.length - 1, Math.floor(t * (simTrackData.track.length - 1)));
-        const curPt = simTrackData.track[idx];
-        const solEl = document.getElementById('sim-sol-val');
-        if (solEl) solEl.textContent = curPt.sol ? `Sol ${curPt.sol}` : `Sol ${Math.floor(t * 1050)}`;
-        const elevEl = document.getElementById('sim-elev-val');
-        if (elevEl && curPt.elev_m !== undefined) elevEl.textContent = `${curPt.elev_m.toLocaleString()} m`;
-      }
-
-      const speedEl = document.getElementById('sim-speed-val');
-      if (speedEl) speedEl.textContent = simPaused ? '0.0 cm/s' : `${(4.2 * (simSpeed / 2.0)).toFixed(1)} cm/s`;
-    }
-
-    function updateRoverTireTracks(t) {
-      if (!simCurve || t <= 0.005) return;
-
-      while (tireTracksGroup.children.length > 0) {
-        tireTracksGroup.remove(tireTracksGroup.children[0]);
-      }
-
-      const numSamples = Math.max(4, Math.floor(t * 80));
-      const leftPts = [];
-      const rightPts = [];
-
-      for (let i = 0; i <= numSamples; i++) {
-        const sampleT = (i / numSamples) * t;
-        const pos = simCurve.getPointAt(sampleT);
-        const tangent = simCurve.getTangentAt(sampleT);
-        const norm = pos.clone().normalize();
-        const fwd = tangent.clone().sub(norm.clone().multiplyScalar(tangent.dot(norm))).normalize();
-        const rgt = new THREE.Vector3().crossVectors(norm, fwd).normalize();
-
-        leftPts.push(pos.clone().sub(rgt.clone().multiplyScalar(0.0022)).add(norm.clone().multiplyScalar(0.0001)));
-        rightPts.push(pos.clone().add(rgt.clone().multiplyScalar(0.0022)).add(norm.clone().multiplyScalar(0.0001)));
-      }
-
-      const trackMat = new THREE.LineBasicMaterial({
-        color: 0x5c2b18,
-        linewidth: 2,
-        transparent: true,
-        opacity: 0.85
-      });
-
-      const leftLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(leftPts), trackMat);
-      const rightLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(rightPts), trackMat);
-
-      tireTracksGroup.add(leftLine);
-      tireTracksGroup.add(rightLine);
-    }
-
-    // Direct WebGL Video Recording via MediaRecorder
-    function toggleRecordingVideo() {
-      if (isRecordingVideo) {
-        stopRecording();
-      } else {
-        startRecording();
-      }
-    }
-
-    function startRecording() {
-      try {
-        const stream = threeCanvas.captureStream(30);
-        const mimeTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
-        let selectedMime = 'video/webm';
-        for (const m of mimeTypes) {
-          if (MediaRecorder.isTypeSupported(m)) {
-            selectedMime = m;
-            break;
-          }
-        }
-        mediaRecorder = new MediaRecorder(stream, { mimeType: selectedMime });
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data && e.data.size > 0) recordedChunks.push(e.data);
-        };
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunks, { type: selectedMime });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `Mars_Rover_${currentSimMission}_Contour_Tour.webm`;
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-          }, 200);
-        };
-        mediaRecorder.start(100);
-        isRecordingVideo = true;
-        const btn = document.getElementById('sim-record-btn');
-        if (btn) {
-          btn.textContent = '⏹️ Stop & Save';
-          btn.style.background = 'rgba(239, 68, 68, 0.85)';
-          btn.style.color = '#ffffff';
-        }
-      } catch (err) {
-        console.error('Failed to start MediaRecorder:', err);
-        alert('Video recording could not be started in this browser: ' + err.message);
-      }
-    }
-
-    function stopRecording() {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-      }
-      isRecordingVideo = false;
-      const btn = document.getElementById('sim-record-btn');
-      if (btn) {
-        btn.textContent = '🔴 Record Video';
-        btn.style.background = 'rgba(239, 68, 68, 0.25)';
-        btn.style.color = '#f87171';
-      }
-    }
-
 
     // --- High-Visibility 3D Tube Traverse & Historical Rover Path Geometry ---
     let historicalMissions = [];
@@ -3763,67 +3356,6 @@
       };
     }
 
-    // Launch Rover Drive Demo
-    const btnRoverDrive = document.getElementById('btn-rover-drive');
-    if (btnRoverDrive) {
-      btnRoverDrive.onclick = () => {
-        startRoverDriveDemo(hoveredMissionId || 'm20_perseverance');
-      };
-    }
-
-    // Simulation Panel Controls
-    const simCloseBtn = document.getElementById('sim-close-btn');
-    if (simCloseBtn) simCloseBtn.onclick = stopRoverDriveDemo;
-
-    const simPlayBtn = document.getElementById('sim-play-btn');
-    if (simPlayBtn) {
-      simPlayBtn.onclick = () => {
-        simPaused = !simPaused;
-        simPlayBtn.textContent = simPaused ? '▶ Play' : '❚❚ Pause';
-        simPlayBtn.classList.toggle('active', !simPaused);
-      };
-    }
-
-    const simRestartBtn = document.getElementById('sim-restart-btn');
-    if (simRestartBtn) {
-      simRestartBtn.onclick = () => {
-        simProgress = 0.0;
-        simPaused = false;
-        if (simPlayBtn) {
-          simPlayBtn.textContent = '❚❚ Pause';
-          simPlayBtn.classList.add('active');
-        }
-      };
-    }
-
-    const simProgressSlider = document.getElementById('sim-progress-slider');
-    if (simProgressSlider) {
-      simProgressSlider.oninput = (e) => {
-        simProgress = parseFloat(e.target.value) / 1000.0;
-        const pctLabel = document.getElementById('sim-time-pct');
-        if (pctLabel) pctLabel.textContent = `${(simProgress * 100).toFixed(1)}%`;
-      };
-    }
-
-    const simSpeedSelect = document.getElementById('sim-speed-select');
-    if (simSpeedSelect) {
-      simSpeedSelect.onchange = (e) => {
-        simSpeed = parseFloat(e.target.value);
-      };
-    }
-
-    const simCamSelect = document.getElementById('sim-cam-select');
-    if (simCamSelect) {
-      simCamSelect.onchange = (e) => {
-        simCameraMode = e.target.value;
-      };
-    }
-
-    const simRecordBtn = document.getElementById('sim-record-btn');
-    if (simRecordBtn) {
-      simRecordBtn.onclick = toggleRecordingVideo;
-    }
-
     // Animation Loop
     let lastRenderTime = performance.now();
     let frameCount = 0;
@@ -3835,11 +3367,43 @@
         const elapsed = performance.now() - transitionStart;
         const progress = Math.min(1.0, elapsed / transitionDuration);
         const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-        camera.position.lerpVectors(startCamPos, targetCamPos, ease);
+
+        // Spherical Great-Circle Interpolation (SLERP) preventing camera from cutting into Mars interior
+        const startDir = startCamPos.clone().normalize();
+        const targetDir = targetCamPos.clone().normalize();
+        const startDist = startCamPos.length();
+        const targetDist = targetCamPos.length();
+
+        const dot = THREE.MathUtils.clamp(startDir.dot(targetDir), -1.0, 1.0);
+        const angle = Math.acos(dot);
+
+        let curDir;
+        if (angle < 0.001) {
+          curDir = targetDir;
+        } else {
+          const sinAngle = Math.sin(angle);
+          const weightA = Math.sin((1.0 - ease) * angle) / sinAngle;
+          const weightB = Math.sin(ease * angle) / sinAngle;
+          curDir = new THREE.Vector3()
+            .addScaledVector(startDir, weightA)
+            .addScaledVector(targetDir, weightB)
+            .normalize();
+        }
+
+        // Planetary altitude arc lifts camera safely over the horizon during transit
+        const arcAltitude = Math.sin(progress * Math.PI) * Math.min(1.2, angle * 0.45);
+        const curDist = Math.max(controls.minDistance, THREE.MathUtils.lerp(startDist, targetDist, ease) + arcAltitude);
+
+        camera.position.copy(curDir.multiplyScalar(curDist));
         controls.update();
         if (progress >= 1.0) isTransitioning = false;
-      } else if (!isRoverSimActive || simCameraMode === 'free') {
+      } else {
         controls.update();
+      }
+
+      // Hard clamp: camera distance must NEVER penetrate or move into the planet surface
+      if (camera.position.length() < controls.minDistance) {
+        camera.position.setLength(controls.minDistance);
       }
 
       // Pulsing corridor highlight animation
@@ -3850,68 +3414,6 @@
             c.material.emissiveIntensity = pulse;
           }
         });
-      }
-
-      // Rover Drive Simulation Engine
-      if (isRoverSimActive && simCurve && roverVehicle) {
-        if (!simPaused) {
-          simProgress += simSpeed * 0.0006;
-          if (simProgress >= 1.0) {
-            simProgress = 1.0;
-            simPaused = true;
-            const pBtn = document.getElementById('sim-play-btn');
-            if (pBtn) {
-              pBtn.textContent = '▶ Play';
-              pBtn.classList.remove('active');
-            }
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-              stopRecording();
-            }
-          }
-          const slider = document.getElementById('sim-progress-slider');
-          if (slider) slider.value = Math.floor(simProgress * 1000);
-          const pctLabel = document.getElementById('sim-time-pct');
-          if (pctLabel) pctLabel.textContent = `${(simProgress * 100).toFixed(1)}%`;
-        }
-
-        const t = THREE.MathUtils.clamp(simProgress, 0.0, 1.0);
-        const roverPos = simCurve.getPointAt(t);
-        const roverTangent = simCurve.getTangentAt(t);
-
-        roverVehicle.position.copy(roverPos);
-
-        const normal = roverPos.clone().normalize();
-        const forward = roverTangent.clone().sub(normal.clone().multiplyScalar(roverTangent.dot(normal))).normalize();
-        const right = new THREE.Vector3().crossVectors(normal, forward).normalize();
-
-        const rotMat = new THREE.Matrix4().makeBasis(right, normal, forward);
-        roverVehicle.quaternion.setFromRotationMatrix(rotMat);
-
-        if (!simPaused && roverVehicle.userData.wheels) {
-          roverVehicle.userData.wheels.forEach(w => {
-            w.rotation.x += simSpeed * 0.06;
-          });
-        }
-
-        updateRoverTireTracks(t);
-        updateRoverSimTelemetry(t);
-
-        if (simCameraMode === 'chase') {
-          const camTarget = roverPos.clone().add(forward.clone().multiplyScalar(0.002));
-          const camPos = roverPos.clone().sub(forward.clone().multiplyScalar(0.016)).add(normal.clone().multiplyScalar(0.008));
-          camera.position.lerp(camPos, 0.12);
-          controls.target.lerp(camTarget, 0.12);
-        } else if (simCameraMode === 'cockpit') {
-          const camTarget = roverPos.clone().add(forward.clone().multiplyScalar(0.020));
-          const camPos = roverPos.clone().add(forward.clone().multiplyScalar(0.001)).add(normal.clone().multiplyScalar(0.0035));
-          camera.position.lerp(camPos, 0.18);
-          controls.target.lerp(camTarget, 0.18);
-        } else if (simCameraMode === 'drone') {
-          const angle = performance.now() * 0.0004;
-          const droneOffset = right.clone().multiplyScalar(Math.sin(angle) * 0.018).add(forward.clone().multiplyScalar(Math.cos(angle) * 0.018)).add(normal.clone().multiplyScalar(0.012));
-          camera.position.lerp(roverPos.clone().add(droneOffset), 0.1);
-          controls.target.lerp(roverPos, 0.12);
-        }
       }
 
       if (appMode === '3D') {
