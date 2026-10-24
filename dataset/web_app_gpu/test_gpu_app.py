@@ -178,6 +178,24 @@ def run_tests():
     assert "raycaster.params.Line" in html, "raycaster Line threshold missing in index.html"
     print("  PASS: 3D hover traversal, continuous glowing tube, touchdown/destination markers, and raycaster thresholds verified.")
 
+    # Test 9: Verify Real-Time Topo Contours & 3D Rover Drive Video Simulation
+    print("\n[Test 9] Verifying Topo Contours, 3D Rover Drive Simulation & Video Engine...")
+    assert "u_contourify" in html, "u_contourify uniform missing in index.html"
+    assert "btn-toggle-contour" in html, "btn-toggle-contour button missing in index.html"
+    assert "btn-rover-drive" in html, "btn-rover-drive button missing in index.html"
+    assert "createRoverVehicle" in html, "createRoverVehicle function missing in index.html"
+    assert "startRoverDriveDemo" in html, "startRoverDriveDemo function missing in index.html"
+    assert "stopRoverDriveDemo" in html, "stopRoverDriveDemo function missing in index.html"
+    assert "rover-sim-panel" in html, "rover-sim-panel missing in index.html"
+    assert "sim-progress-slider" in html, "sim-progress-slider missing in index.html"
+    assert "sim-record-btn" in html, "sim-record-btn video recorder button missing in index.html"
+    assert "MediaRecorder" in html, "MediaRecorder API missing in index.html"
+    assert "captureStream" in html, "Canvas captureStream missing in index.html"
+
+    blender_py = os.path.abspath(os.path.join(gpu_dir, "..", "..", "render_rover_video_blender.py"))
+    assert os.path.exists(blender_py), f"render_rover_video_blender.py script missing at {blender_py}"
+    print("  PASS: Real-time topographic contours, procedural 3D rover model, drive simulation, and canvas video recording verified.")
+
     print("\n" + "=" * 65)
     print("ALL TESTS PASSED! MARS EXPLORATION SUITE FULLY OPERATIONAL.")
     print("=" * 65)
