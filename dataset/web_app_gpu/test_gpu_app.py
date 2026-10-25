@@ -245,6 +245,29 @@ def run_tests():
     assert "focusScoutRoute" in html, "focusScoutRoute function missing in index.html"
     print("  PASS: ARES-OS Scouting-IPP verified (Jezero 64x64, max slope 38.83°, OPTIMAL_PROVEN @ 7.354 km, full mission-control UI & 3D visualization operational).")
 
+    # Test 12: Verify NASA MMGIS 2D Regional Map Viewer, Rover Paths & Controls
+    print("\n[Test 12] Verifying NASA MMGIS 2D Regional Map Viewer & Rover Paths...")
+    assert "regional-map-overlay" in html, "regional-map-overlay container missing in index.html"
+    assert "regional-banner" in html, "regional-banner missing in index.html"
+    assert "regional-controls" in html, "regional-controls dock missing in index.html"
+    assert "regional-scale-bar" in html, "regional-scale-bar container missing in index.html"
+    assert "regional-coord-hud" in html, "regional-coord-hud container missing in index.html"
+    assert "regional-tooltip" in html, "regional-tooltip missing in index.html"
+    assert "openRegionalMapForSite" in html, "openRegionalMapForSite function missing in index.html"
+    assert "centerRegionalMap" in html, "centerRegionalMap function missing in index.html"
+    assert "updateRegionalScaleBar" in html, "updateRegionalScaleBar function missing in index.html"
+    assert "updateRegionalCoordHUD" in html, "updateRegionalCoordHUD function missing in index.html"
+    assert "landing-preview-btn" in html, "landing-preview-btn action button missing in index.html"
+    assert "landing-map-btn" in html, "landing-map-btn regional action button missing in index.html"
+    assert "reg-switch-btn" in html, "reg-switch-btn mission switcher buttons missing in index.html"
+    assert "isDraggingFlat" in html, "2D map smooth drag pan missing in index.html"
+    assert "reg-btn-return-3d" in html, "Return to 3D Globe button missing in index.html"
+    # Verify rover paths rendering: white line, green touchdown, blue milestone, red hazard, and rover badge
+    assert "#ffffff" in html, "Crisp white path stroke missing in index.html"
+    assert "#22c55e" in html, "Green touchdown pin missing in index.html"
+    assert "#ef4444" in html, "Red hazard pin missing in index.html"
+    print("  PASS: NASA MMGIS 2D Regional Map viewer, rover paths, and interactive controls verified.")
+
     print("\n" + "=" * 65)
     print("ALL TESTS PASSED! MARS EXPLORATION SUITE FULLY OPERATIONAL.")
     print("=" * 65)
