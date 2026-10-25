@@ -1,0 +1,442 @@
+[
+  {
+    "symbol": "AHi",
+    "label": "Amazonian and Hesperian impact unit",
+    "hex": "#fff100",
+    "rgb": [
+      255,
+      241,
+      0
+    ]
+  },
+  {
+    "symbol": "AHtu",
+    "label": "Amazonian and Hesperian transition undivided unit",
+    "hex": "#e9e4d8",
+    "rgb": [
+      233,
+      228,
+      216
+    ]
+  },
+  {
+    "symbol": "AHv",
+    "label": "Amazonian and Hesperian volcanic",
+    "hex": "#f89569",
+    "rgb": [
+      248,
+      149,
+      105
+    ]
+  },
+  {
+    "symbol": "ANa",
+    "label": "Amazonian and Noachian apron unit",
+    "hex": "#bda635",
+    "rgb": [
+      189,
+      166,
+      53
+    ]
+  },
+  {
+    "symbol": "Aa",
+    "label": "Amazonian apron unit",
+    "hex": "#eed114",
+    "rgb": [
+      238,
+      209,
+      20
+    ]
+  },
+  {
+    "symbol": "Apu",
+    "label": "Amazonian polar undivided unit",
+    "hex": "#9bb4be",
+    "rgb": [
+      155,
+      180,
+      190
+    ]
+  },
+  {
+    "symbol": "Ap",
+    "label": "Amazonian polar unit",
+    "hex": "#009ccb",
+    "rgb": [
+      0,
+      156,
+      203
+    ]
+  },
+  {
+    "symbol": "Ave",
+    "label": "Amazonian volcanic edifice",
+    "hex": "#cc7c58",
+    "rgb": [
+      204,
+      124,
+      88
+    ]
+  },
+  {
+    "symbol": "Av",
+    "label": "Amazonian volcanic unit",
+    "hex": "#f8aa9e",
+    "rgb": [
+      248,
+      170,
+      158
+    ]
+  },
+  {
+    "symbol": "eAb",
+    "label": "Early Amazonian basin unit",
+    "hex": "#99d4bf",
+    "rgb": [
+      153,
+      212,
+      191
+    ]
+  },
+  {
+    "symbol": "eHb",
+    "label": "Early Hesperian basin unit",
+    "hex": "#42a2ae",
+    "rgb": [
+      66,
+      162,
+      174
+    ]
+  },
+  {
+    "symbol": "eHh",
+    "label": "Early Hesperian highland unit",
+    "hex": "#eaccaf",
+    "rgb": [
+      234,
+      204,
+      175
+    ]
+  },
+  {
+    "symbol": "eHt",
+    "label": "Early Hesperian transition unit",
+    "hex": "#e0b026",
+    "rgb": [
+      224,
+      176,
+      38
+    ]
+  },
+  {
+    "symbol": "eHv",
+    "label": "Early Hesperian volcanic unit",
+    "hex": "#b27ab5",
+    "rgb": [
+      178,
+      122,
+      181
+    ]
+  },
+  {
+    "symbol": "eNhm",
+    "label": "Early Noachian highland massif unit",
+    "hex": "#8d8e82",
+    "rgb": [
+      141,
+      142,
+      130
+    ]
+  },
+  {
+    "symbol": "eNh",
+    "label": "Early Noachian highland unit",
+    "hex": "#b9875f",
+    "rgb": [
+      185,
+      135,
+      95
+    ]
+  },
+  {
+    "symbol": "HNb",
+    "label": "Hesperian and Noachian basin unit",
+    "hex": "#6da69f",
+    "rgb": [
+      109,
+      166,
+      159
+    ]
+  },
+  {
+    "symbol": "HNhu",
+    "label": "Hesperian and Noachian highland undivided unit",
+    "hex": "#ccc2bf",
+    "rgb": [
+      204,
+      194,
+      191
+    ]
+  },
+  {
+    "symbol": "HNt",
+    "label": "Hesperian and Noachian transition unit",
+    "hex": "#fba61b",
+    "rgb": [
+      251,
+      166,
+      27
+    ]
+  },
+  {
+    "symbol": "Hpe",
+    "label": "Hesperian polar edifice unit",
+    "hex": "#0089d0",
+    "rgb": [
+      0,
+      137,
+      208
+    ]
+  },
+  {
+    "symbol": "Hpu",
+    "label": "Hesperian polar undivided unit",
+    "hex": "#80adbd",
+    "rgb": [
+      128,
+      173,
+      189
+    ]
+  },
+  {
+    "symbol": "Hp",
+    "label": "Hesperian polar unit",
+    "hex": "#009cb2",
+    "rgb": [
+      0,
+      156,
+      178
+    ]
+  },
+  {
+    "symbol": "Hto",
+    "label": "Hesperian transition outflow unit",
+    "hex": "#aae1fa",
+    "rgb": [
+      170,
+      225,
+      250
+    ]
+  },
+  {
+    "symbol": "Htu",
+    "label": "Hesperian transition undivided unit",
+    "hex": "#dcd5d2",
+    "rgb": [
+      220,
+      213,
+      210
+    ]
+  },
+  {
+    "symbol": "Ht",
+    "label": "Hesperian transition unit",
+    "hex": "#ffdda3",
+    "rgb": [
+      255,
+      221,
+      163
+    ]
+  },
+  {
+    "symbol": "Hve",
+    "label": "Hesperian volcanic edifice unit",
+    "hex": "#f36f21",
+    "rgb": [
+      243,
+      111,
+      33
+    ]
+  },
+  {
+    "symbol": "lAa",
+    "label": "Late Amazonian apron unit",
+    "hex": "#ffd700",
+    "rgb": [
+      255,
+      215,
+      0
+    ]
+  },
+  {
+    "symbol": "lApc",
+    "label": "Late Amazonian polar cap unit",
+    "hex": "#daf2fd",
+    "rgb": [
+      218,
+      242,
+      253
+    ]
+  },
+  {
+    "symbol": "lApd",
+    "label": "Late Amazonian polar dunes unit",
+    "hex": "#feeaba",
+    "rgb": [
+      254,
+      234,
+      186
+    ]
+  },
+  {
+    "symbol": "lAvf",
+    "label": "Late Amazonian volcanic field unit",
+    "hex": "#ccb0a6",
+    "rgb": [
+      204,
+      176,
+      166
+    ]
+  },
+  {
+    "symbol": "lAv",
+    "label": "Late Amazonian volcanic unit",
+    "hex": "#fabeb7",
+    "rgb": [
+      250,
+      190,
+      183
+    ]
+  },
+  {
+    "symbol": "lHb",
+    "label": "Late Hesperian basin unit",
+    "hex": "#9fb39f",
+    "rgb": [
+      159,
+      179,
+      159
+    ]
+  },
+  {
+    "symbol": "lHl",
+    "label": "Late Hesperian lowland unit",
+    "hex": "#8cc640",
+    "rgb": [
+      140,
+      198,
+      64
+    ]
+  },
+  {
+    "symbol": "lHt",
+    "label": "Late Hesperian transition unit",
+    "hex": "#ffcb0b",
+    "rgb": [
+      255,
+      203,
+      11
+    ]
+  },
+  {
+    "symbol": "lHvf",
+    "label": "Late Hesperian volcanic field unit",
+    "hex": "#cc9e8f",
+    "rgb": [
+      204,
+      158,
+      143
+    ]
+  },
+  {
+    "symbol": "lHv",
+    "label": "Late Hesperian volcanic unit",
+    "hex": "#cc9e8f",
+    "rgb": [
+      204,
+      158,
+      143
+    ]
+  },
+  {
+    "symbol": "lNh",
+    "label": "Late Noachian highland unit",
+    "hex": "#ceae88",
+    "rgb": [
+      206,
+      174,
+      136
+    ]
+  },
+  {
+    "symbol": "lNv",
+    "label": "Late Noachian volcanic unit",
+    "hex": "#8882bd",
+    "rgb": [
+      136,
+      130,
+      189
+    ]
+  },
+  {
+    "symbol": "mAl",
+    "label": "Middle Amazonian lowland unit",
+    "hex": "#bdc031",
+    "rgb": [
+      189,
+      192,
+      49
+    ]
+  },
+  {
+    "symbol": "mNhm",
+    "label": "Middle Noachian highland massif unit",
+    "hex": "#a0a498",
+    "rgb": [
+      160,
+      164,
+      152
+    ]
+  },
+  {
+    "symbol": "mNh",
+    "label": "Middle Noachian highland unit",
+    "hex": "#cd9d80",
+    "rgb": [
+      205,
+      157,
+      128
+    ]
+  },
+  {
+    "symbol": "Nhe",
+    "label": "Noachian highland edifice unit",
+    "hex": "#a62e4d",
+    "rgb": [
+      166,
+      46,
+      77
+    ]
+  },
+  {
+    "symbol": "Nhu",
+    "label": "Noachian highland undivided unit",
+    "hex": "#b5aaa6",
+    "rgb": [
+      181,
+      170,
+      166
+    ]
+  },
+  {
+    "symbol": "Nve",
+    "label": "Noachian volcanic edifice unit",
+    "hex": "#c9262e",
+    "rgb": [
+      201,
+      38,
+      46
+    ]
+  }
+]
