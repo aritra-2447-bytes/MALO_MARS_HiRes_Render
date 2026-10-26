@@ -1995,7 +1995,7 @@
     controls.dampingFactor = 0.06;
     controls.rotateSpeed = 0.65;
     controls.zoomSpeed = 0.9;
-    controls.minDistance = 1.28; // Close-up orbital perspective (~270 km altitude) avoiding surface penetration
+    controls.minDistance = 1.08; // Close-up orbital perspective (~270 km altitude) avoiding surface penetration
     controls.maxDistance = 8.5;
     controls.enablePan = false;
 
@@ -2277,14 +2277,17 @@
     }
 
     // Landmark & Destination Camera Zoom Distances
-    const DEFAULT_LANDMARK_CAM_DIST = 1.95; // Regional context zoom for large volcanoes & canyons (radius 1.0 = surface)
-    const LANDING_SITE_CAM_DIST = 1.35;     // Close-up orbital perspective (~500 km altitude) framing rover traverses in crisp detail
-    const POLAR_CAP_CAM_DIST = 2.45;        // Wide view for continental polar ice sheets
+    const DEFAULT_LANDMARK_CAM_DIST = 1.32; // Regional context zoom for large volcanoes & canyons (~1,085 km altitude)
+    const LANDING_SITE_CAM_DIST = 1.15;     // Close-up orbital perspective (~508 km altitude) framing rover traverses in crisp detail
+    const POLAR_CAP_CAM_DIST = 2.20;        // Wide view for continental polar ice sheets
 
     function getLandmarkZoomDist(item) {
       if (!item) return DEFAULT_LANDMARK_CAM_DIST;
       if (item.targetDist) return item.targetDist;
-      if (item.category === 'landing_site') return LANDING_SITE_CAM_DIST;
+      const cat = String(item.category || item.type || '').toLowerCase();
+      if (cat.includes('landing') || cat.includes('rover') || cat.includes('traverse') || item.station || item.site || item.total_odometry_km !== undefined) {
+        return LANDING_SITE_CAM_DIST;
+      }
       return item.category === 'polar_cap' ? POLAR_CAP_CAM_DIST : DEFAULT_LANDMARK_CAM_DIST;
     }
 
@@ -2480,21 +2483,21 @@
         else if (lm.category === 'canyon') colorHex = 0xd4a373; // warm ochre slate
         else if (lm.category === 'basin') colorHex = 0x93c5fd; // soft periwinkle
 
-        // 1. Sleek Matte Pin Head (Subtle Sphere)
-        const pinGeo = new THREE.SphereGeometry(0.0022, 16, 16);
+        // 1. Sleek Matte Pin Head (Refined Proportional Sphere)
+        const pinGeo = new THREE.SphereGeometry(0.0038, 16, 16);
         const pinMat = new THREE.MeshStandardMaterial({
           color: colorHex,
           roughness: 0.4,
           metalness: 0.2
         });
         const pinMesh = new THREE.Mesh(pinGeo, pinMat);
-        const pinHeight = 0.0055;
+        const pinHeight = 0.008;
         pinMesh.position.copy(normal.clone().multiplyScalar(pinHeight));
         pinMesh.castShadow = true;
         pinMesh.userData = lm;
 
-        // 2. Refined, Minimalist Stem (Thin Titanium Needle)
-        const stemGeo = new THREE.CylinderGeometry(0.0002, 0.0002, pinHeight, 8);
+        // 2. Refined, Minimalist Stem (Thin Needle)
+        const stemGeo = new THREE.CylinderGeometry(0.00025, 0.00025, pinHeight, 8);
         const stemMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
         const stemMesh = new THREE.Mesh(stemGeo, stemMat);
         stemMesh.position.copy(normal.clone().multiplyScalar(pinHeight * 0.5));
@@ -2502,7 +2505,7 @@
         stemMesh.castShadow = true;
 
         // 3. Delicate Surface Target Ring (Semi-transparent, non-distracting)
-        const ringGeo = new THREE.RingGeometry(0.0016, 0.0025, 32);
+        const ringGeo = new THREE.RingGeometry(0.0030, 0.0045, 32);
         const ringMat = new THREE.MeshBasicMaterial({
           color: colorHex,
           side: THREE.DoubleSide,
@@ -2584,8 +2587,8 @@
         // Pivot at the surface so ARES-OS can scale the pin without moving it.
         beaconGroup.userData.aresLandmarkPin = true;
 
-        // 1. High-Fidelity Status-Colored Pin Head Sphere (Miniaturized for clear traverse path visibility)
-        const headGeo = new THREE.SphereGeometry(0.0016, 16, 16);
+        // 1. High-Fidelity Status-Colored Pin Head Sphere
+        const headGeo = new THREE.SphereGeometry(0.0035, 16, 16);
         const headMat = new THREE.MeshStandardMaterial({
           color: colorHex,
           emissive: colorHex,
@@ -2594,20 +2597,20 @@
           metalness: 0.2
         });
         const pinHead = new THREE.Mesh(headGeo, headMat);
-        const pinHeight = 0.0045;
+        const pinHeight = 0.0075;
         pinHead.position.copy(normal.clone().multiplyScalar(pinHeight));
         beaconGroup.add(pinHead);
 
         // 2. High-Contrast Slender White Stem
-        const stemGeo = new THREE.CylinderGeometry(0.00016, 0.00016, pinHeight, 8);
+        const stemGeo = new THREE.CylinderGeometry(0.00025, 0.00025, pinHeight, 8);
         const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const stem = new THREE.Mesh(stemGeo, stemMat);
         stem.position.copy(normal.clone().multiplyScalar(pinHeight * 0.5));
         stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
         beaconGroup.add(stem);
 
-        // 3. Ground Target Ring (Delicate and non-obscuring)
-        const ringGeo = new THREE.RingGeometry(0.0012, 0.0022, 32);
+        // 3. Ground Target Ring
+        const ringGeo = new THREE.RingGeometry(0.0028, 0.0042, 32);
         const ringMat = new THREE.MeshBasicMaterial({
           color: colorHex,
           side: THREE.DoubleSide,
@@ -2804,7 +2807,7 @@
           if (isGeologyGlobeActive && typeof flyGeologyGlobeTo === 'function') {
             flyGeologyGlobeTo(item.lat, item.lon, 440);
           } else {
-            flyToCoordinate(item.lat, item.lon, 1.85);
+            flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
           }
           if (item.elevation_m !== undefined) currentElevation = item.elevation_m;
           updateStatusHUD();
@@ -2882,19 +2885,19 @@
           );
 
           if (curvePoints.length > 1) {
-            // Emissive 3D Tube
+            // Emissive 3D Tube - Prominently visible for rover missions
             const curve = new THREE.CatmullRomCurve3(curvePoints);
             const segments = Math.max(32, curvePoints.length * 4);
-            const radius = props.type === 'rover_traverse' ? 0.0004 : 0.00055;
+            const radius = props.type === 'rover_traverse' ? 0.0011 : 0.0012;
             const tubeGeo = new THREE.TubeGeometry(curve, segments, radius, 8, false);
             const tubeMat = new THREE.MeshStandardMaterial({
               color: colorHex,
               emissive: colorHex,
-              emissiveIntensity: 0.45,
+              emissiveIntensity: 0.85,
               transparent: true,
               opacity: 0.95,
-              roughness: 0.4,
-              metalness: 0.2
+              roughness: 0.3,
+              metalness: 0.3
             });
             const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
             tubeMesh.userData = { feature, type: 'traverse_tube', missionId: props.id, name: props.name };
@@ -2902,12 +2905,12 @@
 
             // Sub-surface line
             const lineGeo = new THREE.BufferGeometry().setFromPoints(
-              geom.coordinates.map(c => latLonToVector3(c[1], c[0], MARS_RADIUS * 1.0005))
+              geom.coordinates.map(c => latLonToVector3(c[1], c[0], MARS_RADIUS * 1.0006))
             );
             const lineMat = new THREE.LineBasicMaterial({
               color: colorHex,
               transparent: true,
-              opacity: 0.7
+              opacity: 0.85
             });
             const lineMesh = new THREE.Line(lineGeo, lineMat);
             lineMesh.userData = { feature, type: 'surface_line', missionId: props.id, name: props.name };
@@ -2973,11 +2976,11 @@
 
       const curve = new THREE.CatmullRomCurve3(highlightPoints);
       const segments = Math.min(320, Math.max(48, highlightPoints.length * 4));
-      const tubeGeo = new THREE.TubeGeometry(curve, segments, 0.0006, 8, false);
+      const tubeGeo = new THREE.TubeGeometry(curve, segments, 0.0015, 8, false);
       const tubeMat = new THREE.MeshStandardMaterial({
         color: colorHex,
         emissive: colorHex,
-        emissiveIntensity: 0.85,
+        emissiveIntensity: 1.0,
         transparent: true,
         opacity: 0.95
       });
@@ -3065,7 +3068,7 @@
           renderHighlyVisibleTraverseTube(routeObj.waypoints, planData.profile_samples, isRoverMission, actualPath);
 
           if (autoFly) {
-            flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, 1.70);
+            flyToCoordinate(routeObj.waypoints[0].lat, routeObj.waypoints[0].lon, isRoverMission ? LANDING_SITE_CAM_DIST : DEFAULT_LANDMARK_CAM_DIST);
           }
           return;
         }
@@ -3094,7 +3097,7 @@
           if (wps.length > 0) {
             renderHighlyVisibleTraverseTube(wps, wps, true, null);
             if (autoFly) {
-              flyToCoordinate(wps[0].lat, wps[0].lon, 1.70);
+              flyToCoordinate(wps[0].lat, wps[0].lon, LANDING_SITE_CAM_DIST);
             }
           }
         } catch (fbErr) {
@@ -3125,30 +3128,30 @@
 
         const pinGroup = new THREE.Group();
 
-        // Miniature Pin Head
-        const headRadius = (isStart || isEnd) ? 0.0016 : 0.0010;
+        // Proportional Waypoint Pin Head
+        const headRadius = (isStart || isEnd) ? 0.0035 : 0.0024;
         const headGeo = new THREE.SphereGeometry(headRadius, 16, 16);
         const headMat = new THREE.MeshBasicMaterial({ color: colorHex });
         const head = new THREE.Mesh(headGeo, headMat);
-        const pinHeight = (isStart || isEnd) ? 0.0055 : 0.0035;
+        const pinHeight = (isStart || isEnd) ? 0.0075 : 0.0050;
         head.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
         pinGroup.add(head);
 
         // Slender Needle Stem
-        const stemGeo = new THREE.CylinderGeometry(0.00015, 0.00015, pinHeight, 8);
+        const stemGeo = new THREE.CylinderGeometry(0.00025, 0.00025, pinHeight, 8);
         const stemMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0 });
         const stem = new THREE.Mesh(stemGeo, stemMat);
         stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
         stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
         pinGroup.add(stem);
 
-        // Delicate Sub-Surface Target Dot (tiny, non-overlapping)
-        const dotGeo = new THREE.CircleGeometry((isStart || isEnd) ? 0.0012 : 0.0007, 16);
+        // Sub-Surface Target Dot
+        const dotGeo = new THREE.CircleGeometry((isStart || isEnd) ? 0.0028 : 0.0018, 16);
         const dotMat = new THREE.MeshBasicMaterial({
           color: colorHex,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.65
+          opacity: 0.75
         });
         const dot = new THREE.Mesh(dotGeo, dotMat);
         dot.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
@@ -3163,17 +3166,17 @@
       const curvePoints = pathNodes.map(s => latLonToVector3(s.lat, s.lon, MARS_RADIUS * 1.0012));
 
       if (curvePoints.length > 1) {
-        // Crisp, delicate 3D tube hugging the Martian terrain (radius 0.00035 = ~1.2 km scale width)
+        // Highly visible 3D tube hugging the Martian terrain
         const curve = new THREE.CatmullRomCurve3(curvePoints);
         const tubeSegments = Math.min(480, Math.max(96, curvePoints.length * 2));
-        const tubeRadius = isRover ? 0.00032 : 0.00045;
+        const tubeRadius = isRover ? 0.0012 : 0.0014;
         const tubeGeo = new THREE.TubeGeometry(curve, tubeSegments, tubeRadius, 8, false);
         const tubeMat = new THREE.MeshStandardMaterial({
           color: isRover ? 0x00f0ff : 0xfbbf24,
-          roughness: 0.3,
-          metalness: 0.8,
-          emissive: isRover ? 0x0284c7 : 0xd97706,
-          emissiveIntensity: 0.55
+          roughness: 0.25,
+          metalness: 0.6,
+          emissive: isRover ? 0x00f0ff : 0xf59e0b,
+          emissiveIntensity: 0.85
         });
         const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
         routesGroup.add(tubeMesh);
@@ -3185,7 +3188,7 @@
         const trackMat = new THREE.LineBasicMaterial({
           color: isRover ? 0x38bdf8 : 0xfde047,
           transparent: true,
-          opacity: 0.95
+          opacity: 1.0
         });
         const trackLine = new THREE.Line(trackGeo, trackMat);
         routesGroup.add(trackLine);
@@ -3490,7 +3493,8 @@
           elev = p.elevation_m !== undefined ? p.elevation_m : (g.coordinates && g.coordinates[2] ? g.coordinates[2] : 0);
         }
         if (lat !== undefined && lon !== undefined) {
-          flyToCoordinate(lat, lon, 1.85);
+          const targetDist = getLandmarkZoomDist(u.feature ? u.feature.properties : u);
+          flyToCoordinate(lat, lon, targetDist);
           if (elev !== undefined) currentElevation = elev;
           updateStatusHUD();
         }
@@ -3726,9 +3730,9 @@
             if (geom && geom.type === 'LineString' && Array.isArray(geom.coordinates) && geom.coordinates.length > 1) {
               ctx.beginPath();
               ctx.strokeStyle = statusHex;
-              ctx.lineWidth = 2.5;
+              ctx.lineWidth = 3.5;
               ctx.shadowColor = statusHex;
-              ctx.shadowBlur = 4;
+              ctx.shadowBlur = 6;
               geom.coordinates.forEach((coord, idx) => {
                 const pt = to2D(coord[0], coord[1]);
                 if (idx === 0) ctx.moveTo(pt.x, pt.y);
