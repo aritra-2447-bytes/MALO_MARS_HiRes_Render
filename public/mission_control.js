@@ -472,7 +472,7 @@
           camera.near = near;
           camera.updateProjectionMatrix();
         }
-        var pinScale = clamp(0.0020 * alt / 0.006, 0.0001, 1.0);
+        var pinScale = clamp(0.0035 * alt / 0.008, 0.50, 1.20);
         var groupsToScale = [];
         if (typeof markersGroup !== 'undefined' && markersGroup) groupsToScale.push(markersGroup);
         if (typeof landingSiteMarkersGroup !== 'undefined' && landingSiteMarkersGroup) groupsToScale.push(landingSiteMarkersGroup);
@@ -492,8 +492,8 @@
             var isDot = m.geometry.type === 'SphereGeometry';
             var base = isDot ? p.radius : (p.outerRadius || p.radius || 0);
             if (!base) return;
-            var targetRad = isDot ? 0.0004 : 0.0010;
-            m.scale.setScalar(clamp(targetRad * alt / base, 0.00001, 1.0));
+            var targetRad = isDot ? 0.0008 : 0.0018;
+            m.scale.setScalar(clamp(targetRad * alt / base, 0.40, 1.20));
           });
         }
       }
@@ -777,10 +777,10 @@
     }
     var lat = Number(item.lat);
     var lon = signedLon(item.lon);
-    var dist = 1.85;
-    var cat = String(item.category || '').toLowerCase();
-    if (cat.indexOf('landing') >= 0 || item._kind === 'mission') dist = 1.15;
-    else if (cat.indexOf('polar') >= 0) dist = 2.4;
+    var dist = 1.32;
+    var cat = String(item.category || item.type || '').toLowerCase();
+    if (cat.indexOf('landing') >= 0 || item._kind === 'mission' || item.total_odometry_km != null) dist = 1.15;
+    else if (cat.indexOf('polar') >= 0) dist = 2.2;
     if (typeof flyToCoordinate === 'function') flyToCoordinate(lat, lon, dist);
     ARES.state.time.cursorLon = (item.lon_east == null) ? eastLon(lon) : Number(item.lon_east);
     ARES.state.time.cursorLat = lat;

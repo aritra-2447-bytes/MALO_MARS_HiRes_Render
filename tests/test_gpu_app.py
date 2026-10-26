@@ -122,8 +122,8 @@ def run_tests():
     # Topo Contours & Strict Camera Zoom Limits
     assert "u_contourify" in html, "u_contourify uniform missing in index.html"
     assert "btn-toggle-contour" in html, "btn-toggle-contour button missing in index.html"
-    assert "controls.minDistance = 1.28" in html, "controls.minDistance must be set to 1.28 to prevent surface penetration"
-    assert "LANDING_SITE_CAM_DIST = 1.35" in html, "LANDING_SITE_CAM_DIST must be set to 1.35 for stable orbital framing"
+    assert "controls.minDistance = 1.08" in html, "controls.minDistance must be set to 1.08 to prevent surface penetration"
+    assert "LANDING_SITE_CAM_DIST = 1.15" in html, "LANDING_SITE_CAM_DIST must be set to 1.15 for close-up orbital framing"
     assert "Spherical Great-Circle Interpolation" in html, "SLERP camera fly-to interpolation missing"
     assert "camera.position.setLength(controls.minDistance)" in html, "Hard distance clamp missing"
     assert "btn-rover-drive" not in html, "btn-rover-drive should be removed"
