@@ -472,12 +472,18 @@
           camera.near = near;
           camera.updateProjectionMatrix();
         }
-        if (typeof markersGroup !== 'undefined' && markersGroup) {
-          var pinScale = clamp(0.0038 * alt / 0.008, 0.0005, 1.0);
-          markersGroup.children.forEach(function (g) {
+        var pinScale = clamp(0.0020 * alt / 0.006, 0.0001, 1.0);
+        var groupsToScale = [];
+        if (typeof markersGroup !== 'undefined' && markersGroup) groupsToScale.push(markersGroup);
+        if (typeof landingSiteMarkersGroup !== 'undefined' && landingSiteMarkersGroup) groupsToScale.push(landingSiteMarkersGroup);
+        if (window.landingSiteMarkersGroup && groupsToScale.indexOf(window.landingSiteMarkersGroup) === -1) {
+          groupsToScale.push(window.landingSiteMarkersGroup);
+        }
+        groupsToScale.forEach(function (grp) {
+          grp.children.forEach(function (g) {
             if (g && g.userData && g.userData.aresLandmarkPin) g.scale.setScalar(pinScale);
           });
-        }
+        });
         var minerals = ARES.state.hoverGroups.minerals;
         if (minerals) {
           minerals.children.forEach(function (m) {
@@ -486,7 +492,7 @@
             var isDot = m.geometry.type === 'SphereGeometry';
             var base = isDot ? p.radius : (p.outerRadius || p.radius || 0);
             if (!base) return;
-            var targetRad = isDot ? 0.0011 : 0.0026;
+            var targetRad = isDot ? 0.0004 : 0.0010;
             m.scale.setScalar(clamp(targetRad * alt / base, 0.00001, 1.0));
           });
         }
@@ -1048,20 +1054,20 @@
       if (!keys.length) return;
       var x = (eastLon(site.lon_east) / 360) * canvas.width;
       var y = ((90 - Number(site.lat)) / 180) * canvas.height;
-      var radius = Math.max(10, ((Number(site.radius_deg) || 0.05) / 360) * canvas.width * 2.2);
+      var radius = Math.max(4, ((Number(site.radius_deg) || 0.05) / 360) * canvas.width * 0.65);
       keys.forEach(function (key) {
         var color = classColor(key);
         var grad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-        grad.addColorStop(0, hexToRgba(color, 0.62));
-        grad.addColorStop(0.45, hexToRgba(color, 0.25));
+        grad.addColorStop(0, hexToRgba(color, 0.35));
+        grad.addColorStop(0.5, hexToRgba(color, 0.10));
         grad.addColorStop(1, hexToRgba(color, 0));
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.fill();
       });
-      ctx.strokeStyle = hexToRgba(classColor(keys[0]), 0.35);
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = hexToRgba(classColor(keys[0]), 0.22);
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(x, y, radius * 0.32, 0, Math.PI * 2);
       ctx.stroke();
@@ -1093,12 +1099,12 @@
       var keys = activeClassesForSite(site);
       if (!keys.length) return;
       var color = classColor(keys[0]);
-      var size = Math.min(0.06, Math.max(0.0045, (Number(site.radius_deg) || 0.05) * 0.01745 * 1.5));
+      var size = Math.min(0.012, Math.max(0.0015, (Number(site.radius_deg) || 0.05) * 0.01745 * 0.4));
       var pos = latLonToVector3(Number(site.lat), eastLon(site.lon_east) > 180 ? eastLon(site.lon_east) - 360 : eastLon(site.lon_east), MARS_RADIUS * 1.0035);
       var normal = pos.clone().normalize();
       var ring = new THREE.Mesh(
-        new THREE.RingGeometry(size * 0.72, size, 40),
-        new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false })
+        new THREE.RingGeometry(size * 0.78, size, 32),
+        new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.70, side: THREE.DoubleSide, depthWrite: false })
       );
       ring.position.copy(pos);
       ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
@@ -1114,8 +1120,8 @@
       };
       group.add(ring);
       var dot = new THREE.Mesh(
-        new THREE.SphereGeometry(size * 0.18, 10, 8),
-        new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.9 })
+        new THREE.SphereGeometry(size * 0.10, 8, 8),
+        new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.80 })
       );
       dot.position.copy(pos.clone().multiplyScalar(1.0002));
       dot.userData = ring.userData;
@@ -2493,11 +2499,11 @@
           var keys = activeClassesForSite(site);
           if (!keys.length) return;
           var x = px(site.lon_east), y = py(site.lat);
-          var radius = Math.max(4, ((Number(site.radius_deg) || 0.05) / 360) * drawW * 1.4);
+          var radius = Math.max(2.5, ((Number(site.radius_deg) || 0.05) / 360) * drawW * 0.35);
           ctx.save();
           ctx.strokeStyle = classColor(keys[0]);
-          ctx.fillStyle = hexToRgba(classColor(keys[0]), 0.18);
-          ctx.lineWidth = 1.3;
+          ctx.fillStyle = hexToRgba(classColor(keys[0]), 0.06);
+          ctx.lineWidth = 1.0;
           ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
           ctx.restore();
         });
