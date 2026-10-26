@@ -268,31 +268,53 @@ def run_tests():
             assert data.get("status") == "success"
             assert "missions" in data
 
-        # 12. ARES-OS Scouting IPP API (presets, terrain-grid, scout-plan)
-        with urllib.request.urlopen(f"{base_url}/api/ipp/presets", timeout=5) as resp:
+        # 12. ARES-OS Science & Mission Control API
+        with urllib.request.urlopen(f"{base_url}/api/atlas/missions", timeout=5) as resp:
             assert resp.status == 200
             data = json.loads(resp.read().decode("utf-8"))
             assert data.get("status") == "success"
-            assert len(data.get("presets", [])) >= 1
+            assert data.get("count", 0) >= 15
 
-        with urllib.request.urlopen(f"{base_url}/api/ipp/terrain-grid?preset=jezero", timeout=5) as resp:
+        with urllib.request.urlopen(f"{base_url}/api/atlas/landmarks", timeout=5) as resp:
             assert resp.status == 200
             data = json.loads(resp.read().decode("utf-8"))
             assert data.get("status") == "success"
-            assert data.get("grid_size") == 64
+            assert data.get("count", 0) >= 40
+
+        with urllib.request.urlopen(f"{base_url}/api/minerals", timeout=5) as resp:
+            assert resp.status == 200
+            data = json.loads(resp.read().decode("utf-8"))
+            assert data.get("status") == "success"
+            assert "classes" in data
+
+        with urllib.request.urlopen(f"{base_url}/api/terrain/slope?lat=18.44&lon=77.45&size=0.03", timeout=10) as resp:
+            assert resp.status == 200
+            data = json.loads(resp.read().decode("utf-8"))
+            assert data.get("status") == "success"
+            assert "slope" in data and "elevation" in data
 
         post_req = urllib.request.Request(
-            f"{base_url}/api/ipp/scout-plan",
-            data=json.dumps({"preset": "jezero", "max_iterations": 5}).encode("utf-8"),
+            f"{base_url}/api/scouting/plan",
+            data=json.dumps({
+                "start": {"lat": 18.4446, "lon": 77.4508},
+                "target": {"lat": 18.51, "lon": 77.35},
+                "max_iterations": 4
+            }).encode("utf-8"),
             headers={"Content-Type": "application/json"}
         )
-        with urllib.request.urlopen(post_req, timeout=10) as resp:
+        with urllib.request.urlopen(post_req, timeout=15) as resp:
             assert resp.status == 200
             data = json.loads(resp.read().decode("utf-8"))
             assert data.get("status") == "success"
-            assert "proof_status" in data
+            assert "outcome" in data and "proof" in data
 
-        print("  PASS: Live server HTTP requests, API routes, CORS, textures, traverses, and IPP verified.")
+        with urllib.request.urlopen(f"{base_url}/api/mars/time?lon=77.45", timeout=5) as resp:
+            assert resp.status == 200
+            data = json.loads(resp.read().decode("utf-8"))
+            assert data.get("status") == "success"
+            assert "ltst" in data and "lmst" in data
+
+        print("  PASS: Live server HTTP requests, API routes, CORS, textures, traverses, and ARES-OS verified.")
     finally:
         httpd.shutdown()
         httpd.server_close()
