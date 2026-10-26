@@ -2481,27 +2481,28 @@
         else if (lm.category === 'basin') colorHex = 0x93c5fd; // soft periwinkle
 
         // 1. Sleek Matte Pin Head (Subtle Sphere)
-        const pinGeo = new THREE.SphereGeometry(0.008, 20, 20);
+        const pinGeo = new THREE.SphereGeometry(0.0022, 16, 16);
         const pinMat = new THREE.MeshStandardMaterial({
           color: colorHex,
           roughness: 0.4,
           metalness: 0.2
         });
         const pinMesh = new THREE.Mesh(pinGeo, pinMat);
-        pinMesh.position.copy(normal.clone().multiplyScalar(0.016));
+        const pinHeight = 0.0055;
+        pinMesh.position.copy(normal.clone().multiplyScalar(pinHeight));
         pinMesh.castShadow = true;
         pinMesh.userData = lm;
 
         // 2. Refined, Minimalist Stem (Thin Titanium Needle)
-        const stemGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.018, 8);
+        const stemGeo = new THREE.CylinderGeometry(0.0002, 0.0002, pinHeight, 8);
         const stemMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
         const stemMesh = new THREE.Mesh(stemGeo, stemMat);
-        stemMesh.position.copy(normal.clone().multiplyScalar(0.008));
+        stemMesh.position.copy(normal.clone().multiplyScalar(pinHeight * 0.5));
         stemMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
         stemMesh.castShadow = true;
 
         // 3. Delicate Surface Target Ring (Semi-transparent, non-distracting)
-        const ringGeo = new THREE.RingGeometry(0.006, 0.009, 32);
+        const ringGeo = new THREE.RingGeometry(0.0016, 0.0025, 32);
         const ringMat = new THREE.MeshBasicMaterial({
           color: colorHex,
           side: THREE.DoubleSide,
@@ -2579,39 +2580,42 @@
         const colorHex = getStatusColor(site.status);
 
         const beaconGroup = new THREE.Group();
+        beaconGroup.position.copy(pos);
+        // Pivot at the surface so ARES-OS can scale the pin without moving it.
+        beaconGroup.userData.aresLandmarkPin = true;
 
-        // 1. High-Fidelity Status-Colored Pin Head Sphere
-        const headGeo = new THREE.SphereGeometry(0.0055, 16, 16);
+        // 1. High-Fidelity Status-Colored Pin Head Sphere (Miniaturized for clear traverse path visibility)
+        const headGeo = new THREE.SphereGeometry(0.0016, 16, 16);
         const headMat = new THREE.MeshStandardMaterial({
           color: colorHex,
           emissive: colorHex,
-          emissiveIntensity: 0.75,
+          emissiveIntensity: 0.65,
           roughness: 0.25,
           metalness: 0.2
         });
         const pinHead = new THREE.Mesh(headGeo, headMat);
-        const pinHeight = 0.014;
-        pinHead.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight)));
+        const pinHeight = 0.0045;
+        pinHead.position.copy(normal.clone().multiplyScalar(pinHeight));
         beaconGroup.add(pinHead);
 
         // 2. High-Contrast Slender White Stem
-        const stemGeo = new THREE.CylinderGeometry(0.00045, 0.00045, pinHeight, 8);
+        const stemGeo = new THREE.CylinderGeometry(0.00016, 0.00016, pinHeight, 8);
         const stemMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const stem = new THREE.Mesh(stemGeo, stemMat);
-        stem.position.copy(pos.clone().add(normal.clone().multiplyScalar(pinHeight * 0.5)));
+        stem.position.copy(normal.clone().multiplyScalar(pinHeight * 0.5));
         stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
         beaconGroup.add(stem);
 
-        // 3. Ground Target Ring
-        const ringGeo = new THREE.RingGeometry(0.005, 0.009, 32);
+        // 3. Ground Target Ring (Delicate and non-obscuring)
+        const ringGeo = new THREE.RingGeometry(0.0012, 0.0022, 32);
         const ringMat = new THREE.MeshBasicMaterial({
           color: colorHex,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.85
+          opacity: 0.75
         });
         const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.position.copy(pos.clone().add(normal.clone().multiplyScalar(0.0001)));
+        ring.position.set(0, 0, 0);
         ring.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
         beaconGroup.add(ring);
 
@@ -2647,9 +2651,9 @@
         if (group.userData?.missionId === missionId || group.userData?.id === missionId) {
           group.children.forEach(mesh => {
             if (mesh.geometry instanceof THREE.RingGeometry) {
-              mesh.scale.set(1.5, 1.5, 1.5);
+              mesh.scale.set(1.25, 1.25, 1.25);
             } else if (mesh.geometry instanceof THREE.SphereGeometry) {
-              mesh.scale.set(1.3, 1.3, 1.3);
+              mesh.scale.set(1.15, 1.15, 1.15);
             }
           });
         }
