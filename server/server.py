@@ -90,16 +90,22 @@ class MarsHandler(http.server.SimpleHTTPRequestHandler):
         try:
             parsed = urllib.parse.urlsplit(self.path)
             path = parsed.path
-            if path == "/api/ipp/scout-plan":
-                content_length = int(self.headers.get("Content-Length", 0))
-                body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
-                try:
-                    params = json.loads(body)
-                except Exception:
-                    params = {}
-                result = self.api_handler.handle_ipp_scout_plan(params)
+            content_length = int(self.headers.get("Content-Length", 0))
+            body_str = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+            try:
+                body = json.loads(body_str) if body_str else {}
+            except Exception:
+                body = {}
+
+            if path == "/api/scouting/plan":
+                result = self.api_handler.handle_scouting_post(body)
                 self.send_json_response(result)
                 return
+            elif path == "/api/nasa/gds/jobs":
+                result = self.api_handler.handle_gds_jobs_post(body)
+                self.send_json_response(result)
+                return
+
             self.send_error(404, "Not Found")
         except Exception as e:
             self.send_error(500, f"Internal Server Error: {e}")
