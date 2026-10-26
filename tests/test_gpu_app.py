@@ -118,7 +118,26 @@ def run_tests():
     assert "landing-fly-btn" in html, "Landings fly action buttons missing"
     assert "statusOrder" in html, "Status ordering (Active -> Completed -> Failed) missing"
     assert "landing-group-header" in html, "Landing status group headers missing"
-    print("  PASS: 3D paths, landing markers, status colors, corridor pulse, and hover detection verified.")
+
+    # Topo Contours & Strict Camera Zoom Limits
+    assert "u_contourify" in html, "u_contourify uniform missing in index.html"
+    assert "btn-toggle-contour" in html, "btn-toggle-contour button missing in index.html"
+    assert "controls.minDistance = 1.28" in html, "controls.minDistance must be set to 1.28 to prevent surface penetration"
+    assert "LANDING_SITE_CAM_DIST = 1.35" in html, "LANDING_SITE_CAM_DIST must be set to 1.35 for stable orbital framing"
+    assert "Spherical Great-Circle Interpolation" in html, "SLERP camera fly-to interpolation missing"
+    assert "camera.position.setLength(controls.minDistance)" in html, "Hard distance clamp missing"
+    assert "btn-rover-drive" not in html, "btn-rover-drive should be removed"
+    assert "rover-sim-panel" not in html, "rover-sim-panel should be removed"
+
+    # Dynamic Cartographic Scale Bar
+    assert "scale-bar-container" in html, "scale-bar-container missing in index.html"
+    assert "scale-bar-line" in html, "scale-bar-line element missing in index.html"
+    assert "scale-bar-label" in html, "scale-bar-label element missing in index.html"
+    assert "updateDynamicScaleBar" in html, "updateDynamicScaleBar function missing in index.html"
+    assert "STANDARD_SCALE_DISTANCES_KM" in html, "STANDARD_SCALE_DISTANCES_KM scale steps missing in index.html"
+    assert "updateDynamicScaleBar()" in html, "updateDynamicScaleBar() call missing in index.html"
+
+    print("  PASS: 3D paths, landing markers, topo contours, scale bar, and hover detection verified.")
 
     # Test 5: Validate 2D WebGL Viewer in public/index_2d_backup.html
     print("\n[Test 5] Verifying 2D WebGL Viewer Implementation...")
