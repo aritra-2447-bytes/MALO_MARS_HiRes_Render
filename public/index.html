@@ -49,7 +49,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 1000;
+      z-index: 2500;
       pointer-events: none;
     }
 
@@ -239,7 +239,7 @@
       flex-direction: row-reverse;
       align-items: flex-start;
       gap: 8px;
-      z-index: 1000;
+      z-index: 2500;
       pointer-events: auto;
       animation: menuFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -251,18 +251,309 @@
 
     .menu-dropdown-panel {
       background: rgba(10, 15, 29, 0.96);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 14px;
-      padding: 8px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      width: 240px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+      gap: 6px;
+      width: 310px;
+      max-width: calc(100vw - 24px);
+      max-height: calc(100vh - 85px);
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    .menu-dropdown-panel::-webkit-scrollbar {
+      width: 5px;
+    }
+    .menu-dropdown-panel::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 3px;
+    }
+    .menu-dropdown-panel::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    /* === MENU UI v2 START === */
+    .menu-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 6px 8px 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 2px;
+    }
+    .menu-panel-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-panel-icon {
+      font-size: 16px;
+    }
+    .menu-panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .menu-panel-subtitle {
+      font-size: 10px;
+      color: var(--accent-orange);
+      font-weight: 500;
+    }
+    .menu-panel-close-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 18px;
+      line-height: 1;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .menu-panel-close-btn:hover,
+    .menu-panel-close-btn:focus-visible {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #f87171;
+      outline: none;
+    }
+
+    .menu-section {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .menu-section:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+    .menu-section.section-open {
+      background: rgba(255, 255, 255, 0.035);
+    }
+    .menu-section-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: transparent;
+      border: none;
+      color: #f1f5f9;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      user-select: none;
       box-sizing: border-box;
     }
+    .menu-section-header:hover,
+    .menu-section-header:focus-visible {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--accent-orange);
+      outline: none;
+    }
+    .sec-header-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .sec-icon {
+      font-size: 13px;
+    }
+    .sec-title {
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    .sec-chevron {
+      font-size: 11px;
+      color: var(--text-dim);
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+    }
+    .menu-section.section-open .sec-chevron {
+      color: var(--accent-orange);
+      transform: rotate(180deg);
+    }
+    .menu-section-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      padding: 0 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: max-height 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, padding 0.2s ease;
+      box-sizing: border-box;
+    }
+    .menu-section.section-open .menu-section-content {
+      max-height: 600px;
+      opacity: 1;
+      padding: 2px 8px 8px 8px;
+    }
+
+    .menu-btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+    .menu-sublabel {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      padding: 4px 4px 2px 4px;
+    }
+    .menu-items-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .layer-control-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 4px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-sizing: border-box;
+    }
+    .layer-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .layer-row .submenu-item {
+      padding: 6px 8px;
+    }
+    .toggle-indicator {
+      width: 30px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      position: relative;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .toggle-indicator::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      background: #94a3b8;
+      border-radius: 50%;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;
+    }
+    .submenu-item.active .toggle-indicator {
+      background: rgba(34, 197, 94, 0.35);
+    }
+    .submenu-item.active .toggle-indicator::after {
+      transform: translateX(14px);
+      background: #22c55e;
+    }
+
+    .menu-slider-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 4px 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+    .slider-pct {
+      color: var(--accent-orange);
+      font-weight: 600;
+    }
+    .menu-range-slider {
+      accent-color: var(--accent-orange);
+      cursor: pointer;
+      width: 100%;
+      height: 4px;
+    }
+
+    .floating-menu-reopen-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1600;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 15px;
+      background: rgba(10, 15, 29, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      transition: all 0.18s ease;
+      pointer-events: auto;
+    }
+    .floating-menu-reopen-btn:hover,
+    .floating-menu-reopen-btn:focus-visible {
+      background: rgba(255, 94, 54, 0.2);
+      border-color: var(--accent-orange);
+      color: #fff;
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .floating-layer-btn {
+      position: fixed;
+      top: 136px;
+      right: 16px;
+      z-index: 1500;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transition: all 0.15s ease;
+      pointer-events: auto;
+    }
+    .floating-layer-btn:hover {
+      color: #fff;
+      border-color: var(--accent-cyan);
+    }
+    /* === MENU UI v2 END === */
 
     .menu-item {
       width: 100%;
@@ -1454,52 +1745,166 @@
 
       <!-- Main Menu Options Dropdown & Flyout Container -->
       <div id="main-menu-dropdown" class="menu-dropdown-wrapper" role="menu" aria-label="Main Navigation Menu" style="display:none;">
-        <div class="menu-dropdown-panel">
-          <button class="pill-btn menu-item active" id="btn-mode-3d" role="menuitem">🌐 3D Planetary Globe</button>
-          <button class="pill-btn menu-item" id="btn-mode-2d" role="menuitem">🗺️ 2D Flat Map</button>
-          <button class="pill-btn menu-item" id="btn-toggle-decontour" role="menuitem" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
-          <button class="pill-btn menu-item" id="btn-toggle-contour" role="menuitem" title="Toggle Topographic Contour Lines: Renders real-time elevation isolines over Martian topography">📐 Topo Contours</button>
-          <button class="pill-btn menu-item active" id="btn-toggle-drawer" role="menuitem">📍 Destinations</button>
-          <button class="pill-btn menu-item" id="btn-scan-nasa" role="menuitem">🛰️ Scan NASA Orbiters</button>
-
-          <!-- Geology 4K Map Item with Submenu Trigger -->
-          <div class="menu-item-wrap has-submenu" id="wrap-geology-menu">
-            <button class="pill-btn menu-item" id="btn-toggle-geology" role="menuitem" aria-haspopup="true" aria-expanded="false" aria-controls="geology-submenu" title="USGS SIM 3292 4K Geologic Map &amp; Planetary Layer Options">
-              <span>🎨 Geology 4K Map</span>
-              <span class="submenu-arrow" aria-hidden="true">◀</span>
-            </button>
+        <div class="menu-dropdown-panel" id="menu-dropdown-panel-root">
+          <!-- Panel Header with Title & Close (X) Button -->
+          <div class="menu-panel-header">
+            <div class="menu-panel-title-wrap">
+              <span class="menu-panel-icon">🪐</span>
+              <div>
+                <div class="menu-panel-title">Mission Control</div>
+                <div class="menu-panel-subtitle">Planetary Explorer &amp; Atlas</div>
+              </div>
+            </div>
+            <button class="menu-panel-close-btn" id="btn-close-main-menu" title="Close Menu (Esc)" aria-label="Close Menu">&times;</button>
           </div>
 
-          <button class="pill-btn highlight-btn menu-item" id="btn-geology-atlas" role="menuitem" onclick="window.location.href='/geology_atlas.html'" title="USGS SIM 3292 Geologic Map of Mars &amp; Aqueous Mineral Spectral Atlas">🪐 USGS Geologic &amp; Mineral Atlas</button>
+          <!-- Section 1: Base Globe & Maps -->
+          <div class="menu-section section-open" id="sec-base-globe">
+            <button class="menu-section-header" type="button" aria-expanded="true">
+              <span class="sec-header-left">
+                <span class="sec-icon">🌐</span>
+                <span class="sec-title">Base Globe &amp; Maps</span>
+              </span>
+              <span class="sec-chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="menu-section-content">
+              <div class="menu-btn-grid">
+                <button class="pill-btn menu-item active" id="btn-mode-3d" role="menuitem" title="Switch to 3D Interactive Planetary Globe">🌐 3D Globe</button>
+                <button class="pill-btn menu-item" id="btn-mode-2d" role="menuitem" title="Switch to 2D Equirectangular Surface Map">🗺️ 2D Map</button>
+              </div>
+              <div class="menu-sublabel">Base Textures (Underlying Globe)</div>
+              <div class="menu-items-col">
+                <button class="pill-btn submenu-item active" id="btn-tex-mola-4k" role="menuitem" title="NASA MGS MOLA + MEX HRSC 4K Topographic Baseline Map (Base Layer)">🏔️ MOLA Topo 4K (Base)</button>
+                <button class="pill-btn submenu-item" id="btn-tex-mola-8k" role="menuitem" title="MOLA High-Resolution 8K Master Baseline Map">🛰️ MOLA 8K Master</button>
+                <button class="pill-btn submenu-item" id="btn-tex-zoom5-grayscale" role="menuitem" title="Mars Trek High-Precision Level 5 Grayscale Surface Base">📷 Zoom 5 Grayscale Base</button>
+                <button class="pill-btn submenu-item" id="btn-add-texture" role="menuitem" title="Load custom local planetary texture or GeoTIFF map">➕ Add Custom Texture</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Overlays & Layers -->
+          <div class="menu-section section-open" id="sec-overlays">
+            <button class="menu-section-header" type="button" aria-expanded="true">
+              <span class="sec-header-left">
+                <span class="sec-icon">🎨</span>
+                <span class="sec-title">Overlays &amp; Layers</span>
+              </span>
+              <span class="sec-chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="menu-section-content">
+              <!-- Geology 4K Map Item with Submenu Trigger -->
+              <div class="menu-item-wrap has-submenu" id="wrap-geology-menu">
+                <button class="pill-btn menu-item" id="btn-toggle-geology" role="menuitem" aria-haspopup="true" aria-expanded="false" aria-controls="geology-submenu" title="USGS SIM 3292 4K Geologic Map &amp; Planetary Layer Options">
+                  <span>🎨 Geology 4K Map</span>
+                  <span class="submenu-arrow" aria-hidden="true">◀</span>
+                </button>
+              </div>
+
+              <!-- Geology Overlay Toggle & Opacity Slider -->
+              <div class="layer-control-card">
+                <div class="layer-row">
+                  <button class="pill-btn submenu-item" id="btn-toggle-geo-topo" role="menuitem" title="Toggle USGS SIM 3292 4K Geologic Map Overlay sitting on top of MOLA Topo 4K">
+                    <span>🎨 Geology 4K Overlay</span>
+                    <span class="toggle-indicator"></span>
+                  </button>
+                </div>
+                <div class="menu-slider-wrap" id="menu-geo-slider-wrap" style="display:none;">
+                  <div class="slider-header">
+                    <span>Geology Opacity</span>
+                    <span class="slider-pct" id="lbl-menu-geo-blend-pct">65%</span>
+                  </div>
+                  <input type="range" class="menu-range-slider" id="slider-menu-geo-blend" min="0" max="1" step="0.05" value="0.65" title="Adjust USGS Geology overlay opacity over MOLA Topo 4K">
+                </div>
+              </div>
+
+              <!-- Zoom 5 Grayscale Overlay Toggle & Opacity Slider -->
+              <div class="layer-control-card">
+                <div class="layer-row">
+                  <button class="pill-btn submenu-item" id="btn-toggle-geo-zoom5" role="menuitem" title="Toggle Zoom 5 Grayscale Context Overlay on top of MOLA &amp; Geology">
+                    <span>📷 Zoom 5 Grayscale</span>
+                    <span class="toggle-indicator"></span>
+                  </button>
+                </div>
+                <div class="menu-slider-wrap" id="menu-zoom5-slider-wrap" style="display:none;">
+                  <div class="slider-header">
+                    <span>Grayscale Opacity</span>
+                    <span class="slider-pct" id="lbl-menu-zoom5-pct">60%</span>
+                  </div>
+                  <input type="range" class="menu-range-slider" id="slider-menu-zoom5" min="0" max="1" step="0.05" value="0.6" title="Adjust Zoom 5 Grayscale overlay opacity">
+                </div>
+              </div>
+
+              <!-- Feature Overlays -->
+              <div class="menu-sublabel">Planetary Markers &amp; Traverses</div>
+              <div class="menu-items-col">
+                <button class="pill-btn submenu-item active" id="btn-toggle-landings" role="menuitem" title="Toggle 16 historic &amp; active NASA/ESA Mars landing site beacons">🛬 Landing Sites (16)</button>
+                <button class="pill-btn submenu-item active" id="btn-toggle-geo-traverses" role="menuitem" title="Toggle NASA Curiosity, Perseverance, Opportunity, and Spirit rover traverse paths">🚀 Rover Traverses</button>
+                <button class="pill-btn submenu-item active" id="btn-toggle-geo-dest" role="menuitem" title="Toggle IAU Geodetic landmarks, volcanoes, and impact craters">📍 Destinations (IAU)</button>
+                <button class="pill-btn menu-item active" id="btn-toggle-drawer" role="menuitem" title="Open IAU Exploration Sites side drawer">📍 Destinations Drawer</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Display & Lighting -->
+          <div class="menu-section section-open" id="sec-display">
+            <button class="menu-section-header" type="button" aria-expanded="true">
+              <span class="sec-header-left">
+                <span class="sec-icon">✨</span>
+                <span class="sec-title">Display &amp; Effects</span>
+              </span>
+              <span class="sec-chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="menu-section-content">
+              <div class="menu-items-col">
+                <button class="pill-btn menu-item" id="btn-toggle-decontour" role="menuitem" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
+                <button class="pill-btn menu-item" id="btn-toggle-contour" role="menuitem" title="Toggle Topographic Contour Lines: Renders real-time elevation isolines over Martian topography">📐 Topo Contours</button>
+                <button class="pill-btn submenu-item" id="btn-toggle-grid" role="menuitem" title="Toggle 30-degree Martian latitude/longitude graticule coordinate lines">🌐 Lat/Lon Grid</button>
+                <button class="pill-btn submenu-item" id="btn-toggle-sun" role="menuitem" title="Toggle real-time solar direction &amp; dynamic shadow simulation">☀️ Solar Sun</button>
+                <button class="pill-btn submenu-item" id="btn-reset-cam" role="menuitem" title="Reset camera orientation to Martian Prime Meridian (0° N, 0° E)">🎯 Center View</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Science Atlas & Intel -->
+          <div class="menu-section section-open" id="sec-info">
+            <button class="menu-section-header" type="button" aria-expanded="true">
+              <span class="sec-header-left">
+                <span class="sec-icon">🔬</span>
+                <span class="sec-title">Science Atlas &amp; Intel</span>
+              </span>
+              <span class="sec-chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="menu-section-content">
+              <div class="menu-items-col">
+                <button class="pill-btn menu-item" id="btn-scan-nasa" role="menuitem" title="Query NASA PDS ODE REST API for MRO CTX &amp; HiRISE observation footprints">🛰️ Scan NASA Orbiters</button>
+                <button class="pill-btn submenu-item" id="btn-geologic-legend" role="menuitem" title="Open USGS SIM 3292 44-Unit Geologic Color Legend &amp; Chronology Drawer">🗺️ Geologic Legend</button>
+                <button class="pill-btn highlight-btn menu-item" id="btn-geology-atlas" role="menuitem" onclick="window.location.href='/geology_atlas.html'" title="USGS SIM 3292 Geologic Map of Mars &amp; Aqueous Mineral Spectral Atlas">🪐 USGS Geologic &amp; Mineral Atlas</button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Geology 4K Map Submenu (Appears on right side of menu) -->
+        <!-- Geology 4K Map Submenu (Preserved for backwards-compatibility / flyout access) -->
         <div id="geology-submenu" class="geology-submenu-flyout" role="menu" aria-label="Geology 4K Map Options" style="display:none;">
           <div class="submenu-header">
-            <span class="submenu-title">USGS SIM 3292 4K Geology</span>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="submenu-title">USGS SIM 3292 4K Geology</span>
+              <button class="menu-panel-close-btn" id="btn-close-geology-submenu" title="Close Submenu" style="font-size:16px; padding:2px 6px;">&times;</button>
+            </div>
             <span class="submenu-sub">Map Options &amp; Layers</span>
           </div>
           <div class="submenu-items">
-            <button class="pill-btn submenu-item active" id="btn-tex-geology-4k" role="menuitem">🪐 USGS SIM 3292 4K Master</button>
-            <button class="pill-btn submenu-item" id="btn-tex-mola-4k" role="menuitem">🏔️ MOLA Topo 4K</button>
-            <button class="pill-btn submenu-item" id="btn-tex-mola-8k" role="menuitem">🛰️ MOLA 8K Master</button>
-            <button class="pill-btn submenu-item" id="btn-tex-zoom5-grayscale" role="menuitem">📷 Zoom 5 Grayscale Base</button>
-            <button class="pill-btn submenu-item" id="btn-add-texture" role="menuitem">➕ Add Texture</button>
-            <div class="submenu-divider"></div>
-            <button class="pill-btn submenu-item active" id="btn-toggle-landings" role="menuitem">🛬 Landing Sites (16)</button>
-            <button class="pill-btn submenu-item active" id="btn-toggle-geo-traverses" role="menuitem">🚀 Rover Traverses</button>
-            <button class="pill-btn submenu-item active" id="btn-toggle-geo-dest" role="menuitem">📍 Destinations (IAU)</button>
-            <button class="pill-btn submenu-item" id="btn-toggle-geo-topo" role="menuitem">🏔️ MOLA Blend Overlay</button>
-            <button class="pill-btn submenu-item" id="btn-toggle-geo-zoom5" role="menuitem">📷 Zoom 5 Grayscale</button>
-            <button class="pill-btn submenu-item" id="btn-geologic-legend" role="menuitem">🗺️ Geologic Legend</button>
-            <button class="pill-btn submenu-item" id="btn-toggle-grid" role="menuitem">🌐 Lat/Lon Grid</button>
-            <button class="pill-btn submenu-item" id="btn-toggle-sun" role="menuitem">☀️ Solar Sun</button>
-            <button class="pill-btn submenu-item" id="btn-reset-cam" role="menuitem">🎯 Center View</button>
+            <button class="pill-btn submenu-item" id="btn-tex-geology-4k" role="menuitem" title="USGS SIM 3292 4K Geologic Map Master Overlay">🪐 USGS SIM 3292 4K Master</button>
           </div>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- Floating Button to Reopen Navigation Menu -->
+  <button id="btn-floating-menu-reopen" class="floating-menu-reopen-btn" title="Open Navigation Menu">
+    <span>🪐 Menu</span>
+  </button>
 
   <!-- Ephemeris Solar Intel Floating Panel -->
   <div id="ephemeris-panel" style="display:none;">
@@ -1781,51 +2186,61 @@
         </div>
       </div>
 
-      <!-- Floating Geology Layer Controls Panel -->
-      <div id="geo-layer-controls-panel" class="globe-hud-panel" style="position:absolute; top:72px; right:16px; z-index:40; display:flex; flex-direction:column; gap:8px; padding:10px 14px; background:rgba(15, 23, 42, 0.88); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.14); border-radius:10px; min-width:200px; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
-        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#f8fafc; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-          <span>Geology 4K Overlays</span>
+    </div>
+
+    <!-- Floating Geology Layer Controls Panel (Top-level Fixed HUD) -->
+    <div id="geo-layer-controls-panel" class="globe-hud-panel" style="position:fixed; top:136px; right:16px; z-index:1500; display:none; flex-direction:column; gap:8px; padding:10px 14px; background:rgba(15, 23, 42, 0.94); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.18); border-radius:10px; min-width:200px; box-shadow:0 8px 32px rgba(0,0,0,0.6); pointer-events:auto;">
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#f8fafc; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+        <span>Geology 4K Overlays</span>
+        <div style="display:flex; align-items:center; gap:6px;">
           <span style="font-size:9px; color:var(--accent-orange); font-weight:600;">ACTIVE</span>
+          <button id="btn-close-geo-controls" class="target-btn-close" title="Close Panel (Esc)" style="font-size:16px; line-height:1; cursor:pointer; background:none; border:none; color:#94a3b8;">&times;</button>
         </div>
-        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
-          <input type="checkbox" id="chk-geo-landings" checked style="accent-color:var(--accent-cyan); cursor:pointer;">
-          <span>🛬 Landing Sites</span>
-        </label>
-        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
-          <input type="checkbox" id="chk-geo-traverses" checked style="accent-color:var(--accent-green); cursor:pointer;">
-          <span>🚀 Rover Traverses</span>
-        </label>
-        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
-          <input type="checkbox" id="chk-geo-destinations" checked style="accent-color:var(--accent-orange); cursor:pointer;">
-          <span>📍 Destinations (IAU)</span>
-        </label>
-        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
-          <input type="checkbox" id="chk-geo-topo-blend" style="accent-color:var(--accent-cyan); cursor:pointer;">
-          <span>🏔️ MOLA Blend Overlay</span>
-        </label>
-        <div id="geo-topo-blend-slider-wrap" style="display:none; flex-direction:column; gap:4px; padding-left:18px; margin-top:2px;">
-          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
-            <span>Blend Opacity</span>
-            <span id="lbl-geo-blend-pct">50%</span>
-          </div>
-          <input type="range" id="slider-geo-blend" min="0" max="1" step="0.05" value="0.5" style="accent-color:var(--accent-orange); cursor:pointer; width:100%;">
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;" title="Toggle 16 historic & active NASA/ESA Mars landing sites">
+        <input type="checkbox" id="chk-geo-landings" checked style="accent-color:var(--accent-cyan); cursor:pointer;">
+        <span>🛬 Landing Sites</span>
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;" title="Toggle NASA Curiosity, Perseverance, Spirit, and Opportunity rover traverse routes">
+        <input type="checkbox" id="chk-geo-traverses" checked style="accent-color:var(--accent-green); cursor:pointer;">
+        <span>🚀 Rover Traverses</span>
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;" title="Toggle IAU Geodetic landmarks, volcanoes, and impact craters">
+        <input type="checkbox" id="chk-geo-destinations" checked style="accent-color:var(--accent-orange); cursor:pointer;">
+        <span>📍 Destinations (IAU)</span>
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;" title="Toggle USGS SIM 3292 4K Geologic Map Overlay sitting on top of MOLA Topo 4K">
+        <input type="checkbox" id="chk-geo-topo-blend" style="accent-color:var(--accent-cyan); cursor:pointer;">
+        <span>🎨 Geology 4K Overlay</span>
+      </label>
+      <div id="geo-topo-blend-slider-wrap" style="display:none; flex-direction:column; gap:4px; padding-left:18px; margin-top:2px;">
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
+          <span>Geology Opacity</span>
+          <span id="lbl-geo-blend-pct">65%</span>
         </div>
-        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;">
-          <input type="checkbox" id="chk-geo-zoom5-blend" style="accent-color:var(--accent-yellow); cursor:pointer;">
-          <span>📷 Zoom 5 Grayscale</span>
-        </label>
-        <div id="geo-zoom5-blend-slider-wrap" style="display:none; flex-direction:column; gap:4px; padding-left:18px; margin-top:2px;">
-          <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
-            <span>Grayscale Opacity</span>
-            <span id="lbl-geo-zoom5-pct">60%</span>
-          </div>
-          <input type="range" id="slider-geo-zoom5" min="0" max="1" step="0.05" value="0.6" style="accent-color:var(--accent-yellow); cursor:pointer; width:100%;">
+        <input type="range" id="slider-geo-blend" min="0" max="1" step="0.05" value="0.65" style="accent-color:var(--accent-orange); cursor:pointer; width:100%;">
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#e2e8f0; cursor:pointer;" title="Toggle Zoom 5 Grayscale Context Overlay sitting on top of Geology & MOLA Topo">
+        <input type="checkbox" id="chk-geo-zoom5-blend" style="accent-color:var(--accent-yellow); cursor:pointer;">
+        <span>📷 Zoom 5 Grayscale</span>
+      </label>
+      <div id="geo-zoom5-blend-slider-wrap" style="display:none; flex-direction:column; gap:4px; padding-left:18px; margin-top:2px;">
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim);">
+          <span>Grayscale Opacity</span>
+          <span id="lbl-geo-zoom5-pct">60%</span>
         </div>
+        <input type="range" id="slider-geo-zoom5" min="0" max="1" step="0.05" value="0.6" style="accent-color:var(--accent-yellow); cursor:pointer; width:100%;">
       </div>
     </div>
 
+    <!-- Floating Button to Reopen Geology Controls Panel -->
+    <button id="btn-open-geo-controls" class="floating-layer-btn" title="Open Geology 4K Overlays Panel">
+      <span>🎨 Overlays HUD</span>
+    </button>
+
     <!-- Landmark Hover Card -->
-    <div id="hover-tooltip">
+    <div id="hover-tooltip" style="position:absolute;">
+      <button class="target-btn-close" id="tt-close-btn" title="Dismiss tooltip (Esc)" style="position:absolute; top:4px; right:6px; background:none; border:none; color:#94a3b8; font-size:16px; cursor:pointer; z-index:10;">&times;</button>
       <div class="tooltip-tag" id="tt-category">Volcano</div>
       <div class="tooltip-name" id="tt-name">Olympus Mons</div>
       <div class="tooltip-coords" id="tt-coords">18.6500° N, 133.8000° W • +21,287 m</div>
@@ -2173,6 +2588,7 @@
     };
 
     const marsGlobe = new THREE.Mesh(sphereGeo, marsMaterial);
+    marsGlobe.renderOrder = 0;
     marsGlobe.castShadow = true;
     marsGlobe.receiveShadow = true;
     scene.add(marsGlobe);
@@ -2197,7 +2613,30 @@
       });
     });
 
-    // Zoom 5 Grayscale 3D Overlay on Main Globe
+    // USGS SIM 3292 Geology 4K 3D Overlay on Main Globe (Rendered ON TOP of MOLA Topo Base)
+    const mainGeoGeo = new THREE.SphereGeometry(MARS_RADIUS * 1.0004, 128, 64);
+    textureLoader.load('/textures/mars_sim3292_geology_4k.jpg', (tex) => {
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      const mainGeoMat = new THREE.MeshStandardMaterial({
+        map: tex,
+        transparent: true,
+        opacity: 0.65,
+        roughness: 0.9,
+        metalness: 0.0,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -1,
+        polygonOffsetUnits: -1
+      });
+      window.mainGeologyOverlayMesh = new THREE.Mesh(mainGeoGeo, mainGeoMat);
+      window.mainGeologyOverlayMesh.renderOrder = 1;
+      window.mainGeologyOverlayMesh.visible = false;
+      marsGlobe.add(window.mainGeologyOverlayMesh);
+    }, undefined, () => {});
+
+    // Zoom 5 Grayscale 3D Overlay on Main Globe (Rendered ON TOP of Geology & MOLA Topo)
     const mainZoom5Geo = new THREE.SphereGeometry(MARS_RADIUS * 1.0008, 128, 64);
     textureLoader.load('/textures/mars_zoom5_grayscale_4k.jpg', (tex) => {
       tex.generateMipmaps = true;
@@ -2209,9 +2648,13 @@
         opacity: 0.6,
         roughness: 0.88,
         metalness: 0.04,
-        depthWrite: false
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -2
       });
       window.mainZoom5OverlayMesh = new THREE.Mesh(mainZoom5Geo, mainZoom5Mat);
+      window.mainZoom5OverlayMesh.renderOrder = 2;
       window.mainZoom5OverlayMesh.visible = !!window._zoom5Visible;
       marsGlobe.add(window.mainZoom5OverlayMesh);
     }, undefined, () => {});
@@ -4079,7 +4522,7 @@
       const starField = new THREE.Points(starGeo, starMat);
       globeScene.add(starField);
 
-      // 6. Mars Sphere Mesh
+      // 6. Mars Sphere Mesh (BASE GLOBE LAYER - MOLA Topo 4K)
       const sphereGeo = new THREE.SphereGeometry(GEO_GLOBE_RADIUS, 96, 64);
       const marsMat = new THREE.MeshStandardMaterial({
         color: 0xffffff,
@@ -4087,6 +4530,7 @@
         metalness: 0.0
       });
       marsGlobeMesh = new THREE.Mesh(sphereGeo, marsMat);
+      marsGlobeMesh.renderOrder = 0;
       marsGlobeMesh.rotation.y = -Math.PI / 2; // Prime Meridian (0 deg lon) faces front to camera
       globeScene.add(marsGlobeMesh);
       window.flyGeologyGlobeTo = flyGeologyGlobeTo;
@@ -4106,27 +4550,32 @@
       marsGlobeMesh.add(window.geoLandmarksGroup);
       if (landmarksData && landmarksData.length > 0) renderGeologyLandmarks(landmarksData);
 
-      // 6e. MOLA Topography Blend Overlay
+      // 6e. USGS SIM 3292 Geology 4K Overlay (Rendered ON TOP of MOLA Topo 4K Base)
       const topoGeo = new THREE.SphereGeometry(GEO_GLOBE_RADIUS * 1.0004, 96, 64);
-      const topoLoader = new THREE.TextureLoader();
-      topoLoader.load('/textures/mars_mola_4k.jpg', (tex) => {
+      const geoOverlayLoader = new THREE.TextureLoader();
+      geoOverlayLoader.load('/textures/mars_sim3292_geology_4k.jpg', (tex) => {
         tex.generateMipmaps = true;
         tex.minFilter = THREE.LinearMipmapLinearFilter;
         tex.magFilter = THREE.LinearFilter;
         const topoMat = new THREE.MeshStandardMaterial({
           map: tex,
           transparent: true,
-          opacity: 0.5,
+          opacity: 0.65,
           roughness: 0.9,
           metalness: 0.0,
-          depthWrite: false
+          depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -1,
+          polygonOffsetUnits: -1
         });
         window.geoTopoOverlayMesh = new THREE.Mesh(topoGeo, topoMat);
+        window.geoTopoOverlayMesh.renderOrder = 1;
         window.geoTopoOverlayMesh.visible = false;
+        window.geoGeologyOverlayMesh = window.geoTopoOverlayMesh;
         marsGlobeMesh.add(window.geoTopoOverlayMesh);
       });
 
-      // 6f. Zoom 5 Grayscale Blend Overlay
+      // 6f. Zoom 5 Grayscale Blend Overlay (Rendered ON TOP of Geology & MOLA Topo)
       const zoom5Geo = new THREE.SphereGeometry(GEO_GLOBE_RADIUS * 1.0008, 96, 64);
       const zoom5Loader = new THREE.TextureLoader();
       zoom5Loader.load('/textures/mars_zoom5_grayscale_4k.jpg', (tex) => {
@@ -4139,9 +4588,13 @@
           opacity: 0.6,
           roughness: 0.9,
           metalness: 0.0,
-          depthWrite: false
+          depthWrite: false,
+          polygonOffset: true,
+          polygonOffsetFactor: -2,
+          polygonOffsetUnits: -2
         });
         window.geoZoom5OverlayMesh = new THREE.Mesh(zoom5Geo, zoom5Mat);
+        window.geoZoom5OverlayMesh.renderOrder = 2;
         window.geoZoom5OverlayMesh.visible = !!window._zoom5Visible;
         marsGlobeMesh.add(window.geoZoom5OverlayMesh);
       }, undefined, () => {});
@@ -4175,8 +4628,8 @@
       gridMesh.visible = false;
       marsGlobeMesh.add(gridMesh);
 
-      // 9. Progressive Texture Pipeline: Wrap full sphere with 1K Fast, then enhance to 4K Master
-      loadGeologyGlobeTexture('/textures/mars_sim3292_geology_4k.jpg', '/textures/mars_sim3292_geology_fast.jpg', 'USGS SIM 3292');
+      // 9. Progressive Texture Pipeline: MOLA Topo 4K as BASE globe layer
+      loadGeologyGlobeTexture('/textures/mars_mola_4k.jpg', '/textures/mars_mola_base_2k.jpg', 'MOLA Topo 4K');
 
       // 10. Setup Interaction Events
       setupGeologyGlobeEvents(canvas);
@@ -4547,8 +5000,8 @@
 
       if (btnGeo) {
         btnGeo.onclick = () => {
-          setActiveTexBtn(btnGeo);
-          loadGeologyGlobeTexture('/textures/mars_sim3292_geology_4k.jpg', '/textures/mars_sim3292_geology_fast.jpg', 'USGS SIM 3292');
+          const isVis = window.geoTopoOverlayMesh ? window.geoTopoOverlayMesh.visible : false;
+          setTopoBlendVisibility(!isVis);
         };
       }
       if (btnMola4k) {
@@ -4569,6 +5022,8 @@
           loadGeologyGlobeTexture('/textures/mars_zoom5_grayscale_8k.jpg', '/textures/mars_zoom5_grayscale_4k.jpg', 'Zoom 5 Grayscale');
         };
       }
+      // Set MOLA Topo 4K as initial active base texture button
+      setActiveTexBtn(btnMola4k);
 
       // Legend Drawer Toggle
       const legendDrawer = document.getElementById('globe-legend-drawer');
@@ -4725,18 +5180,38 @@
         };
       }
 
-      // MOLA Topography Blend Overlay Toggle & Slider
+      // USGS SIM 3292 Geology 4K Overlay Toggle & Slider (Rendered ON TOP of MOLA Topo 4K Base)
       const btnGeoTopo = document.getElementById('btn-toggle-geo-topo');
       const chkGeoTopo = document.getElementById('chk-geo-topo-blend');
       const sliderGeoTopo = document.getElementById('slider-geo-blend');
       const sliderWrap = document.getElementById('geo-topo-blend-slider-wrap');
       const lblGeoBlendPct = document.getElementById('lbl-geo-blend-pct');
+      const sliderMenuGeo = document.getElementById('slider-menu-geo-blend');
+      const lblMenuGeoBlendPct = document.getElementById('lbl-menu-geo-blend-pct');
+
+      function updateGeologyOpacity(val) {
+        if (window.geoTopoOverlayMesh && window.geoTopoOverlayMesh.material) {
+          window.geoTopoOverlayMesh.material.opacity = val;
+        }
+        if (window.mainGeologyOverlayMesh && window.mainGeologyOverlayMesh.material) {
+          window.mainGeologyOverlayMesh.material.opacity = val;
+        }
+        if (sliderGeoTopo) sliderGeoTopo.value = val;
+        if (sliderMenuGeo) sliderMenuGeo.value = val;
+        const pctStr = `${Math.round(val * 100)}%`;
+        if (lblGeoBlendPct) lblGeoBlendPct.textContent = pctStr;
+        if (lblMenuGeoBlendPct) lblMenuGeoBlendPct.textContent = pctStr;
+      }
 
       function setTopoBlendVisibility(vis) {
         if (window.geoTopoOverlayMesh) window.geoTopoOverlayMesh.visible = vis;
+        if (window.mainGeologyOverlayMesh) window.mainGeologyOverlayMesh.visible = vis;
         if (btnGeoTopo) btnGeoTopo.classList.toggle('active', vis);
         if (chkGeoTopo) chkGeoTopo.checked = vis;
+        if (btnGeo) btnGeo.classList.toggle('active', vis);
         if (sliderWrap) sliderWrap.style.display = vis ? 'flex' : 'none';
+        const menuSliderWrap = document.getElementById('menu-geo-slider-wrap');
+        if (menuSliderWrap) menuSliderWrap.style.display = vis ? 'flex' : 'none';
       }
       if (btnGeoTopo) {
         btnGeoTopo.onclick = () => {
@@ -4751,20 +5226,44 @@
       }
       if (sliderGeoTopo) {
         sliderGeoTopo.oninput = (e) => {
-          const val = parseFloat(e.target.value);
-          if (window.geoTopoOverlayMesh && window.geoTopoOverlayMesh.material) {
-            window.geoTopoOverlayMesh.material.opacity = val;
-          }
-          if (lblGeoBlendPct) lblGeoBlendPct.textContent = `${Math.round(val * 100)}%`;
+          updateGeologyOpacity(parseFloat(e.target.value));
+        };
+      }
+      if (sliderMenuGeo) {
+        sliderMenuGeo.oninput = (e) => {
+          updateGeologyOpacity(parseFloat(e.target.value));
         };
       }
 
-      // Zoom 5 Grayscale Overlay Toggle & Slider
+      // Zoom 5 Grayscale Overlay Toggle & Slider (Rendered ON TOP of Geology & MOLA Topo)
       const btnGeoZoom5 = document.getElementById('btn-toggle-geo-zoom5');
       const chkGeoZoom5 = document.getElementById('chk-geo-zoom5-blend');
       const sliderGeoZoom5 = document.getElementById('slider-geo-zoom5');
       const sliderZoom5Wrap = document.getElementById('geo-zoom5-blend-slider-wrap');
       const lblGeoZoom5Pct = document.getElementById('lbl-geo-zoom5-pct');
+      const sliderMenuZoom5 = document.getElementById('slider-menu-zoom5');
+      const lblMenuZoom5Pct = document.getElementById('lbl-menu-zoom5-pct');
+
+      function updateZoom5Opacity(val) {
+        const isFullOpaque = val >= 0.999;
+        if (window.geoZoom5OverlayMesh && window.geoZoom5OverlayMesh.material) {
+          window.geoZoom5OverlayMesh.material.opacity = val;
+          window.geoZoom5OverlayMesh.material.transparent = !isFullOpaque;
+          window.geoZoom5OverlayMesh.material.depthWrite = isFullOpaque;
+          window.geoZoom5OverlayMesh.material.needsUpdate = true;
+        }
+        if (window.mainZoom5OverlayMesh && window.mainZoom5OverlayMesh.material) {
+          window.mainZoom5OverlayMesh.material.opacity = val;
+          window.mainZoom5OverlayMesh.material.transparent = !isFullOpaque;
+          window.mainZoom5OverlayMesh.material.depthWrite = isFullOpaque;
+          window.mainZoom5OverlayMesh.material.needsUpdate = true;
+        }
+        if (sliderGeoZoom5) sliderGeoZoom5.value = val;
+        if (sliderMenuZoom5) sliderMenuZoom5.value = val;
+        const pctStr = `${Math.round(val * 100)}%`;
+        if (lblGeoZoom5Pct) lblGeoZoom5Pct.textContent = pctStr;
+        if (lblMenuZoom5Pct) lblMenuZoom5Pct.textContent = pctStr;
+      }
 
       function setZoom5BlendVisibility(vis) {
         window._zoom5Visible = vis;
@@ -4773,6 +5272,8 @@
         if (btnGeoZoom5) btnGeoZoom5.classList.toggle('active', vis);
         if (chkGeoZoom5) chkGeoZoom5.checked = vis;
         if (sliderZoom5Wrap) sliderZoom5Wrap.style.display = vis ? 'flex' : 'none';
+        const menuZoom5Wrap = document.getElementById('menu-zoom5-slider-wrap');
+        if (menuZoom5Wrap) menuZoom5Wrap.style.display = vis ? 'flex' : 'none';
       }
       if (btnGeoZoom5) {
         btnGeoZoom5.onclick = () => {
@@ -4787,21 +5288,12 @@
       }
       if (sliderGeoZoom5) {
         sliderGeoZoom5.oninput = (e) => {
-          const val = parseFloat(e.target.value);
-          const isFullOpaque = val >= 0.999;
-          if (window.geoZoom5OverlayMesh && window.geoZoom5OverlayMesh.material) {
-            window.geoZoom5OverlayMesh.material.opacity = val;
-            window.geoZoom5OverlayMesh.material.transparent = !isFullOpaque;
-            window.geoZoom5OverlayMesh.material.depthWrite = isFullOpaque;
-            window.geoZoom5OverlayMesh.material.needsUpdate = true;
-          }
-          if (window.mainZoom5OverlayMesh && window.mainZoom5OverlayMesh.material) {
-            window.mainZoom5OverlayMesh.material.opacity = val;
-            window.mainZoom5OverlayMesh.material.transparent = !isFullOpaque;
-            window.mainZoom5OverlayMesh.material.depthWrite = isFullOpaque;
-            window.mainZoom5OverlayMesh.material.needsUpdate = true;
-          }
-          if (lblGeoZoom5Pct) lblGeoZoom5Pct.textContent = `${Math.round(val * 100)}%`;
+          updateZoom5Opacity(parseFloat(e.target.value));
+        };
+      }
+      if (sliderMenuZoom5) {
+        sliderMenuZoom5.oninput = (e) => {
+          updateZoom5Opacity(parseFloat(e.target.value));
         };
       }
 
@@ -4918,6 +5410,13 @@
     const mainMenuDropdown = document.getElementById('main-menu-dropdown');
     const geologySubmenu = document.getElementById('geology-submenu');
     const wrapGeologyMenu = document.getElementById('wrap-geology-menu');
+    const btnCloseMainMenu = document.getElementById('btn-close-main-menu');
+    const btnFloatingMenuReopen = document.getElementById('btn-floating-menu-reopen');
+    const btnCloseGeoSubmenu = document.getElementById('btn-close-geology-submenu');
+    const geoControlsPanel = document.getElementById('geo-layer-controls-panel');
+    const btnCloseGeoControls = document.getElementById('btn-close-geo-controls');
+    const btnOpenGeoControls = document.getElementById('btn-open-geo-controls');
+    const ttCloseBtn = document.getElementById('tt-close-btn');
 
     function openMainMenu() {
       if (!mainMenuDropdown) return;
@@ -4933,6 +5432,9 @@
         btnMenuToggle.setAttribute('aria-expanded', 'true');
         btnMenuToggle.classList.add('active');
       }
+      if (btnFloatingMenuReopen) {
+        btnFloatingMenuReopen.style.display = 'none';
+      }
     }
 
     function closeMainMenu() {
@@ -4942,6 +5444,9 @@
       if (btnMenuToggle) {
         btnMenuToggle.setAttribute('aria-expanded', 'false');
         btnMenuToggle.classList.remove('active');
+      }
+      if (btnFloatingMenuReopen) {
+        btnFloatingMenuReopen.style.display = 'flex';
       }
     }
 
@@ -4973,6 +5478,8 @@
       if (bottomDock) bottomDock.style.display = 'none';
       const statusPill = document.getElementById('status-pill');
       if (statusPill) statusPill.style.display = 'none';
+      const geoControls = document.getElementById('geo-layer-controls-panel');
+      if (geoControls) geoControls.style.display = 'flex';
 
       if (!isGeologyGlobeInitialized) {
         init3DGeologyGlobe();
@@ -5000,6 +5507,10 @@
       if (bottomDock && routesVisible) bottomDock.style.display = 'flex';
       const statusPill = document.getElementById('status-pill');
       if (statusPill) statusPill.style.display = 'flex';
+      const geoControls = document.getElementById('geo-layer-controls-panel');
+      if (geoControls) geoControls.style.display = 'none';
+      const btnOpenGeo = document.getElementById('btn-open-geo-controls');
+      if (btnOpenGeo) btnOpenGeo.style.display = 'none';
       syncBottomLayout();
       updateTargetHudPosition();
     }
@@ -5017,6 +5528,69 @@
       };
     }
 
+    // Close Main Menu (X) Button
+    if (btnCloseMainMenu) {
+      btnCloseMainMenu.onclick = (e) => {
+        e.stopPropagation();
+        closeMainMenu();
+      };
+    }
+
+    // Floating Button to Reopen Navigation Menu
+    if (btnFloatingMenuReopen) {
+      btnFloatingMenuReopen.onclick = (e) => {
+        e.stopPropagation();
+        openMainMenu();
+      };
+      btnFloatingMenuReopen.style.display = 'flex';
+    }
+
+    // Close Geology Submenu Button
+    if (btnCloseGeoSubmenu) {
+      btnCloseGeoSubmenu.onclick = (e) => {
+        e.stopPropagation();
+        closeGeologySubmenu();
+      };
+    }
+
+    // Close / Reopen Geology Overlays HUD Panel
+    if (btnCloseGeoControls && geoControlsPanel) {
+      btnCloseGeoControls.onclick = (e) => {
+        e.stopPropagation();
+        geoControlsPanel.style.display = 'none';
+        if (btnOpenGeoControls) btnOpenGeoControls.style.display = 'flex';
+      };
+    }
+    if (btnOpenGeoControls && geoControlsPanel) {
+      btnOpenGeoControls.onclick = (e) => {
+        e.stopPropagation();
+        geoControlsPanel.style.display = 'flex';
+        btnOpenGeoControls.style.display = 'none';
+      };
+    }
+
+    // Close Tooltip Button
+    if (ttCloseBtn) {
+      ttCloseBtn.onclick = (e) => {
+        e.stopPropagation();
+        const tt = document.getElementById('hover-tooltip');
+        if (tt) tt.style.display = 'none';
+      };
+    }
+
+    // Collapsible Menu Section Accordions
+    document.querySelectorAll('.menu-section-header').forEach(header => {
+      header.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const sec = header.closest('.menu-section');
+        if (sec) {
+          const isOpen = sec.classList.contains('section-open');
+          sec.classList.toggle('section-open', !isOpen);
+          header.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+        }
+      });
+    });
+
     // Toggle Geology 4K Map Item & Submenu Flyout
     if (btnToggleGeo) {
       btnToggleGeo.onclick = (e) => {
@@ -5033,36 +5607,144 @@
       };
     }
 
-    // Dismiss submenu & menu on outside click or Escape key
+    // Dismiss submenu, menu, modals, and HUDs on outside click
     document.addEventListener('click', (e) => {
+      // Do not auto-close on interactive form inputs, sliders, or file pickers
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.type === 'file')) {
+        return;
+      }
+
       // If clicking outside geology submenu & toggle button, close submenu
       if (geologySubmenu && geologySubmenu.style.display !== 'none') {
-        if (!geologySubmenu.contains(e.target) && !btnToggleGeo.contains(e.target)) {
+        if (!geologySubmenu.contains(e.target) && !btnToggleGeo?.contains(e.target)) {
           closeGeologySubmenu();
         }
       }
 
-      // If clicking outside main menu panel & menu toggle button, close main menu
+      // If clicking outside main menu panel & menu toggle buttons, close main menu
       if (mainMenuDropdown && mainMenuDropdown.style.display !== 'none') {
-        if (!mainMenuDropdown.contains(e.target) && !btnMenuToggle.contains(e.target)) {
+        if (!mainMenuDropdown.contains(e.target) && 
+            !btnMenuToggle?.contains(e.target) && 
+            !btnFloatingMenuReopen?.contains(e.target)) {
           closeMainMenu();
+        }
+      }
+
+      // If clicking outside ephemeris panel
+      if (ephPanel && ephPanel.style.display !== 'none') {
+        const ephBtn = document.getElementById('val-mtc-time')?.parentElement;
+        if (!ephPanel.contains(e.target) && !ephBtn?.contains(e.target)) {
+          ephPanel.style.display = 'none';
+        }
+      }
+
+      // If clicking outside legend drawer
+      const legendDrawer = document.getElementById('globe-legend-drawer');
+      const btnToggleLegend = document.getElementById('btn-geologic-legend');
+      if (legendDrawer && legendDrawer.style.display === 'flex') {
+        if (!legendDrawer.contains(e.target) && !btnToggleLegend?.contains(e.target)) {
+          legendDrawer.style.display = 'none';
+          if (btnToggleLegend) btnToggleLegend.classList.remove('active');
+        }
+      }
+
+      // If clicking outside mineral target HUD
+      const mineralHud = document.getElementById('mineral-target-hud');
+      if (mineralHud && mineralHud.style.display !== 'none') {
+        if (!mineralHud.contains(e.target) && !e.target.closest('#geology-three-canvas')) {
+          mineralHud.style.display = 'none';
+        }
+      }
+
+      // If clicking outside product modal
+      const prodModal = document.getElementById('product-modal');
+      if (prodModal && prodModal.style.display === 'block') {
+        if (e.target === prodModal) {
+          prodModal.style.display = 'none';
         }
       }
     });
 
+    // Dismiss popups/menus on Escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        const prodModal = document.getElementById('product-modal');
+        if (prodModal && prodModal.style.display === 'block') {
+          prodModal.style.display = 'none';
+          e.stopPropagation();
+          return;
+        }
+
         if (geologySubmenu && geologySubmenu.style.display !== 'none') {
           closeGeologySubmenu();
           if (btnToggleGeo) btnToggleGeo.focus();
           e.stopPropagation();
-        } else if (mainMenuDropdown && mainMenuDropdown.style.display !== 'none') {
+          return;
+        }
+
+        if (mainMenuDropdown && mainMenuDropdown.style.display !== 'none') {
           closeMainMenu();
           if (btnMenuToggle) btnMenuToggle.focus();
           e.stopPropagation();
+          return;
+        }
+
+        const legendDrawer = document.getElementById('globe-legend-drawer');
+        if (legendDrawer && legendDrawer.style.display === 'flex') {
+          legendDrawer.style.display = 'none';
+          const btnToggleLegend = document.getElementById('btn-geologic-legend');
+          if (btnToggleLegend) btnToggleLegend.classList.remove('active');
+          e.stopPropagation();
+          return;
+        }
+
+        if (ephPanel && ephPanel.style.display !== 'none') {
+          ephPanel.style.display = 'none';
+          e.stopPropagation();
+          return;
+        }
+
+        const mineralHud = document.getElementById('mineral-target-hud');
+        if (mineralHud && mineralHud.style.display !== 'none') {
+          mineralHud.style.display = 'none';
+          e.stopPropagation();
+          return;
+        }
+
+        const tooltip = document.getElementById('hover-tooltip');
+        if (tooltip && tooltip.style.display !== 'none') {
+          tooltip.style.display = 'none';
+          e.stopPropagation();
+          return;
+        }
+
+        const leftDrawer = document.getElementById('left-drawer');
+        if (leftDrawer && !leftDrawer.classList.contains('collapsed')) {
+          leftDrawer.classList.add('collapsed');
+          const btnToggleDrawer = document.getElementById('btn-toggle-drawer');
+          if (btnToggleDrawer) btnToggleDrawer.classList.remove('active');
+          e.stopPropagation();
+          return;
         }
       }
     });
+
+    // Auto-collapse menu on small screens when an action button is selected
+    if (mainMenuDropdown) {
+      mainMenuDropdown.addEventListener('click', (e) => {
+        if (window.innerWidth > 768) return;
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        if (btn.id === 'btn-close-main-menu' || 
+            btn.classList.contains('menu-section-header') || 
+            btn.id === 'btn-toggle-geology') {
+          return;
+        }
+        setTimeout(() => {
+          closeMainMenu();
+        }, 150);
+      });
+    }
 
     // Animation Loop
     let lastRenderTime = performance.now();
