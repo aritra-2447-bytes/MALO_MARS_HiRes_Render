@@ -1,0 +1,911 @@
+{
+  "map_metadata": {
+    "title": "Geologic Map of Mars, Scale 1:20,000,000 (USGS SIM 3292)",
+    "authors": "K.L. Tanaka, J.A. Skinner Jr., J.M. Dohm, R.P. Irwin III, E.J. Kolb, C.M. Fortezzo, T. Platz, G.G. Michael, T.M. Hare (2014)",
+    "citation_url": "http://pubs.usgs.gov/sim/3292",
+    "projection": "Robinson Projection (GCS_Mars_2000_Sphere, R = 3,396,190 m, Center Longitude = 0.0)",
+    "basemaps": "MGS MOLA DEM (128 ppd, ~463 m/px) & Mars Odyssey THEMIS Daytime IR Mosaic (100 m/px)",
+    "total_mapped_area_km2": 144941659.9,
+    "total_units_count": 44,
+    "structure_features": {
+      "Trough": 1451,
+      "Ridge": 2142
+    },
+    "contact_types": {
+      "Border": 94,
+      "Approx": 1436,
+      "Certain": 2242,
+      "Internal": 28
+    }
+  },
+  "geologic_units": [
+    {
+      "symbol": "mNh",
+      "name": "Middle Noachian highland unit",
+      "epoch": "Middle Noachian",
+      "group": "Noachian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 99,
+      "total_area_km2": 32313475.2,
+      "percent_surface": 22.29,
+      "color": "#cd9d80",
+      "crater_locality": {
+        "locality_sample": 31,
+        "sample_lat": -8.5,
+        "sample_lon": 345.53,
+        "sample_area_km2": 21190.0,
+        "notes": "Locality #31 (-8.5 deg, 345.53 deg, 21,190 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "lHl",
+      "name": "Late Hesperian lowland unit",
+      "epoch": "Late Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Lowland Plains",
+      "polygon_count": 10,
+      "total_area_km2": 16020810.4,
+      "percent_surface": 11.05,
+      "color": "#8cc640",
+      "crater_locality": {
+        "locality_sample": 11,
+        "sample_lat": 26.7,
+        "sample_lon": 106.38,
+        "sample_area_km2": 27410.0,
+        "notes": "Locality #11 (26.7 deg, 106.38 deg, 27,410 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "eNh",
+      "name": "Early Noachian highland unit",
+      "epoch": "Early Noachian",
+      "group": "Noachian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 112,
+      "total_area_km2": 14599336.4,
+      "percent_surface": 10.07,
+      "color": "#b9875f",
+      "crater_locality": {
+        "locality_sample": 36,
+        "sample_lat": -23.57,
+        "sample_lon": 35.53,
+        "sample_area_km2": 42060.0,
+        "notes": "Locality #36 (-23.57 deg, 35.53 deg, 42,060 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "AHv",
+      "name": "Amazonian and Hesperian volcanic",
+      "epoch": "Amazonian-Hesperian Transition",
+      "group": "Transitional",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 12,
+      "total_area_km2": 13213955.4,
+      "percent_surface": 9.12,
+      "color": "#f89569",
+      "crater_locality": null,
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "lNh",
+      "name": "Late Noachian highland unit",
+      "epoch": "Late Noachian",
+      "group": "Noachian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 292,
+      "total_area_km2": 8419068.6,
+      "percent_surface": 5.81,
+      "color": "#ceae88",
+      "crater_locality": {
+        "locality_sample": 35,
+        "sample_lat": -21.85,
+        "sample_lon": 354.96,
+        "sample_area_km2": 35180.0,
+        "notes": "Locality #35 (-21.85 deg, 354.96 deg, 35,180 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "AHi",
+      "name": "Amazonian and Hesperian impact unit",
+      "epoch": "Amazonian-Hesperian Transition",
+      "group": "Transitional",
+      "subcategory": "Impact Structure",
+      "polygon_count": 342,
+      "total_area_km2": 7913061.4,
+      "percent_surface": 5.46,
+      "color": "#fff100",
+      "crater_locality": null,
+      "alteration_minerals": "Impact melt glass, excavated deep crustal phyllosilicates & central peak hydrothermal silicates"
+    },
+    {
+      "symbol": "eHv",
+      "name": "Early Hesperian volcanic unit",
+      "epoch": "Early Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 23,
+      "total_area_km2": 5791996.8,
+      "percent_surface": 4.0,
+      "color": "#b27ab5",
+      "crater_locality": {
+        "locality_sample": 42,
+        "sample_lat": -41.92,
+        "sample_lon": 254.04,
+        "sample_area_km2": 7631.0,
+        "notes": "Locality #42 (-41.92 deg, 254.04 deg, 7,631 km2)"
+      },
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "eHt",
+      "name": "Early Hesperian transition unit",
+      "epoch": "Early Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Transition / Chasmata",
+      "polygon_count": 20,
+      "total_area_km2": 3688017.3,
+      "percent_surface": 2.54,
+      "color": "#e0b026",
+      "crater_locality": {
+        "locality_sample": 16,
+        "sample_lat": 15.92,
+        "sample_lon": 311.47,
+        "sample_area_km2": 31990.0,
+        "notes": "Locality #16 (15.92 deg, 311.47 deg, 31,990 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "lAv",
+      "name": "Late Amazonian volcanic unit",
+      "epoch": "Late Amazonian",
+      "group": "Amazonian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 11,
+      "total_area_km2": 3409561.0,
+      "percent_surface": 2.35,
+      "color": "#fabeb7",
+      "crater_locality": {
+        "locality_sample": 21,
+        "sample_lat": 5.41,
+        "sample_lon": 177.26,
+        "sample_area_km2": 45340.0,
+        "notes": "Locality #21 (5.41 deg, 177.26 deg, 45,340 km2)"
+      },
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "mAl",
+      "name": "Middle Amazonian lowland unit",
+      "epoch": "Middle Amazonian",
+      "group": "Amazonian",
+      "subcategory": "Lowland Plains",
+      "polygon_count": 26,
+      "total_area_km2": 2996875.7,
+      "percent_surface": 2.07,
+      "color": "#bdc031",
+      "crater_locality": null,
+      "alteration_minerals": "Ferric oxides (nanophase hematite), eolian dust mantles"
+    },
+    {
+      "symbol": "HNt",
+      "name": "Hesperian and Noachian transition unit",
+      "epoch": "Hesperian-Noachian Transition",
+      "group": "Transitional",
+      "subcategory": "Transition / Chasmata",
+      "polygon_count": 46,
+      "total_area_km2": 2889482.4,
+      "percent_surface": 1.99,
+      "color": "#fba61b",
+      "crater_locality": {
+        "locality_sample": 18,
+        "sample_lat": 11.19,
+        "sample_lon": 161.48,
+        "sample_area_km2": 19700.0,
+        "notes": "Locality #18 (11.19 deg, 161.48 deg, 19,700 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "lHv",
+      "name": "Late Hesperian volcanic unit",
+      "epoch": "Late Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 13,
+      "total_area_km2": 2391021.7,
+      "percent_surface": 1.65,
+      "color": "#cc9e8f",
+      "crater_locality": {
+        "locality_sample": 29,
+        "sample_lat": -7.5,
+        "sample_lon": 252.99,
+        "sample_area_km2": 6508.0,
+        "notes": "Locality #29 (-7.5 deg, 252.99 deg, 6,508 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "lHt",
+      "name": "Late Hesperian transition unit",
+      "epoch": "Late Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Transition / Chasmata",
+      "polygon_count": 28,
+      "total_area_km2": 2345022.4,
+      "percent_surface": 1.62,
+      "color": "#ffcb0b",
+      "crater_locality": {
+        "locality_sample": 15,
+        "sample_lat": 18.08,
+        "sample_lon": 117.37,
+        "sample_area_km2": 19190.0,
+        "notes": "Locality #15 (18.08 deg, 117.37 deg, 19,190 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "lNv",
+      "name": "Late Noachian volcanic unit",
+      "epoch": "Late Noachian",
+      "group": "Noachian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 9,
+      "total_area_km2": 2226351.6,
+      "percent_surface": 1.54,
+      "color": "#8882bd",
+      "crater_locality": {
+        "locality_sample": 47,
+        "sample_lat": -57.05,
+        "sample_lon": 35.18,
+        "sample_area_km2": 26420.0,
+        "notes": "Locality #47 (-57.05 deg, 35.18 deg, 26,420 km2)"
+      },
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "AHtu",
+      "name": "Amazonian and Hesperian transition undivided unit",
+      "epoch": "Amazonian-Hesperian Transition",
+      "group": "Transitional",
+      "subcategory": "Transition / Chasmata",
+      "polygon_count": 12,
+      "total_area_km2": 2200401.8,
+      "percent_surface": 1.52,
+      "color": "#e9e4d8",
+      "crater_locality": {
+        "locality_sample": 30,
+        "sample_lat": -8.12,
+        "sample_lon": 182.28,
+        "sample_area_km2": 23890.0,
+        "notes": "Locality #30 (-8.12 deg, 182.28 deg, 23,890 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "Av",
+      "name": "Amazonian volcanic unit",
+      "epoch": "Amazonian Undivided",
+      "group": "Amazonian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 8,
+      "total_area_km2": 2102494.3,
+      "percent_surface": 1.45,
+      "color": "#f8aa9e",
+      "crater_locality": {
+        "locality_sample": 4,
+        "sample_lat": 38.06,
+        "sample_lon": 128.28,
+        "sample_area_km2": 13810.0,
+        "notes": "Locality #4 (38.06 deg, 128.28 deg, 13,810 km2)"
+      },
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "Apu",
+      "name": "Amazonian polar undivided unit",
+      "epoch": "Amazonian Undivided",
+      "group": "Amazonian",
+      "subcategory": "Polar Deposit",
+      "polygon_count": 5,
+      "total_area_km2": 2005394.2,
+      "percent_surface": 1.38,
+      "color": "#9bb4be",
+      "crater_locality": null,
+      "alteration_minerals": "Perennial H2O ice, seasonal CO2 frost, dust-ice clathrates"
+    },
+    {
+      "symbol": "eNhm",
+      "name": "Early Noachian highland massif unit",
+      "epoch": "Early Noachian",
+      "group": "Noachian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 10,
+      "total_area_km2": 1944451.7,
+      "percent_surface": 1.34,
+      "color": "#8d8e82",
+      "crater_locality": {
+        "locality_sample": 45,
+        "sample_lat": -52.52,
+        "sample_lon": 106.74,
+        "sample_area_km2": 26810.0,
+        "notes": "Locality #45 (-52.52 deg, 106.74 deg, 26,810 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "mNhm",
+      "name": "Middle Noachian highland massif unit",
+      "epoch": "Middle Noachian",
+      "group": "Noachian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 15,
+      "total_area_km2": 1873163.5,
+      "percent_surface": 1.29,
+      "color": "#a0a498",
+      "crater_locality": null,
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "eHh",
+      "name": "Early Hesperian highland unit",
+      "epoch": "Early Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 21,
+      "total_area_km2": 1805659.3,
+      "percent_surface": 1.25,
+      "color": "#eaccaf",
+      "crater_locality": null,
+      "alteration_minerals": "Ferric oxides (nanophase hematite), eolian dust mantles"
+    },
+    {
+      "symbol": "Nhu",
+      "name": "Noachian highland undivided unit",
+      "epoch": "Noachian Undivided",
+      "group": "Noachian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 16,
+      "total_area_km2": 1610477.2,
+      "percent_surface": 1.11,
+      "color": "#b5aaa6",
+      "crater_locality": {
+        "locality_sample": 24,
+        "sample_lat": 2.76,
+        "sample_lon": 355.64,
+        "sample_area_km2": 11680.0,
+        "notes": "Locality #24 (2.76 deg, 355.64 deg, 11,680 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "Hto",
+      "name": "Hesperian transition outflow unit",
+      "epoch": "Hesperian Undivided",
+      "group": "Hesperian",
+      "subcategory": "Transition / Chasmata",
+      "polygon_count": 8,
+      "total_area_km2": 1289054.5,
+      "percent_surface": 0.89,
+      "color": "#aae1fa",
+      "crater_locality": {
+        "locality_sample": 12,
+        "sample_lat": 22.84,
+        "sample_lon": 316.7,
+        "sample_area_km2": 20360.0,
+        "notes": "Locality #12 (22.84 deg, 316.7 deg, 20,360 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "Hp",
+      "name": "Hesperian polar unit",
+      "epoch": "Hesperian Undivided",
+      "group": "Hesperian",
+      "subcategory": "Polar Deposit",
+      "polygon_count": 9,
+      "total_area_km2": 1221563.2,
+      "percent_surface": 0.84,
+      "color": "#009cb2",
+      "crater_locality": {
+        "locality_sample": 48,
+        "sample_lat": -73.21,
+        "sample_lon": 301.28,
+        "sample_area_km2": 33160.0,
+        "notes": "Locality #48 (-73.21 deg, 301.28 deg, 33,160 km2)"
+      },
+      "alteration_minerals": "Perennial H2O ice, seasonal CO2 frost, dust-ice clathrates"
+    },
+    {
+      "symbol": "HNhu",
+      "name": "Hesperian and Noachian highland undivided unit",
+      "epoch": "Hesperian-Noachian Transition",
+      "group": "Transitional",
+      "subcategory": "Highland Crust",
+      "polygon_count": 11,
+      "total_area_km2": 1006732.2,
+      "percent_surface": 0.69,
+      "color": "#ccc2bf",
+      "crater_locality": {
+        "locality_sample": 37,
+        "sample_lat": -27.04,
+        "sample_lon": 288.95,
+        "sample_area_km2": 19210.0,
+        "notes": "Locality #37 (-27.04 deg, 288.95 deg, 19,210 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "Aa",
+      "name": "Amazonian apron unit",
+      "epoch": "Amazonian Undivided",
+      "group": "Amazonian",
+      "subcategory": "Apron Debris",
+      "polygon_count": 13,
+      "total_area_km2": 998728.6,
+      "percent_surface": 0.69,
+      "color": "#eed114",
+      "crater_locality": null,
+      "alteration_minerals": "Ferric oxides (nanophase hematite), eolian dust mantles"
+    },
+    {
+      "symbol": "lHb",
+      "name": "Late Hesperian basin unit",
+      "epoch": "Late Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Basin Sedimentary",
+      "polygon_count": 1,
+      "total_area_km2": 912198.0,
+      "percent_surface": 0.63,
+      "color": "#9fb39f",
+      "crater_locality": {
+        "locality_sample": 39,
+        "sample_lat": -32.07,
+        "sample_lon": 65.62,
+        "sample_area_km2": 8412.0,
+        "notes": "Locality #39 (-32.07 deg, 65.62 deg, 8,412 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "Ht",
+      "name": "Hesperian transition unit",
+      "epoch": "Hesperian Undivided",
+      "group": "Hesperian",
+      "subcategory": "Transition / Chasmata",
+      "polygon_count": 16,
+      "total_area_km2": 910149.3,
+      "percent_surface": 0.63,
+      "color": "#ffdda3",
+      "crater_locality": null,
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "Ave",
+      "name": "Amazonian volcanic edifice",
+      "epoch": "Amazonian Undivided",
+      "group": "Amazonian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 6,
+      "total_area_km2": 824779.2,
+      "percent_surface": 0.57,
+      "color": "#cc7c58",
+      "crater_locality": null,
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "Htu",
+      "name": "Hesperian transition undivided unit",
+      "epoch": "Hesperian Undivided",
+      "group": "Hesperian",
+      "subcategory": "Transition / Chasmata",
+      "polygon_count": 16,
+      "total_area_km2": 741193.7,
+      "percent_surface": 0.51,
+      "color": "#dcd5d2",
+      "crater_locality": {
+        "locality_sample": 28,
+        "sample_lat": -4.53,
+        "sample_lon": 174.64,
+        "sample_area_km2": 10410.0,
+        "notes": "Locality #28 (-4.53 deg, 174.64 deg, 10,410 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "lApc",
+      "name": "Late Amazonian polar cap unit",
+      "epoch": "Late Amazonian",
+      "group": "Amazonian",
+      "subcategory": "Polar Deposit",
+      "polygon_count": 2,
+      "total_area_km2": 700535.0,
+      "percent_surface": 0.48,
+      "color": "#daf2fd",
+      "crater_locality": null,
+      "alteration_minerals": "Perennial H2O ice, seasonal CO2 frost, dust-ice clathrates"
+    },
+    {
+      "symbol": "HNb",
+      "name": "Hesperian and Noachian basin unit",
+      "epoch": "Hesperian-Noachian Transition",
+      "group": "Transitional",
+      "subcategory": "Basin Sedimentary",
+      "polygon_count": 2,
+      "total_area_km2": 596206.0,
+      "percent_surface": 0.41,
+      "color": "#6da69f",
+      "crater_locality": {
+        "locality_sample": 40,
+        "sample_lat": -32.78,
+        "sample_lon": 62.82,
+        "sample_area_km2": 74590.0,
+        "notes": "Locality #40 (-32.78 deg, 62.82 deg, 74,590 km2)"
+      },
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "eAb",
+      "name": "Early Amazonian basin unit",
+      "epoch": "Early Amazonian",
+      "group": "Amazonian",
+      "subcategory": "Basin Sedimentary",
+      "polygon_count": 2,
+      "total_area_km2": 545426.7,
+      "percent_surface": 0.38,
+      "color": "#99d4bf",
+      "crater_locality": {
+        "locality_sample": 41,
+        "sample_lat": -36.83,
+        "sample_lon": 52.81,
+        "sample_area_km2": 4172.0,
+        "notes": "Locality #41 (-36.83 deg, 52.81 deg, 4,172 km2)"
+      },
+      "alteration_minerals": "Ferric oxides (nanophase hematite), eolian dust mantles"
+    },
+    {
+      "symbol": "lHvf",
+      "name": "Late Hesperian volcanic field unit",
+      "epoch": "Late Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 7,
+      "total_area_km2": 440896.9,
+      "percent_surface": 0.3,
+      "color": "#cc9e8f",
+      "crater_locality": null,
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "eHb",
+      "name": "Early Hesperian basin unit",
+      "epoch": "Early Hesperian",
+      "group": "Hesperian",
+      "subcategory": "Basin Sedimentary",
+      "polygon_count": 2,
+      "total_area_km2": 395407.1,
+      "percent_surface": 0.27,
+      "color": "#42a2ae",
+      "crater_locality": {
+        "locality_sample": 44,
+        "sample_lat": -45.99,
+        "sample_lon": 86.77,
+        "sample_area_km2": 36310.0,
+        "notes": "Locality #44 (-45.99 deg, 86.77 deg, 36,310 km2)"
+      },
+      "alteration_minerals": "Layered polyhydrated & monohydrated sulfates (kieserite, gypsum), jarosite, hematite"
+    },
+    {
+      "symbol": "Hve",
+      "name": "Hesperian volcanic edifice unit",
+      "epoch": "Hesperian Undivided",
+      "group": "Hesperian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 10,
+      "total_area_km2": 382779.7,
+      "percent_surface": 0.26,
+      "color": "#f36f21",
+      "crater_locality": null,
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "ANa",
+      "name": "Amazonian and Noachian apron unit",
+      "epoch": "Amazonian-Noachian Apron",
+      "group": "Transitional",
+      "subcategory": "Apron Debris",
+      "polygon_count": 17,
+      "total_area_km2": 373841.8,
+      "percent_surface": 0.26,
+      "color": "#bda635",
+      "crater_locality": null,
+      "alteration_minerals": "Ferric oxides (nanophase hematite), eolian dust mantles"
+    },
+    {
+      "symbol": "lAvf",
+      "name": "Late Amazonian volcanic field unit",
+      "epoch": "Late Amazonian",
+      "group": "Amazonian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 9,
+      "total_area_km2": 312533.7,
+      "percent_surface": 0.22,
+      "color": "#ccb0a6",
+      "crater_locality": null,
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "lApd",
+      "name": "Late Amazonian polar dunes unit",
+      "epoch": "Late Amazonian",
+      "group": "Amazonian",
+      "subcategory": "Polar Deposit",
+      "polygon_count": 5,
+      "total_area_km2": 301048.4,
+      "percent_surface": 0.21,
+      "color": "#feeaba",
+      "crater_locality": null,
+      "alteration_minerals": "Perennial H2O ice, seasonal CO2 frost, dust-ice clathrates"
+    },
+    {
+      "symbol": "lAa",
+      "name": "Late Amazonian apron unit",
+      "epoch": "Late Amazonian",
+      "group": "Amazonian",
+      "subcategory": "Apron Debris",
+      "polygon_count": 4,
+      "total_area_km2": 285947.5,
+      "percent_surface": 0.2,
+      "color": "#ffd700",
+      "crater_locality": null,
+      "alteration_minerals": "Ferric oxides (nanophase hematite), eolian dust mantles"
+    },
+    {
+      "symbol": "Hpe",
+      "name": "Hesperian polar edifice unit",
+      "epoch": "Hesperian Undivided",
+      "group": "Hesperian",
+      "subcategory": "Polar Deposit",
+      "polygon_count": 8,
+      "total_area_km2": 259771.4,
+      "percent_surface": 0.18,
+      "color": "#0089d0",
+      "crater_locality": null,
+      "alteration_minerals": "Perennial H2O ice, seasonal CO2 frost, dust-ice clathrates"
+    },
+    {
+      "symbol": "Ap",
+      "name": "Amazonian polar unit",
+      "epoch": "Amazonian Undivided",
+      "group": "Amazonian",
+      "subcategory": "Polar Deposit",
+      "polygon_count": 1,
+      "total_area_km2": 221101.0,
+      "percent_surface": 0.15,
+      "color": "#009ccb",
+      "crater_locality": null,
+      "alteration_minerals": "Perennial H2O ice, seasonal CO2 frost, dust-ice clathrates"
+    },
+    {
+      "symbol": "Nhe",
+      "name": "Noachian highland edifice unit",
+      "epoch": "Noachian Undivided",
+      "group": "Noachian",
+      "subcategory": "Highland Crust",
+      "polygon_count": 23,
+      "total_area_km2": 220604.3,
+      "percent_surface": 0.15,
+      "color": "#a62e4d",
+      "crater_locality": null,
+      "alteration_minerals": "Fe/Mg smectites (nontronite, saponite), chlorite, minor Al-phyllosilicates (kaolinite)"
+    },
+    {
+      "symbol": "Nve",
+      "name": "Noachian volcanic edifice unit",
+      "epoch": "Noachian Undivided",
+      "group": "Noachian",
+      "subcategory": "Volcanic / Edifice",
+      "polygon_count": 8,
+      "total_area_km2": 206573.7,
+      "percent_surface": 0.14,
+      "color": "#c9262e",
+      "crater_locality": null,
+      "alteration_minerals": "Anhydrous pyroxene-olivine basalts, local hydrothermal opaline silica & fumarolic sulfur"
+    },
+    {
+      "symbol": "Hpu",
+      "name": "Hesperian polar undivided unit",
+      "epoch": "Hesperian Undivided",
+      "group": "Hesperian",
+      "subcategory": "Polar Deposit",
+      "polygon_count": 1,
+      "total_area_km2": 34509.9,
+      "percent_surface": 0.02,
+      "color": "#80adbd",
+      "crater_locality": null,
+      "alteration_minerals": "Perennial H2O ice, seasonal CO2 frost, dust-ice clathrates"
+    }
+  ],
+  "landing_sites": [
+    {
+      "name": "Mars 2",
+      "full_name": "Mars 2 Landing Site",
+      "lon": -158.0943,
+      "lat": -45.0419,
+      "year": "1971",
+      "country": "Russian",
+      "weblink": "http://nssdc.gsfc.nasa.gov/database/MasterCatalog?sc=1971-045A"
+    },
+    {
+      "name": "Mars 6",
+      "full_name": "Mars 6 Landing Site",
+      "lon": -19.4528,
+      "lat": -23.9203,
+      "year": "1973",
+      "country": "Russian",
+      "weblink": "http://nssdc.gsfc.nasa.gov/database/MasterCatalog?sc=1973-052A"
+    },
+    {
+      "name": "Viking 1",
+      "full_name": "Viking 1 Landing Site",
+      "lon": -47.9507,
+      "lat": 22.4571,
+      "year": "1975",
+      "country": "American",
+      "weblink": "http://nssdc.gsfc.nasa.gov/database/MasterCatalog?sc=1975-075C"
+    },
+    {
+      "name": "Viking 2",
+      "full_name": "Viking 2 Landing Site",
+      "lon": 133.739,
+      "lat": 47.9325,
+      "year": "1975",
+      "country": "American",
+      "weblink": "http://nssdc.gsfc.nasa.gov/database/MasterCatalog?sc=1975-083C"
+    },
+    {
+      "name": "Pathfinder",
+      "full_name": "Mars Pathfinder Landing Site",
+      "lon": -33.2528,
+      "lat": 19.2608,
+      "year": "1996",
+      "country": "American",
+      "weblink": "http://nssdc.gsfc.nasa.gov/database/MasterCatalog?sc=1996-068A"
+    },
+    {
+      "name": "MER A",
+      "full_name": "MER Spirit Landing Site",
+      "lon": 175.4729,
+      "lat": -14.5692,
+      "year": "2003",
+      "country": "American",
+      "weblink": "http://nssdc.gsfc.nasa.gov/database/MasterCatalog?sc=2003-027A"
+    },
+    {
+      "name": "MER B",
+      "full_name": "MER Opportunity Landing Site",
+      "lon": -5.5266,
+      "lat": -1.9462,
+      "year": "2003",
+      "country": "American",
+      "weblink": "http://nssdc.gsfc.nasa.gov/database/MasterCatalog?sc=2003-032A"
+    },
+    {
+      "name": "PHX",
+      "full_name": "Phoenix Landing Site",
+      "lon": -125.7492,
+      "lat": 68.2188,
+      "year": "2008",
+      "country": "American",
+      "weblink": "http://www.nasa.gov/mission_pages/phoenix/main"
+    },
+    {
+      "name": "MSL",
+      "full_name": "MSL Curiosity Landing Site (prelim)",
+      "lon": 137.44,
+      "lat": -4.59,
+      "year": "2012",
+      "country": "American",
+      "weblink": "http://www.nasa.gov/mission_pages/msl/"
+    }
+  ],
+  "aqueous_mineral_classes": [
+    {
+      "class": "Clay Minerals (Phyllosilicates)",
+      "subtypes": [
+        "Fe/Mg-Smectites (Nontronite, Saponite)",
+        "Al-Phyllosilicates (Kaolinite, Montmorillonite)",
+        "Illite / Chlorite"
+      ],
+      "diagnostic_bands": [
+        "1.41 \u00b5m (OH stretch)",
+        "1.91-1.93 \u00b5m (H2O molecular bend+stretch)",
+        "2.21 \u00b5m (Al-OH bend)",
+        "2.30-2.31 \u00b5m (Fe/Mg-OH bend)"
+      ],
+      "crism_parameters": {
+        "BD1900": "> 0.02",
+        "D2300": "> 0.015",
+        "BD2210": "> 0.015"
+      },
+      "spectral_rgb_composite": "CRISM PHY Browse (R = D2300, G = BD2210, B = BD1900)",
+      "key_mars_occurrences": [
+        "Mawrth Vallis (thick stratified clay sequence)",
+        "Nili Fossae crustal exposures",
+        "Jezero Crater delta basement",
+        "Tyrrhena Terra highlands"
+      ],
+      "formation_environment": "Subsurface/surface aqueous alteration, near-neutral to mildly alkaline pH, high water-to-rock ratio",
+      "habitability_rating": "HIGH (benign pH, sustained liquid water activity)",
+      "preservation_potential": "EXCELLENT (interlayer entrapment of organic carbon, macromolecular shielding from UV/oxidants)"
+    },
+    {
+      "class": "Sulfates (Evaporite Deposits)",
+      "subtypes": [
+        "Polyhydrated Mg-Sulfates (Epsomite, Starkeyite)",
+        "Monohydrated Mg-Sulfates (Kieserite)",
+        "Ca-Sulfates (Gypsum, Bassanite)",
+        "Fe-Hydroxysulfates (Jarosite)"
+      ],
+      "diagnostic_bands": [
+        "1.45 \u00b5m (H2O overtone)",
+        "1.75 \u00b5m (gypsum doublet)",
+        "1.93 \u00b5m (polyhydrated H2O)",
+        "2.10-2.13 \u00b5m (kieserite OH)",
+        "2.27 \u00b5m (jarosite Fe-OH)",
+        "2.40-2.42 \u00b5m (SO4 stretch overtone)",
+        "2.52 \u00b5m"
+      ],
+      "crism_parameters": {
+        "SINDEX2": "> 0.02",
+        "BD2100": "> 0.015",
+        "BD2400": "> 0.02",
+        "BD1750": "> 0.015"
+      },
+      "spectral_rgb_composite": "CRISM SUL Browse (R = BD2100, G = SINDEX2, B = BD1900)",
+      "key_mars_occurrences": [
+        "Valles Marineris (Interior Layered Deposits: Candor & Melas Chasmata)",
+        "Meridiani Planum hematite-sulfate plains",
+        "Gale Crater (Mount Sharp sulfate-bearing unit)",
+        "Aram Chaos"
+      ],
+      "formation_environment": "Evaporative playa/lacustrine brines, acidic groundwater upwelling, volcanic SO2 degassing",
+      "habitability_rating": "MODERATE TO MARGINAL (variable pH, high ionic strength/salinity, low water activity aw)",
+      "preservation_potential": "HIGH TO MODERATE (rapid crystalline entombment of microbes and organic acids, though jarosite indicates oxidizing conditions)"
+    },
+    {
+      "class": "Ancient Water-Altered Rocks (Carbonates, Opaline Silica, Zeolites)",
+      "subtypes": [
+        "Mg/Fe Carbonates (Magnesite, Siderite)",
+        "Hydrated Opaline Silica (Opal-A, Opal-CT)",
+        "Hydrothermal Zeolites (Analcime)",
+        "Serpentine"
+      ],
+      "diagnostic_bands": [
+        "2.21-2.26 \u00b5m (broad Si-OH asymmetric absorption for silica)",
+        "2.30-2.33 \u00b5m (CO3 strong vibrational overtone)",
+        "2.50-2.54 \u00b5m (CO3 secondary overtone)",
+        "2.12 \u00b5m (serpentine Mg-OH)"
+      ],
+      "crism_parameters": {
+        "MIN2295_2480": "> 0.018",
+        "BD2500": "> 0.015",
+        "BD2210": "> 0.025 with Si-OH broadness ratio"
+      },
+      "spectral_rgb_composite": "CRISM CR2 / HYS Browse (R = MIN2295_2480, G = BD2500, B = BD1900)",
+      "key_mars_occurrences": [
+        "Nili Fossae olivine-carbonate unit",
+        "Jezero Crater margin carbonate ring",
+        "Gusev Crater (Home Plate opaline silica)",
+        "Eridania Basin paleolake hydrothermal deposits"
+      ],
+      "formation_environment": "CO2-rich groundwater alteration of ultramafic basalt, alkaline lacustrine precipitation, epithermal/fumarolic hot springs",
+      "habitability_rating": "HIGH (buffered circumneutral to alkaline pH, hydrothermal energy gradients)",
+      "preservation_potential": "EXCEPTIONAL (fine-grained opaline silica and sparry carbonate cements represent Gold Standard terrestrial biosignature taphonomy)"
+    }
+  ]
+}
