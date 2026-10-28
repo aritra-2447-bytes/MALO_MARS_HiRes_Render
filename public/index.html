@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Mars 3D - Planetary Explorer (NASA PDS / ODE / GDS)</title>
-  <link rel="stylesheet" href="/mission_control.css?v=ares10">
+  <link rel="stylesheet" href="/mission_control.css?v=ares11">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <style>
     :root {
@@ -498,36 +498,7 @@
       height: 4px;
     }
 
-    .floating-menu-reopen-btn {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 1600;
-      display: none;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 15px;
-      background: rgba(10, 15, 29, 0.94);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 20px;
-      color: #e2e8f0;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      transition: all 0.18s ease;
-      pointer-events: auto;
-    }
-    .floating-menu-reopen-btn:hover,
-    .floating-menu-reopen-btn:focus-visible {
-      background: rgba(255, 94, 54, 0.2);
-      border-color: var(--accent-orange);
-      color: #fff;
-      transform: translateY(-1px);
-      outline: none;
-    }
+
     .floating-layer-btn {
       position: fixed;
       top: 136px;
@@ -1708,29 +1679,41 @@
       document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
     }
   </script>
+  <!-- MALO UI Polish & Overlap Management Stylesheet -->
+  <link rel="stylesheet" href="/ui_polish.css?v=malo2">
 </head>
 <body>
 
   <!-- Navigation Header -->
   <header>
-    <div class="ge-search-bar">
-      <div class="brand-logo">
-        <div class="mars-glyph"></div>
-        <span class="ge-title">Mars 3D Explorer</span>
+    <!-- Left Navigation Group: Search Bar + Mars24 Astronomical Clock + Live Sun Shadows -->
+    <div class="header-left-nav">
+      <div class="ge-search-bar">
+        <div class="brand-logo">
+          <div class="mars-glyph"></div>
+          <span class="ge-title">Mars 3D Explorer</span>
+        </div>
+        <input type="text" class="ge-search-input" id="search-input" placeholder="Search Olympus Mons, Jezero, Poles...">
       </div>
-      <input type="text" class="ge-search-input" id="search-input" placeholder="Search Olympus Mons, Jezero, Poles...">
-    </div>
 
-    <div class="header-right-nav">
+      <!-- Live Allison & McEwen Mars24 Astronomical Clock beside the Search Bar -->
       <div class="mars-clock-widget" id="mars-clock-widget" title="Live Allison &amp; McEwen Mars24 Astronomical Clock">
         <span class="clock-label">MTC</span>
         <span class="clock-time" id="val-mtc-time">02:30:00</span>
         <span class="clock-sol" id="val-sol-num">Sol 54,309</span>
       </div>
 
-      <!-- Standalone Live Sun Shadows Toggle Button -->
+      <!-- Live Sun Shadows beside Astronomical Clock -->
       <button id="btn-toggle-solar" class="pill-btn active" title="Toggle Real-Time Astronomical Sun Position &amp; Surface Shadows" aria-label="Toggle Live Sun Shadows">
         <span>☀️ Live Sun Shadows</span>
+      </button>
+    </div>
+
+    <!-- Right Navigation Group: ARES-OS Dropdown Toggle + Main Menu Toggle -->
+    <div class="header-right-nav">
+      <!-- ARES-OS Button beside Menu Button -->
+      <button id="ares-panel-toggle" class="pill-btn ares-toggle-btn" type="button" title="Open ARES-OS Mission Control" aria-label="ARES-OS" aria-expanded="false" aria-haspopup="true">
+        <span>▲ ARES-OS</span>
       </button>
 
       <!-- Semantic Keyboard-Accessible Menu Button -->
@@ -1745,6 +1728,7 @@
 
       <!-- Main Menu Options Dropdown & Flyout Container -->
       <div id="main-menu-dropdown" class="menu-dropdown-wrapper" role="menu" aria-label="Main Navigation Menu" style="display:none;">
+        <!-- Primary Menu Navigator (Index Panel) -->
         <div class="menu-dropdown-panel" id="menu-dropdown-panel-root">
           <!-- Panel Header with Title & Close (X) Button -->
           <div class="menu-panel-header">
@@ -1758,16 +1742,66 @@
             <button class="menu-panel-close-btn" id="btn-close-main-menu" title="Close Menu (Esc)" aria-label="Close Menu">&times;</button>
           </div>
 
-          <!-- Section 1: Base Globe & Maps -->
-          <div class="menu-section section-open" id="sec-base-globe">
-            <button class="menu-section-header" type="button" aria-expanded="true">
-              <span class="sec-header-left">
-                <span class="sec-icon">🌐</span>
-                <span class="sec-title">Base Globe &amp; Maps</span>
-              </span>
-              <span class="sec-chevron" aria-hidden="true">▾</span>
+          <!-- Subsection Navigation Buttons -->
+          <div class="menu-nav-list">
+            <button class="menu-subsection-nav-btn" id="nav-btn-base-globe" data-target="sidepanel-base-globe" type="button" aria-expanded="false">
+              <div class="sub-nav-left">
+                <span class="sub-nav-icon">🌐</span>
+                <div class="sub-nav-text">
+                  <span class="sub-nav-title">Base Globe &amp; Maps</span>
+                  <span class="sub-nav-desc">3D Globe, 2D Map, MOLA Topo</span>
+                </div>
+              </div>
+              <span class="sub-nav-arrow" aria-hidden="true">◀</span>
             </button>
-            <div class="menu-section-content">
+
+            <button class="menu-subsection-nav-btn" id="nav-btn-overlays" data-target="sidepanel-overlays" type="button" aria-expanded="false">
+              <div class="sub-nav-left">
+                <span class="sub-nav-icon">🎨</span>
+                <div class="sub-nav-text">
+                  <span class="sub-nav-title">Overlays &amp; Layers</span>
+                  <span class="sub-nav-desc">Geology, Landers, Traverses</span>
+                </div>
+              </div>
+              <span class="sub-nav-arrow" aria-hidden="true">◀</span>
+            </button>
+
+            <button class="menu-subsection-nav-btn" id="nav-btn-display" data-target="sidepanel-display" type="button" aria-expanded="false">
+              <div class="sub-nav-left">
+                <span class="sub-nav-icon">✨</span>
+                <div class="sub-nav-text">
+                  <span class="sub-nav-title">Display &amp; Effects</span>
+                  <span class="sub-nav-desc">Decontour, Topo Contours, Sun</span>
+                </div>
+              </div>
+              <span class="sub-nav-arrow" aria-hidden="true">◀</span>
+            </button>
+
+            <button class="menu-subsection-nav-btn" id="nav-btn-info" data-target="sidepanel-info" type="button" aria-expanded="false">
+              <div class="sub-nav-left">
+                <span class="sub-nav-icon">🔬</span>
+                <div class="sub-nav-text">
+                  <span class="sub-nav-title">Science Atlas &amp; Intel</span>
+                  <span class="sub-nav-desc">NASA Orbiters, USGS Atlas</span>
+                </div>
+              </div>
+              <span class="sub-nav-arrow" aria-hidden="true">◀</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dedicated Subsection Sidepanels (Opens to the side of the menu) -->
+        <div class="menu-sidepanel-wrapper" id="menu-sidepanel-wrapper" style="display:none;">
+          <!-- Section 1: Base Globe & Maps Sidepanel -->
+          <div class="menu-sidepanel" id="sidepanel-base-globe" role="region" aria-label="Base Globe &amp; Maps" style="display:none;">
+            <div class="sidepanel-header">
+              <div class="sidepanel-title-wrap">
+                <span class="sidepanel-icon">🌐</span>
+                <span class="sidepanel-title">Base Globe &amp; Maps</span>
+              </div>
+              <button class="sidepanel-close-btn" type="button" title="Close Subsection Panel">&times;</button>
+            </div>
+            <div class="sidepanel-body">
               <div class="menu-btn-grid">
                 <button class="pill-btn menu-item active" id="btn-mode-3d" role="menuitem" title="Switch to 3D Interactive Planetary Globe">🌐 3D Globe</button>
                 <button class="pill-btn menu-item" id="btn-mode-2d" role="menuitem" title="Switch to 2D Equirectangular Surface Map">🗺️ 2D Map</button>
@@ -1782,16 +1816,16 @@
             </div>
           </div>
 
-          <!-- Section 2: Overlays & Layers -->
-          <div class="menu-section section-open" id="sec-overlays">
-            <button class="menu-section-header" type="button" aria-expanded="true">
-              <span class="sec-header-left">
-                <span class="sec-icon">🎨</span>
-                <span class="sec-title">Overlays &amp; Layers</span>
-              </span>
-              <span class="sec-chevron" aria-hidden="true">▾</span>
-            </button>
-            <div class="menu-section-content">
+          <!-- Section 2: Overlays & Layers Sidepanel -->
+          <div class="menu-sidepanel" id="sidepanel-overlays" role="region" aria-label="Overlays &amp; Layers" style="display:none;">
+            <div class="sidepanel-header">
+              <div class="sidepanel-title-wrap">
+                <span class="sidepanel-icon">🎨</span>
+                <span class="sidepanel-title">Overlays &amp; Layers</span>
+              </div>
+              <button class="sidepanel-close-btn" type="button" title="Close Subsection Panel">&times;</button>
+            </div>
+            <div class="sidepanel-body">
               <!-- Geology 4K Map Item with Submenu Trigger -->
               <div class="menu-item-wrap has-submenu" id="wrap-geology-menu">
                 <button class="pill-btn menu-item" id="btn-toggle-geology" role="menuitem" aria-haspopup="true" aria-expanded="false" aria-controls="geology-submenu" title="USGS SIM 3292 4K Geologic Map &amp; Planetary Layer Options">
@@ -1845,16 +1879,16 @@
             </div>
           </div>
 
-          <!-- Section 3: Display & Lighting -->
-          <div class="menu-section section-open" id="sec-display">
-            <button class="menu-section-header" type="button" aria-expanded="true">
-              <span class="sec-header-left">
-                <span class="sec-icon">✨</span>
-                <span class="sec-title">Display &amp; Effects</span>
-              </span>
-              <span class="sec-chevron" aria-hidden="true">▾</span>
-            </button>
-            <div class="menu-section-content">
+          <!-- Section 3: Display & Lighting Sidepanel -->
+          <div class="menu-sidepanel" id="sidepanel-display" role="region" aria-label="Display &amp; Effects" style="display:none;">
+            <div class="sidepanel-header">
+              <div class="sidepanel-title-wrap">
+                <span class="sidepanel-icon">✨</span>
+                <span class="sidepanel-title">Display &amp; Effects</span>
+              </div>
+              <button class="sidepanel-close-btn" type="button" title="Close Subsection Panel">&times;</button>
+            </div>
+            <div class="sidepanel-body">
               <div class="menu-items-col">
                 <button class="pill-btn menu-item" id="btn-toggle-decontour" role="menuitem" title="Decontourification: Removes contour banding and enhances continuous MOLA ridge topography">⚡ Decontour Filter</button>
                 <button class="pill-btn menu-item" id="btn-toggle-contour" role="menuitem" title="Toggle Topographic Contour Lines: Renders real-time elevation isolines over Martian topography">📐 Topo Contours</button>
@@ -1865,16 +1899,16 @@
             </div>
           </div>
 
-          <!-- Section 4: Science Atlas & Intel -->
-          <div class="menu-section section-open" id="sec-info">
-            <button class="menu-section-header" type="button" aria-expanded="true">
-              <span class="sec-header-left">
-                <span class="sec-icon">🔬</span>
-                <span class="sec-title">Science Atlas &amp; Intel</span>
-              </span>
-              <span class="sec-chevron" aria-hidden="true">▾</span>
-            </button>
-            <div class="menu-section-content">
+          <!-- Section 4: Science Atlas & Intel Sidepanel -->
+          <div class="menu-sidepanel" id="sidepanel-info" role="region" aria-label="Science Atlas &amp; Intel" style="display:none;">
+            <div class="sidepanel-header">
+              <div class="sidepanel-title-wrap">
+                <span class="sidepanel-icon">🔬</span>
+                <span class="sidepanel-title">Science Atlas &amp; Intel</span>
+              </div>
+              <button class="sidepanel-close-btn" type="button" title="Close Subsection Panel">&times;</button>
+            </div>
+            <div class="sidepanel-body">
               <div class="menu-items-col">
                 <button class="pill-btn menu-item" id="btn-scan-nasa" role="menuitem" title="Query NASA PDS ODE REST API for MRO CTX &amp; HiRISE observation footprints">🛰️ Scan NASA Orbiters</button>
                 <button class="pill-btn submenu-item" id="btn-geologic-legend" role="menuitem" title="Open USGS SIM 3292 44-Unit Geologic Color Legend &amp; Chronology Drawer">🗺️ Geologic Legend</button>
@@ -1900,11 +1934,6 @@
       </div>
     </div>
   </header>
-
-  <!-- Floating Button to Reopen Navigation Menu -->
-  <button id="btn-floating-menu-reopen" class="floating-menu-reopen-btn" title="Open Navigation Menu">
-    <span>🪐 Menu</span>
-  </button>
 
   <!-- Ephemeris Solar Intel Floating Panel -->
   <div id="ephemeris-panel" style="display:none;">
@@ -5411,12 +5440,54 @@
     const geologySubmenu = document.getElementById('geology-submenu');
     const wrapGeologyMenu = document.getElementById('wrap-geology-menu');
     const btnCloseMainMenu = document.getElementById('btn-close-main-menu');
-    const btnFloatingMenuReopen = document.getElementById('btn-floating-menu-reopen');
     const btnCloseGeoSubmenu = document.getElementById('btn-close-geology-submenu');
     const geoControlsPanel = document.getElementById('geo-layer-controls-panel');
     const btnCloseGeoControls = document.getElementById('btn-close-geo-controls');
     const btnOpenGeoControls = document.getElementById('btn-open-geo-controls');
     const ttCloseBtn = document.getElementById('tt-close-btn');
+
+    function updateChronometerSqueezeState(isSubsectionOpen) {
+      document.body.classList.toggle('menu-subsection-open', !!isSubsectionOpen);
+      const chron = document.getElementById('ares-chronometer');
+      if (chron) {
+        chron.classList.toggle('squeezed', !!isSubsectionOpen);
+      }
+    }
+
+    function openSubsectionSidepanel(targetId) {
+      const sidepanelWrapper = document.getElementById('menu-sidepanel-wrapper');
+      const sidepanels = document.querySelectorAll('.menu-sidepanel');
+      const subNavBtns = document.querySelectorAll('.menu-subsection-nav-btn');
+      if (sidepanelWrapper) sidepanelWrapper.style.display = 'flex';
+      sidepanels.forEach(sp => {
+        const isTarget = (sp.id === targetId);
+        sp.classList.toggle('active', isTarget);
+        sp.style.setProperty('display', isTarget ? 'flex' : 'none', 'important');
+      });
+      subNavBtns.forEach(btn => {
+        const isTarget = btn.getAttribute('data-target') === targetId;
+        btn.classList.toggle('active', isTarget);
+        btn.setAttribute('aria-expanded', isTarget ? 'true' : 'false');
+      });
+      updateChronometerSqueezeState(true);
+    }
+
+    function closeSubsectionSidepanel() {
+      const sidepanelWrapper = document.getElementById('menu-sidepanel-wrapper');
+      const sidepanels = document.querySelectorAll('.menu-sidepanel');
+      const subNavBtns = document.querySelectorAll('.menu-subsection-nav-btn');
+      if (sidepanelWrapper) sidepanelWrapper.style.display = 'none';
+      sidepanels.forEach(sp => {
+        sp.classList.remove('active');
+        sp.style.setProperty('display', 'none', 'important');
+      });
+      subNavBtns.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+      closeGeologySubmenu();
+      updateChronometerSqueezeState(false);
+    }
 
     function openMainMenu() {
       if (!mainMenuDropdown) return;
@@ -5427,28 +5498,44 @@
       const btnToggleLegend = document.getElementById('btn-geologic-legend');
       if (btnToggleLegend) btnToggleLegend.classList.remove('active');
 
-      mainMenuDropdown.style.display = 'flex';
+      // Mutual exclusion: Close Atlas OS Menu (ARES panel) if open
+      const aresPanel = document.getElementById('ares-panel');
+      if (aresPanel && !aresPanel.classList.contains('ares-panel-collapsed')) {
+        const aresClose = document.getElementById('ares-panel-close');
+        if (aresClose) aresClose.click();
+        else if (window.ARES && typeof window.ARES.setPanel === 'function') {
+          window.ARES.setPanel(false);
+        }
+      }
+
+      mainMenuDropdown.classList.add('sidebar-open');
+      mainMenuDropdown.style.setProperty('display', 'flex', 'important');
+      document.body.classList.add('main-menu-open');
       if (btnMenuToggle) {
         btnMenuToggle.setAttribute('aria-expanded', 'true');
         btnMenuToggle.classList.add('active');
       }
-      if (btnFloatingMenuReopen) {
-        btnFloatingMenuReopen.style.display = 'none';
-      }
+
+      // Subsections start closed by default until user clicks one
+      closeSubsectionSidepanel();
     }
 
     function closeMainMenu() {
       if (!mainMenuDropdown) return;
       closeGeologySubmenu();
-      mainMenuDropdown.style.display = 'none';
+      closeSubsectionSidepanel();
+      mainMenuDropdown.classList.remove('sidebar-open');
+      mainMenuDropdown.style.setProperty('display', 'none', 'important');
+      document.body.classList.remove('main-menu-open');
+      updateChronometerSqueezeState(false);
       if (btnMenuToggle) {
         btnMenuToggle.setAttribute('aria-expanded', 'false');
         btnMenuToggle.classList.remove('active');
       }
-      if (btnFloatingMenuReopen) {
-        btnFloatingMenuReopen.style.display = 'flex';
-      }
     }
+
+    window.openMainMenu = openMainMenu;
+    window.closeMainMenu = closeMainMenu;
 
     function openGeologySubmenu() {
       if (!geologySubmenu) return;
@@ -5536,14 +5623,34 @@
       };
     }
 
-    // Floating Button to Reopen Navigation Menu
-    if (btnFloatingMenuReopen) {
-      btnFloatingMenuReopen.onclick = (e) => {
+    // Subsection navigation buttons inside primary menu
+    document.querySelectorAll('.menu-subsection-nav-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        openMainMenu();
-      };
-      btnFloatingMenuReopen.style.display = 'flex';
-    }
+        const targetId = btn.getAttribute('data-target');
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel && targetPanel.style.display === 'flex') {
+          closeSubsectionSidepanel();
+        } else {
+          openSubsectionSidepanel(targetId);
+        }
+      });
+    });
+
+    // Subsection sidepanel close (X) buttons
+    document.querySelectorAll('.sidepanel-close-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeSubsectionSidepanel();
+      });
+    });
+
+    // Mutual exclusion: when Atlas OS Menu toggle button is clicked, close Main Menu
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.closest('#ares-panel-toggle')) {
+        closeMainMenu();
+      }
+    }, true);
 
     // Close Geology Submenu Button
     if (btnCloseGeoSubmenu) {
@@ -5578,19 +5685,6 @@
       };
     }
 
-    // Collapsible Menu Section Accordions
-    document.querySelectorAll('.menu-section-header').forEach(header => {
-      header.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const sec = header.closest('.menu-section');
-        if (sec) {
-          const isOpen = sec.classList.contains('section-open');
-          sec.classList.toggle('section-open', !isOpen);
-          header.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
-        }
-      });
-    });
-
     // Toggle Geology 4K Map Item & Submenu Flyout
     if (btnToggleGeo) {
       btnToggleGeo.onclick = (e) => {
@@ -5624,9 +5718,22 @@
       // If clicking outside main menu panel & menu toggle buttons, close main menu
       if (mainMenuDropdown && mainMenuDropdown.style.display !== 'none') {
         if (!mainMenuDropdown.contains(e.target) && 
-            !btnMenuToggle?.contains(e.target) && 
-            !btnFloatingMenuReopen?.contains(e.target)) {
+            !btnMenuToggle?.contains(e.target)) {
           closeMainMenu();
+        }
+      }
+
+      // If clicking outside ARES-OS dropdown panel & ARES toggle button, close ARES dropdown
+      const aresPanel = document.getElementById('ares-panel');
+      const aresToggle = document.getElementById('ares-panel-toggle');
+      if (aresPanel && !aresPanel.classList.contains('ares-panel-collapsed')) {
+        if (!aresPanel.contains(e.target) && !aresToggle?.contains(e.target)) {
+          if (window.ARES && typeof window.ARES.setPanel === 'function') {
+            window.ARES.setPanel(false);
+          } else {
+            const aresClose = document.getElementById('ares-panel-close');
+            if (aresClose) aresClose.click();
+          }
         }
       }
 
@@ -5671,6 +5778,19 @@
         const prodModal = document.getElementById('product-modal');
         if (prodModal && prodModal.style.display === 'block') {
           prodModal.style.display = 'none';
+          e.stopPropagation();
+          return;
+        }
+
+        // Close ARES-OS dropdown if open
+        const aresPanel = document.getElementById('ares-panel');
+        if (aresPanel && !aresPanel.classList.contains('ares-panel-collapsed')) {
+          if (window.ARES && typeof window.ARES.setPanel === 'function') {
+            window.ARES.setPanel(false);
+          } else {
+            const aresClose = document.getElementById('ares-panel-close');
+            if (aresClose) aresClose.click();
+          }
           e.stopPropagation();
           return;
         }
