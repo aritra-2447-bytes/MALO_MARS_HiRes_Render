@@ -807,7 +807,7 @@
 
     <div class="header-actions">
       <a href="/" class="nav-btn primary">🌐 Return to 3D Globe</a>
-      <a href="Table.pdf" target="_blank" class="nav-btn">📊 Chronology (Table.pdf)</a>
+      <a href="Table.pdf" target="_blank" class="nav-btn">📊 Stratigraphic Chronology</a>
     </div>
   </header>
 
@@ -816,7 +816,7 @@
     <div class="hero-stats-banner">
       <div class="hero-text">
         <h1>Aqueous Mineral Distribution &amp; Geologic Atlas of Mars</h1>
-        <p>Integration of the USGS Scientific Investigations Map 3292 (Tanaka et al., 2014, 1:20,000,000 Scale) with high-resolution orbital spectral imaging from MRO CRISM and MEX OMEGA. Features high-resolution planetary remote sensing and spectral analysis cut and stitched directly from the official PDF map sheet.</p>
+        <p>Integration of the USGS Scientific Investigations Map 3292 (Tanaka et al., 2014, 1:20,000,000 Scale) with high-resolution orbital spectral imaging from MRO CRISM and MEX OMEGA, providing comprehensive planetary remote sensing and mineralogical characterization across Martian epochs.</p>
       </div>
 
       <div class="stats-pills-row">
@@ -829,7 +829,7 @@
         <div class="stat-card">
           <span class="stat-label">3D Texture Resolution</span>
           <span class="stat-value" style="color:var(--accent-orange);">4K (4096 &times; 2048)</span>
-          <span class="stat-sub">Direct PDF Cut &amp; Stitch</span>
+          <span class="stat-sub">Global Cartographic Projection</span>
         </div>
 
         <div class="stat-card">
@@ -871,7 +871,7 @@
           <span style="font-size:12px; color:var(--text-dim);">CRISM (MRO) &bull; OMEGA (Mars Express)</span>
         </div>
 
-        <!-- Headed Sections as specified in the prompt -->
+        <!-- Planetary Remote Sensing Sections -->
         <div class="workflow-section">
           <div class="workflow-h3">1. Data Selection</div>
           <div class="workflow-p">
@@ -1194,7 +1194,7 @@
         </div>
 
         <div style="background:rgba(15, 23, 42, 0.6); border:1px solid var(--card-border); border-radius:12px; padding:16px; font-size:12px; line-height:1.6; color:#cbd5e1;">
-          <strong>Cartographic GIS Standards (Metadata.txt &amp; README.txt):</strong>
+          <strong>Cartographic GIS Standards &amp; Geodetic Specifications:</strong>
           Compiled in Robinson projection using the Mars 2000 geographic coordinate system (<code>GCS_Mars_2000_Sphere</code>, radius 3,396,190.0 m, Center Longitude = 0.0°). Drafting was conducted at 1:5,000,000 scale with a 5 km vertex spacing for smoothing. Minimum mapped line feature length is 100 km, and minimum outcrop dimensions are 40 km wide by 100 km long for global legibility.
         </div>
       </div>
@@ -1283,30 +1283,30 @@
         <div class="doc-viewer-grid">
           <div class="doc-menu">
             <div class="doc-menu-item active" data-doc="readme">
-              <span class="doc-menu-title">📄 README.txt</span>
-              <span class="doc-menu-desc">Database structure, GIS layers, projection</span>
+              <span class="doc-menu-title">📄 GIS Database Specification</span>
+              <span class="doc-menu-desc">Database structure, GIS layers &amp; projection</span>
             </div>
             <div class="doc-menu-item" data-doc="metadata">
-              <span class="doc-menu-title">📋 Metadata.txt</span>
-              <span class="doc-menu-desc">FGDC standard metadata, spatial lineage</span>
+              <span class="doc-menu-title">📋 FGDC Spatial Metadata</span>
+              <span class="doc-menu-desc">Federal standards, spatial lineage &amp; geodetic attributes</span>
             </div>
             <div class="doc-menu-item" data-doc="table">
-              <span class="doc-menu-title">📊 Table.pdf</span>
-              <span class="doc-menu-desc">Crater size-frequency &amp; model ages</span>
+              <span class="doc-menu-title">📊 Stratigraphic Chronology Table</span>
+              <span class="doc-menu-desc">Crater size-frequency distribution &amp; model ages</span>
             </div>
             <div class="doc-menu-item" data-doc="pamphlet">
-              <span class="doc-menu-title">📖 sim3292_pamphlet.pdf</span>
+              <span class="doc-menu-title">📖 Explanatory Memoir (Pamphlet)</span>
               <span class="doc-menu-desc">48-page comprehensive scientific monograph</span>
             </div>
             <div class="doc-menu-item" data-doc="map">
-              <span class="doc-menu-title">🗺️ sim3292_map.pdf</span>
-              <span class="doc-menu-desc">Official 1:20M Geologic Map Sheet (36 MB)</span>
+              <span class="doc-menu-title">🗺️ Global Geologic Map Sheet</span>
+              <span class="doc-menu-desc">Official 1:20M scale geologic map of Mars</span>
             </div>
           </div>
 
           <div class="doc-display-pane">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <h3 id="doc-active-title" style="font-family:'Outfit'; font-size:16px; color:#fff;">README.txt - USGS SIM 3292</h3>
+              <h3 id="doc-active-title" style="font-family:'Outfit'; font-size:16px; color:#fff;">GIS Database Architecture &amp; Layer Specification</h3>
               <a id="doc-download-link" href="/README.txt" target="_blank" class="nav-btn primary" style="font-size:11px; padding:4px 10px;">Open Raw Document &nearr;</a>
             </div>
 
@@ -1540,11 +1540,11 @@
 
     // Document Viewer logic
     const DOCS_METADATA = {
-      readme: { title: 'README.txt - USGS SIM 3292 Database Description', url: '/README.txt' },
-      metadata: { title: 'Metadata.txt - FGDC Federal Geographic Data Committee Metadata', url: '/Metadata.txt' },
-      table: { title: 'Table.pdf - Tanaka et al. Crater Size-Frequency Distribution & Model Ages', url: 'Table.pdf', usgs_url: 'https://pubs.usgs.gov/sim/3292/' },
-      pamphlet: { title: 'sim3292_pamphlet.pdf - 48-Page Geologic Map of Mars Monograph', url: 'https://pubs.usgs.gov/sim/3292/', usgs_url: 'https://pubs.usgs.gov/sim/3292/' },
-      map: { title: 'sim3292_map.pdf - Official 1:20M Geologic Map Sheet (36 MB)', url: 'https://pubs.usgs.gov/sim/3292/', usgs_url: 'https://pubs.usgs.gov/sim/3292/' }
+      readme: { title: 'USGS SIM 3292 GIS Database Architecture & Layer Specification', url: '/README.txt' },
+      metadata: { title: 'Federal Geographic Data Committee (FGDC) Spatial Lineage & Standards', url: '/Metadata.txt' },
+      table: { title: 'Tanaka et al. Stratigraphic Model Ages & Crater Chronology Table', url: 'Table.pdf', usgs_url: 'https://pubs.usgs.gov/sim/3292/' },
+      pamphlet: { title: 'USGS SIM 3292 48-Page Explanatory Monograph (Tanaka et al., 2014)', url: 'https://pubs.usgs.gov/sim/3292/', usgs_url: 'https://pubs.usgs.gov/sim/3292/' },
+      map: { title: 'Official 1:20,000,000 Global Geologic Map of Mars (USGS SIM 3292)', url: 'https://pubs.usgs.gov/sim/3292/', usgs_url: 'https://pubs.usgs.gov/sim/3292/' }
     };
 
     const docItems = document.querySelectorAll('.doc-menu-item');
@@ -1564,7 +1564,7 @@
           pane.innerHTML = `
             <div style="display:flex; flex-direction:column; gap:12px; height:520px;">
               <div style="font-size:12px; color:var(--text-dim);">
-                Viewing PDF: <strong>${info.title}</strong>. If embedded viewer is unsupported by your browser, click "Open Raw Document".
+                Viewing: <strong>${info.title}</strong>. If embedded viewer is unsupported by your browser, click "Open Raw Document".
               </div>
               <iframe src="${info.url}" style="width:100%; height:100%; border:1px solid var(--card-border); border-radius:8px; background:#1e293b;"></iframe>
             </div>
