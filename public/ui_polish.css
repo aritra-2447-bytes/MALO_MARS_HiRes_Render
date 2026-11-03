@@ -1,0 +1,1419 @@
+/* ==========================================================================
+   UI POLISH - MALO
+   Unified Design System, Visual Polish, & Conflict-Free Layout Management
+   Project: MALO_MARS_HiRes_Render
+   ========================================================================== */
+
+:root {
+  /* Surface & Panel Elevation System */
+  --malo-bg-base: #000206;
+  --malo-panel-bg: rgba(10, 15, 29, 0.94);
+  --malo-panel-bg-subtle: rgba(15, 23, 42, 0.88);
+  --malo-panel-bg-elevated: rgba(10, 15, 29, 0.96);
+  --malo-panel-border: rgba(255, 255, 255, 0.14);
+  --malo-panel-border-glow: rgba(56, 189, 248, 0.4);
+  --malo-panel-border-orange: rgba(255, 94, 54, 0.45);
+  
+  /* Harmonious Color Palette (WCAG AA Compliant on dark surfaces) */
+  --malo-text-primary: #f8fafc;     /* 18.2:1 contrast */
+  --malo-text-secondary: #cbd5e1;   /* 12.1:1 contrast */
+  --malo-text-muted: #94a3b8;       /* 6.5:1 contrast (exceeds 4.5:1 AA) */
+  --malo-text-dim: #94a3b8;
+  --malo-accent-cyan: #38bdf8;      /* 9.8:1 contrast */
+  --malo-accent-orange: #ff6b3d;    /* 6.2:1 contrast */
+  --malo-accent-green: #22c55e;     /* 8.2:1 contrast */
+  --malo-accent-yellow: #facc15;    /* 13.0:1 contrast */
+  --malo-accent-violet: #a78bfa;    /* 7.5:1 contrast */
+  --malo-hazard-red: #ef4444;       /* 5.1:1 contrast */
+
+  /* Shadows & Depth */
+  --malo-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --malo-shadow-md: 0 10px 30px rgba(0, 0, 0, 0.65);
+  --malo-shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.85);
+  --malo-shadow-glow-cyan: 0 0 16px rgba(56, 189, 248, 0.35);
+  --malo-shadow-glow-orange: 0 0 16px rgba(255, 94, 54, 0.35);
+
+  /* Radii Scale */
+  --malo-radius-sm: 6px;
+  --malo-radius-md: 10px;
+  --malo-radius-lg: 14px;
+  --malo-radius-xl: 20px;
+  --malo-radius-full: 999px;
+
+  /* Typography Scale & Transitions */
+  --malo-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --malo-font-mono: 'JetBrains Mono', "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  --malo-transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --malo-transition-norm: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --malo-transition-slow: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Deterministic Conflict-Free Layer Hierarchy (Z-Index Scale) */
+  --malo-z-canvas: 1;                 /* 3D WebGL render & 2D flat canvas */
+  --malo-z-hud-telemetry: 10;         /* Readouts, Status Pill, Scale Bar, Bottom Dock */
+  --malo-z-interactive-controls: 20;  /* Navigation controls dock, header bar, close triggers */
+  --malo-z-sidebars-menus: 30;        /* Main Menu Sidebar, Atlas OS Menu (ARES), Left Drawer */
+  --malo-z-tooltips: 40;              /* Hover cards, Target HUD, Toast alerts */
+  --malo-z-modals: 50;                /* Full inspection modals & overlays */
+}
+
+/* ==========================================================================
+   1. GLOBAL REFINEMENTS & TABULAR NUMERICS
+   ========================================================================== */
+
+/* Smooth text rendering and selection */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Jitter-free tabular numeric alignment on all dynamic numbers and clocks */
+.clock-time,
+.clock-sol,
+.ares-chron-value,
+.ares-chron-sub,
+#status-pill,
+#status-pill span,
+#scale-bar-label,
+.metric-val,
+.eph-val,
+.slider-pct,
+#globe-coords-pill,
+#globe-coords-pill strong,
+.target-row-val.mono,
+.coords-readout-pill strong {
+  font-variant-numeric: tabular-nums lining-nums !important;
+  -webkit-font-feature-settings: "tnum" 1 !important;
+  font-feature-settings: "tnum" 1 !important;
+}
+
+/* Scrollbars: Consistent sleek theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(10, 15, 29, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: var(--malo-radius-sm);
+  transition: background var(--malo-transition-fast);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--malo-accent-orange);
+}
+
+/* Canvas Layer */
+#viewport-container {
+  z-index: var(--malo-z-canvas) !important;
+}
+#three-canvas,
+#flat-canvas,
+#geology-three-canvas {
+  z-index: var(--malo-z-canvas) !important;
+}
+
+/* ==========================================================================
+   2. HEADER & SEARCH BAR POLISH
+   ========================================================================== */
+
+header {
+  position: absolute !important;
+  top: 16px !important;
+  left: 16px !important;
+  right: 16px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  z-index: var(--malo-z-interactive-controls) !important;
+  pointer-events: none !important;
+  transition: top var(--malo-transition-norm), left var(--malo-transition-norm), right var(--malo-transition-norm);
+}
+
+.header-left-nav {
+  pointer-events: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.header-right-nav {
+  pointer-events: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  position: relative !important;
+}
+
+.ge-search-bar {
+  background: var(--malo-panel-bg) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: var(--malo-shadow-md) !important;
+  padding: 8px 16px !important;
+  border-radius: var(--malo-radius-full) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  transition: border-color var(--malo-transition-fast), box-shadow var(--malo-transition-fast);
+}
+
+.ge-search-bar:focus-within {
+  border-color: var(--malo-accent-cyan) !important;
+  box-shadow: var(--malo-shadow-glow-cyan) !important;
+}
+
+.ge-search-input {
+  color: var(--malo-text-primary) !important;
+  font-family: var(--malo-font-sans);
+  background: transparent !important;
+  border: none !important;
+  font-size: 13px !important;
+  width: 200px !important;
+  outline: none !important;
+}
+
+.ge-search-input::placeholder {
+  color: var(--malo-text-muted) !important;
+}
+
+.mars-glyph {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 35% 35%, #ff7a50, #9f2a08) !important;
+  box-shadow: 0 0 12px rgba(255, 94, 54, 0.7) !important;
+  transition: transform var(--malo-transition-norm);
+}
+.ge-search-bar:hover .mars-glyph {
+  transform: scale(1.06);
+}
+
+/* Astronomical Clock Widget (Beside Search Bar) */
+.mars-clock-widget {
+  background: var(--malo-panel-bg) !important;
+  border: 1px solid rgba(250, 204, 21, 0.4) !important;
+  box-shadow: var(--malo-shadow-sm) !important;
+  padding: 7px 14px !important;
+  border-radius: var(--malo-radius-full) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all var(--malo-transition-fast) !important;
+}
+
+.mars-clock-widget:hover {
+  border-color: var(--malo-accent-yellow) !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+.clock-label {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: var(--malo-text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.clock-time {
+  font-family: var(--malo-font-mono) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--malo-accent-yellow) !important;
+  letter-spacing: 0.5px;
+}
+
+.clock-sol {
+  font-size: 11px !important;
+  color: var(--malo-text-secondary) !important;
+  padding-left: 6px !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Live Sun Shadows Button (Beside Astronomical Clock) */
+#btn-toggle-solar {
+  padding: 8px 14px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: var(--malo-radius-full) !important;
+}
+
+/* General Header Pill Buttons */
+.pill-btn {
+  background: var(--malo-panel-bg) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  color: var(--malo-text-primary) !important;
+  box-shadow: var(--malo-shadow-sm) !important;
+  border-radius: var(--malo-radius-full) !important;
+  transition: all var(--malo-transition-fast) !important;
+}
+
+.pill-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: var(--malo-accent-cyan) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.pill-btn:active {
+  transform: translateY(0);
+}
+
+.pill-btn.active {
+  background: var(--malo-accent-orange) !important;
+  border-color: var(--malo-accent-orange) !important;
+  color: #fff !important;
+  box-shadow: var(--malo-shadow-glow-orange) !important;
+}
+
+/* ARES-OS Toggle Button (Beside Menu Button) */
+#ares-panel-toggle,
+.ares-toggle-btn {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: var(--malo-panel-bg) !important;
+  border: 1px solid var(--malo-panel-border-orange) !important;
+  color: #ff8c69 !important;
+  padding: 8px 14px !important;
+  border-radius: var(--malo-radius-full) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: var(--malo-shadow-sm) !important;
+  transition: all var(--malo-transition-fast) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+#ares-panel-toggle:hover,
+.ares-toggle-btn:hover {
+  background: rgba(255, 94, 54, 0.2) !important;
+  border-color: var(--malo-accent-orange) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--malo-shadow-glow-orange) !important;
+}
+
+#ares-panel-toggle.active,
+#ares-panel-toggle[aria-expanded="true"] {
+  background: var(--malo-accent-orange) !important;
+  color: #fff !important;
+  border-color: var(--malo-accent-orange) !important;
+  box-shadow: var(--malo-shadow-glow-orange) !important;
+}
+
+/* Menu Toggle Button */
+.menu-toggle-btn {
+  background: var(--malo-panel-bg) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: var(--malo-shadow-sm) !important;
+  padding: 8px 14px !important;
+  border-radius: var(--malo-radius-full) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: all var(--malo-transition-fast) !important;
+}
+
+.menu-toggle-btn:hover {
+  border-color: var(--malo-accent-cyan) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  transform: translateY(-1px);
+}
+
+.menu-toggle-btn.active,
+.menu-toggle-btn[aria-expanded="true"] {
+  border-color: var(--malo-accent-orange) !important;
+  background: rgba(255, 94, 54, 0.25) !important;
+  box-shadow: var(--malo-shadow-glow-orange) !important;
+}
+
+/* ==========================================================================
+   3. PRIMARY NAVIGATION & SUBSECTION SIDEPANELS
+   Menu Navigator on the right, each subsection opens to its own sidepanel
+   docked cleanly along the side without obscuring the 3D globe.
+   ========================================================================== */
+
+#main-menu-dropdown.menu-dropdown-wrapper,
+.menu-dropdown-wrapper {
+  position: fixed !important;
+  top: 70px !important;
+  right: 16px !important;
+  bottom: 24px !important;
+  display: flex;
+  flex-direction: row-reverse !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  z-index: var(--malo-z-sidebars-menus) !important;
+  pointer-events: auto !important;
+  animation: menuFadeInRight 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#main-menu-dropdown.menu-dropdown-wrapper[style*="display: none"],
+.menu-dropdown-wrapper[style*="display: none"] {
+  display: none !important;
+}
+
+#main-menu-dropdown.menu-dropdown-wrapper.sidebar-open,
+.menu-dropdown-wrapper.sidebar-open {
+  display: flex !important;
+}
+
+@keyframes menuFadeInRight {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Primary Navigation Panel (Menu Index) */
+#menu-dropdown-panel-root.menu-dropdown-panel,
+.menu-dropdown-panel {
+  width: 290px !important;
+  max-width: calc(100vw - 32px) !important;
+  height: auto !important;
+  max-height: calc(100vh - 94px) !important;
+  flex: 0 0 290px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  border-radius: var(--malo-radius-lg) !important;
+  padding: 14px 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+}
+
+.menu-panel-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-bottom: 8px !important;
+}
+
+.menu-panel-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.menu-panel-icon {
+  font-size: 18px !important;
+}
+
+.menu-panel-title {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--malo-text-primary) !important;
+  letter-spacing: 0.3px !important;
+}
+
+.menu-panel-subtitle {
+  font-size: 10px !important;
+  color: var(--malo-text-muted) !important;
+}
+
+.menu-panel-close-btn {
+  background: transparent !important;
+  border: none !important;
+  color: var(--malo-text-muted) !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  line-height: 1 !important;
+  transition: color var(--malo-transition-fast), background var(--malo-transition-fast) !important;
+}
+
+.menu-panel-close-btn:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Subsection Navigation List & Buttons in Menu */
+.menu-nav-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  margin-top: 4px !important;
+}
+
+.menu-subsection-nav-btn {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 12px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: var(--malo-radius-md) !important;
+  color: var(--malo-text-primary) !important;
+  cursor: pointer !important;
+  transition: all var(--malo-transition-fast) !important;
+  text-align: left !important;
+  user-select: none !important;
+}
+
+.menu-subsection-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--malo-accent-cyan) !important;
+  transform: translateX(-2px) !important;
+}
+
+.menu-subsection-nav-btn.active {
+  background: rgba(255, 94, 54, 0.16) !important;
+  border-color: var(--malo-accent-orange) !important;
+  box-shadow: 0 0 14px rgba(255, 94, 54, 0.25) !important;
+}
+
+.sub-nav-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.sub-nav-icon {
+  font-size: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+.sub-nav-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.sub-nav-title {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--malo-text-primary) !important;
+  letter-spacing: 0.2px !important;
+}
+
+.sub-nav-desc {
+  font-size: 10px !important;
+  color: var(--malo-text-muted) !important;
+}
+
+.sub-nav-arrow {
+  font-size: 11px !important;
+  color: var(--malo-text-muted) !important;
+  transition: transform var(--malo-transition-fast), color var(--malo-transition-fast) !important;
+}
+
+.menu-subsection-nav-btn.active .sub-nav-arrow {
+  color: var(--malo-accent-orange) !important;
+  transform: translateX(-3px) !important;
+}
+
+/* Dedicated Subsection Sidepanel Container & Cards */
+.menu-sidepanel-wrapper {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+
+.menu-sidepanel-wrapper[style*="display: none"] {
+  display: none !important;
+}
+
+.menu-sidepanel {
+  display: none;
+  width: 330px !important;
+  max-width: calc(100vw - 320px) !important;
+  height: auto !important;
+  max-height: calc(100vh - 94px) !important;
+  flex: 0 0 330px !important;
+  flex-direction: column !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  border-radius: var(--malo-radius-lg) !important;
+  padding: 14px 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin !important;
+  animation: sidepanelSlideInLeft 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.menu-sidepanel.active,
+.menu-sidepanel[style*="display: flex"] {
+  display: flex !important;
+}
+
+.menu-sidepanel[style*="display: none"] {
+  display: none !important;
+}
+
+@keyframes sidepanelSlideInLeft {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.sidepanel-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 10px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidepanel-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.sidepanel-icon {
+  font-size: 16px !important;
+}
+
+.sidepanel-title {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--malo-text-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.sidepanel-close-btn {
+  background: transparent !important;
+  border: none !important;
+  color: var(--malo-text-muted) !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  line-height: 1 !important;
+  transition: color var(--malo-transition-fast), background var(--malo-transition-fast) !important;
+}
+
+.sidepanel-close-btn:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.sidepanel-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+/* Geology Submenu integrated inside Sidebar stack */
+.geology-submenu-flyout {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border-orange) !important;
+  border-radius: var(--malo-radius-md) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+  margin-top: 4px !important;
+  animation: submenuFadeInDown 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes submenuFadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   4. ATLAS OS MENU (ARES-OS MISSION CONTROL) AS A HEADER DROPDOWN
+   Strict mutual exclusion: Main Menu Sidebar & ARES-OS Dropdown never open simultaneously
+   ========================================================================== */
+
+#ares-panel {
+  position: fixed !important;
+  top: 70px !important;
+  right: 16px !important;
+  bottom: auto !important;
+  width: 420px !important;
+  max-width: calc(100vw - 32px) !important;
+  height: auto !important;
+  max-height: calc(100vh - 90px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border-radius: var(--malo-radius-lg) !important;
+  z-index: var(--malo-z-sidebars-menus) !important;
+  background: linear-gradient(180deg, rgba(9, 14, 25, 0.99), rgba(5, 9, 17, 0.98)) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.88), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transform-origin: top right !important;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease, visibility 180ms !important;
+  overflow: hidden !important;
+}
+
+#ares-panel.ares-panel-collapsed {
+  transform: translateY(-12px) scale(0.98) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+#ares-panel:not(.ares-panel-collapsed) {
+  transform: translateY(0) scale(1) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+/* ==========================================================================
+   CHRONOMETER BAR - DYNAMIC FLEXIBLE HUD POSITIONING & SQUEEZE LOGIC
+   Default: UNsqueezed, flexible, comfortable breathing room across all viewports.
+   Squeezes ONLY when a subsection of the menu buttons is open (sidepanels).
+   ========================================================================== */
+
+#ares-chronometer {
+  z-index: var(--malo-z-interactive-controls) !important;
+  left: 356px !important;
+  right: 20px !important;
+  max-width: 1080px !important;
+  width: auto !important;
+  transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              left 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s ease,
+              opacity 0.2s ease !important;
+}
+
+/* Dynamic Left Shift when Left Drawer is collapsed */
+#left-drawer.collapsed ~ #ares-ui-root #ares-chronometer,
+body.drawer-collapsed #ares-chronometer {
+  left: 20px !important;
+}
+
+/* Flexible Unsqueezed Cells */
+.ares-chron-cell {
+  flex: 1 1 auto !important;
+  min-width: 100px !important;
+  padding: 7px 12px 6px !important;
+  transition: padding 0.2s ease, min-width 0.2s ease, flex 0.2s ease !important;
+}
+
+.ares-chron-earth {
+  flex: 1 1 120px !important;
+  min-width: 110px !important;
+}
+
+/* 1. When Main Menu root index is open, but NO subsection sidepanel is open:
+   Clears the 290px main menu panel (right: 16px + 290px + 20px gap = 326px).
+   The chronometer stays UNSQUEEZED with full readability. */
+body:has(#main-menu-dropdown.sidebar-open):not(:has(.menu-sidepanel.active)) #ares-chronometer,
+body.main-menu-open:not(.menu-subsection-open) #ares-chronometer {
+  right: 326px !important;
+  max-width: calc(100vw - 356px - 326px) !important;
+}
+
+/* 2. When ARES-OS Mission Control panel is open:
+   Clears the 420px ARES dropdown (right: 16px + 420px + 16px buffer = 452px). */
+body:has(#ares-panel:not(.ares-panel-collapsed)) #ares-chronometer,
+body.ares-panel-open #ares-chronometer {
+  right: 452px !important;
+  max-width: calc(100vw - 356px - 452px) !important;
+}
+
+/* 3. SQUEEZED STATE:
+   Triggers ONLY when a subsection of the menu buttons is open (sidepanels: Base Globe, Overlays, Display, Info).
+   The menu + subsection sidepanel together take ~646px from the right, so the chronometer squeezes to right: 660px. */
+body:has(.menu-sidepanel.active) #ares-chronometer,
+body:has(#menu-sidepanel-wrapper:not([style*="display: none"]):not([style*="display:none"])) #ares-chronometer,
+body.menu-subsection-open #ares-chronometer,
+#ares-chronometer.squeezed {
+  right: 660px !important;
+  max-width: calc(100vw - 356px - 660px) !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+
+body:has(.menu-sidepanel.active) #ares-chronometer::-webkit-scrollbar,
+body:has(#menu-sidepanel-wrapper:not([style*="display: none"]):not([style*="display:none"])) #ares-chronometer::-webkit-scrollbar,
+body.menu-subsection-open #ares-chronometer::-webkit-scrollbar,
+#ares-chronometer.squeezed::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Compact cell metrics during squeeze */
+body:has(.menu-sidepanel.active) .ares-chron-cell,
+body:has(#menu-sidepanel-wrapper:not([style*="display: none"]):not([style*="display:none"])) .ares-chron-cell,
+body.menu-subsection-open .ares-chron-cell,
+#ares-chronometer.squeezed .ares-chron-cell {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  padding: 6px 6px 5px !important;
+}
+
+body:has(.menu-sidepanel.active) .ares-chron-earth,
+body:has(#menu-sidepanel-wrapper:not([style*="display: none"]):not([style*="display:none"])) .ares-chron-earth,
+body.menu-subsection-open .ares-chron-earth,
+#ares-chronometer.squeezed .ares-chron-earth {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
+
+body:has(.menu-sidepanel.active) .ares-chron-value,
+body:has(#menu-sidepanel-wrapper:not([style*="display: none"]):not([style*="display:none"])) .ares-chron-value,
+body.menu-subsection-open .ares-chron-value,
+#ares-chronometer.squeezed .ares-chron-value {
+  font-size: 13px !important;
+}
+
+body:has(.menu-sidepanel.active) .ares-chron-label,
+body:has(#menu-sidepanel-wrapper:not([style*="display: none"]):not([style*="display:none"])) .ares-chron-label,
+body.menu-subsection-open .ares-chron-label,
+#ares-chronometer.squeezed .ares-chron-label {
+  font-size: 8px !important;
+}
+
+body:has(.menu-sidepanel.active) .ares-chron-sub,
+body:has(#menu-sidepanel-wrapper:not([style*="display: none"]):not([style*="display:none"])) .ares-chron-sub,
+body.menu-subsection-open .ares-chron-sub,
+#ares-chronometer.squeezed .ares-chron-sub {
+  font-size: 8.5px !important;
+}
+
+/* ==========================================================================
+   5. RIGHT-SIDE HUD OVERLAYS & CONTROLS DOCKING
+   ========================================================================== */
+
+/* Geology HUD panel */
+#geo-layer-controls-panel {
+  position: fixed !important;
+  top: 136px !important;
+  right: 16px !important;
+  z-index: var(--malo-z-sidebars-menus) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  border-radius: var(--malo-radius-md) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+}
+
+/* Button to reopen Geology Overlays HUD */
+#btn-open-geo-controls,
+.floating-layer-btn {
+  position: fixed !important;
+  top: 188px !important;
+  right: 16px !important;
+  z-index: var(--malo-z-interactive-controls) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border-glow) !important;
+  border-radius: var(--malo-radius-md) !important;
+  box-shadow: var(--malo-shadow-sm) !important;
+  transition: all var(--malo-transition-fast) !important;
+}
+
+#btn-open-geo-controls:hover,
+.floating-layer-btn:hover {
+  border-color: var(--malo-accent-cyan) !important;
+  color: #fff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--malo-shadow-glow-cyan) !important;
+}
+
+/* Solar Ephemeris Panel (Anchored under Mars24 Astronomical Clock) */
+#ephemeris-panel {
+  position: fixed !important;
+  top: 70px !important;
+  left: 360px !important;
+  right: auto !important;
+  width: 330px !important;
+  max-width: calc(100vw - 32px) !important;
+  z-index: var(--malo-z-sidebars-menus) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(250, 204, 21, 0.4) !important;
+  border-radius: var(--malo-radius-lg) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+  animation: ephemerisFadeInDown 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes ephemerisFadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.eph-label {
+  color: var(--malo-text-muted) !important;
+}
+
+.eph-val {
+  color: var(--malo-text-primary) !important;
+  font-family: var(--malo-font-mono) !important;
+}
+
+/* Geologic Legend Drawer */
+#globe-legend-drawer {
+  z-index: var(--malo-z-sidebars-menus) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+}
+
+/* ==========================================================================
+   6. BOTTOM DOCK, STATUS PILL & SCALE BAR
+   Clean docking zones: status pill and scale bar on bottom-left,
+   bottom-dock with responsive right-anchor clearance from ge-controls-dock.
+   ========================================================================== */
+
+#status-pill {
+  z-index: var(--malo-z-hud-telemetry) !important;
+  background: rgba(5, 9, 18, 0.92) !important;
+  border: 1px solid var(--malo-panel-border-glow) !important;
+  box-shadow: var(--malo-shadow-md) !important;
+  font-family: var(--malo-font-mono) !important;
+  letter-spacing: 0.2px;
+}
+
+#status-pill span {
+  display: inline-flex;
+  align-items: center;
+}
+
+#scale-bar-container {
+  z-index: var(--malo-z-hud-telemetry) !important;
+  background: rgba(5, 9, 18, 0.92) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: var(--malo-shadow-sm) !important;
+  transition: bottom var(--malo-transition-slow), left var(--malo-transition-slow);
+}
+
+#bottom-dock {
+  z-index: var(--malo-z-hud-telemetry) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+}
+
+.dock-title {
+  color: var(--malo-accent-yellow) !important;
+  font-family: var(--malo-font-sans);
+}
+
+.route-select-input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  color: var(--malo-text-primary) !important;
+  border-radius: var(--malo-radius-sm) !important;
+}
+
+.route-select-input:focus {
+  border-color: var(--malo-accent-cyan) !important;
+  outline: none;
+}
+
+.metric-label {
+  color: var(--malo-text-muted) !important;
+}
+
+.metric-val {
+  color: var(--malo-text-primary) !important;
+  font-family: var(--malo-font-mono) !important;
+}
+
+/* Navigation Dock Controls (Bottom-Right) */
+#ge-controls-dock {
+  z-index: var(--malo-z-interactive-controls) !important;
+}
+
+.ge-btn-group {
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: var(--malo-shadow-md) !important;
+}
+
+.ge-ctrl-btn {
+  color: var(--malo-text-primary) !important;
+  transition: background var(--malo-transition-fast), color var(--malo-transition-fast) !important;
+}
+
+.ge-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: var(--malo-accent-cyan) !important;
+}
+
+.ge-ctrl-btn.active {
+  background: rgba(255, 94, 54, 0.25) !important;
+  color: var(--malo-accent-orange) !important;
+}
+
+/* ==========================================================================
+   7. LEFT DRAWER & TARGET HUD OVERLAP FIXES
+   ========================================================================== */
+
+#left-drawer {
+  z-index: var(--malo-z-sidebars-menus) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+}
+
+.dest-card {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: var(--malo-radius-sm) !important;
+  transition: all var(--malo-transition-fast) !important;
+}
+
+.dest-card:hover {
+  background: rgba(255, 94, 54, 0.16) !important;
+  border-color: var(--malo-accent-orange) !important;
+  transform: translateX(2px);
+}
+
+.dest-name {
+  color: var(--malo-text-primary) !important;
+}
+
+.dest-sub {
+  color: var(--malo-text-muted) !important;
+}
+
+/* Mineral Target HUD */
+#mineral-target-hud {
+  z-index: var(--malo-z-tooltips) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border-orange) !important;
+  border-radius: var(--malo-radius-lg) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+}
+
+.target-row-label {
+  color: var(--malo-text-muted) !important;
+}
+
+.target-row-val {
+  color: var(--malo-text-primary) !important;
+}
+
+.target-row-val.mono {
+  color: var(--malo-accent-cyan) !important;
+  font-family: var(--malo-font-mono) !important;
+}
+
+/* Hover Card Tooltip */
+#hover-tooltip {
+  z-index: var(--malo-z-tooltips) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border) !important;
+  border-radius: var(--malo-radius-md) !important;
+  box-shadow: var(--malo-shadow-lg) !important;
+  pointer-events: none;
+}
+
+.tooltip-tag {
+  color: var(--malo-accent-cyan) !important;
+}
+
+.tooltip-name {
+  color: var(--malo-text-primary) !important;
+}
+
+.tooltip-coords {
+  color: var(--malo-accent-yellow) !important;
+  font-family: var(--malo-font-mono) !important;
+}
+
+.tooltip-desc {
+  color: var(--malo-text-secondary) !important;
+}
+
+/* Observation Product Modal */
+#product-modal {
+  z-index: var(--malo-z-modals) !important;
+  background: var(--malo-panel-bg-elevated) !important;
+  border: 1px solid var(--malo-panel-border-glow) !important;
+  border-radius: var(--malo-radius-lg) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.9) !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+}
+
+/* Geology Globe Mode Bottom HUD */
+.globe-hud-bottom {
+  z-index: var(--malo-z-hud-telemetry) !important;
+  right: 80px !important;
+}
+
+.coords-readout-pill {
+  background: rgba(5, 9, 18, 0.92) !important;
+  border: 1px solid var(--malo-panel-border-glow) !important;
+  font-family: var(--malo-font-mono) !important;
+  color: var(--malo-accent-cyan) !important;
+}
+
+.hud-chip-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--malo-text-secondary) !important;
+  transition: all var(--malo-transition-fast) !important;
+}
+
+.hud-chip-btn:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: var(--malo-accent-cyan) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.hud-chip-btn.active {
+  background: rgba(255, 94, 54, 0.28) !important;
+  border-color: var(--malo-accent-orange) !important;
+  color: #fff !important;
+}
+
+/* ==========================================================================
+   8. RESPONSIVE VIEWPORT ADAPTATIONS & OVERLAP PREVENTION
+   Targets: 1920x1080, 1366x768, 1280x720, 768px width
+   ========================================================================== */
+
+/* Medium Desktops (<= 1440px) */
+@media (max-width: 1440px) {
+  #bottom-dock {
+    width: 680px;
+    max-width: calc(100vw - 200px);
+  }
+
+  #status-pill {
+    padding: 5px 12px;
+    gap: 8px;
+    font-size: 10px;
+  }
+}
+
+/* 1366x768 & 1280x720 Viewports */
+@media (max-width: 1366px) {
+  #bottom-dock {
+    left: auto !important;
+    right: 76px !important;
+    transform: none !important;
+    width: min(580px, calc(100vw - 440px)) !important;
+    padding: 10px 14px !important;
+  }
+
+  /* Status pill stays at bottom: 24px and never collides with bottom dock or left drawer */
+  #status-pill {
+    bottom: 24px !important;
+    left: 20px !important;
+    padding: 5px 12px !important;
+    gap: 8px !important;
+    font-size: 10px !important;
+    max-width: 380px !important;
+  }
+
+  #scale-bar-container {
+    bottom: 64px !important;
+    left: 20px !important;
+  }
+
+  .dock-metrics {
+    gap: 12px;
+  }
+
+  .chart-box {
+    height: 62px;
+  }
+
+  #left-drawer {
+    max-height: calc(100vh - 190px);
+  }
+
+  /* Ensure chronometer clears left drawer and adapts flexibly */
+  #ares-chronometer {
+    top: 76px;
+    left: 356px;
+    right: 20px;
+    max-width: calc(100vw - 376px);
+  }
+}
+
+/* 1280x720 Target Viewport Specifics */
+@media (max-width: 1280px) {
+  #bottom-dock {
+    left: auto !important;
+    right: 76px !important;
+    transform: none !important;
+    width: min(540px, calc(100vw - 420px)) !important;
+  }
+
+  .dock-title span {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #status-pill {
+    bottom: 24px !important;
+    left: 20px !important;
+    padding: 5px 10px !important;
+    gap: 7px !important;
+    font-size: 10px !important;
+    max-width: 360px !important;
+  }
+
+  #scale-bar-container {
+    bottom: 64px !important;
+    left: 20px !important;
+  }
+
+  #ares-chronometer {
+    left: 348px;
+    right: 20px;
+    max-width: calc(100vw - 368px);
+  }
+
+  #ares-panel {
+    width: 360px;
+  }
+}
+
+/* Tablet & Smaller Screens (<= 1024px) */
+@media (max-width: 1024px) {
+  #left-drawer {
+    width: 300px;
+    max-height: calc(100vh - 170px);
+  }
+
+  #bottom-dock {
+    width: 520px;
+    max-width: calc(100vw - 150px);
+  }
+
+  #ares-chronometer {
+    top: 72px;
+    left: 320px;
+    right: 16px;
+    overflow-x: auto;
+  }
+
+  /* Keep ARES Mission Control dropdown below header navigation on <=1024px */
+  #ares-panel {
+    top: 66px !important;
+    right: 12px !important;
+    width: min(420px, calc(100vw - 24px)) !important;
+  }
+
+  /* Menu and sidepanel adapt cleanly to tablet */
+  #main-menu-dropdown.menu-dropdown-wrapper,
+  .menu-dropdown-wrapper {
+    top: 66px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+  }
+
+  .menu-sidepanel {
+    max-width: calc(100vw - 320px) !important;
+  }
+}
+
+/* Narrow Viewport (~768px Width Target) */
+@media (max-width: 768px) {
+  /* ARES Dropdown on 768px */
+  #ares-panel {
+    top: 66px !important;
+    right: 10px !important;
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 80px) !important;
+  }
+
+  /* Menu and Subsection Sidepanels on 768px */
+  #main-menu-dropdown.menu-dropdown-wrapper,
+  .menu-dropdown-wrapper {
+    top: 66px !important;
+    right: 10px !important;
+    bottom: 12px !important;
+    width: min(360px, calc(100vw - 20px)) !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  #menu-dropdown-panel-root.menu-dropdown-panel,
+  .menu-dropdown-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+  }
+
+  .menu-sidepanel-wrapper {
+    width: 100% !important;
+    flex-direction: column !important;
+  }
+
+  .menu-sidepanel {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Header clean reflow */
+  header {
+    top: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    gap: 6px !important;
+  }
+
+  .header-left-nav {
+    gap: 6px !important;
+  }
+
+  .ge-search-bar {
+    padding: 6px 10px !important;
+    gap: 6px !important;
+    max-width: 180px !important;
+    flex-shrink: 1 !important;
+  }
+
+  .ge-title {
+    display: none !important;
+  }
+
+  .ge-search-input {
+    width: 110px !important;
+    font-size: 11px !important;
+  }
+
+  .header-right-nav {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mars-clock-widget {
+    padding: 5px 10px !important;
+    gap: 6px !important;
+  }
+
+  .clock-time {
+    font-size: 11px !important;
+  }
+
+  .clock-sol {
+    display: none !important;
+  }
+
+  /* Sun shadows button in compact form */
+  #btn-toggle-solar {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+  }
+  #btn-toggle-solar span {
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .menu-toggle-btn {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+
+  /* Left Drawer on mobile */
+  #left-drawer {
+    top: 66px !important;
+    left: 10px !important;
+    width: calc(100vw - 20px) !important;
+    max-width: 340px !important;
+    max-height: calc(100vh - 160px) !important;
+  }
+
+  /* Bottom Dock on 768px */
+  #bottom-dock {
+    left: 10px !important;
+    transform: none !important;
+    width: calc(100vw - 80px) !important;
+    max-width: 480px !important;
+    bottom: 12px !important;
+    padding: 8px 12px !important;
+  }
+
+  .dock-metrics {
+    gap: 8px !important;
+  }
+  .metric-col {
+    gap: 0 !important;
+  }
+  .metric-label {
+    font-size: 8px !important;
+  }
+  .metric-val {
+    font-size: 10px !important;
+  }
+  .chart-box {
+    height: 52px !important;
+  }
+
+  /* Status Pill on 768px: compact horizontal flow */
+  #status-pill {
+    left: 10px !important;
+    padding: 4px 10px !important;
+    font-size: 9px !important;
+    gap: 6px !important;
+    max-width: calc(100vw - 80px) !important;
+    overflow-x: auto !important;
+  }
+
+  #scale-bar-container {
+    left: 10px !important;
+    padding: 3px 8px !important;
+  }
+
+  /* Controls Dock on mobile */
+  #ge-controls-dock {
+    right: 10px !important;
+    bottom: 12px !important;
+    gap: 6px !important;
+  }
+
+  .ge-ctrl-btn {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 14px !important;
+  }
+
+  /* Geology Globe Bottom HUD on mobile */
+  .globe-hud-bottom {
+    left: 10px !important;
+    right: 56px !important;
+    bottom: 10px !important;
+  }
+  .coords-readout-pill {
+    padding: 4px 10px !important;
+    font-size: 9px !important;
+    gap: 6px !important;
+  }
+  .waypoints-bar {
+    gap: 4px !important;
+  }
+  .hud-chip-btn {
+    padding: 4px 8px !important;
+    font-size: 9px !important;
+  }
+
+  /* Target HUD on mobile */
+  #mineral-target-hud {
+    left: 10px !important;
+    top: 66px !important;
+    width: calc(100vw - 20px) !important;
+    max-width: 340px !important;
+    padding: 12px !important;
+  }
+
+  /* Observation Modal on mobile */
+  #product-modal {
+    width: calc(100vw - 24px) !important;
+    padding: 14px !important;
+  }
+}

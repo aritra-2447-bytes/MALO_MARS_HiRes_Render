@@ -221,7 +221,7 @@
         drawScoutCharts();
       }
     });
-    if (window.innerWidth < 900) setPanel(false);
+    setPanel(false);
   }
 
   /* ------------------------------------------------------------------------
@@ -261,9 +261,7 @@
           '<div class="ares-chron-sub" id="ares-earth-date">----</div>' +
         '</div>' +
       '</div>' +
-
-      '<button id="ares-panel-toggle" type="button" title="Open ARES-OS Mission Control">\u25c0 ARES-OS</button>' +
-
+      (document.getElementById('ares-panel-toggle') ? '' : '<button id="ares-panel-toggle" type="button" title="Open ARES-OS Mission Control">\u25c0 ARES-OS</button>') +
       '<aside id="ares-panel" aria-label="ARES-OS Mission Control">' +
         '<div class="ares-panel-head">' +
           '<div class="ares-brand-mark">A</div>' +
@@ -425,6 +423,12 @@
     holder.id = 'ares-ui-root';
     holder.innerHTML = html;
     document.body.appendChild(holder);
+
+    // Sync squeeze state if a menu subsection is already open
+    var chron = document.getElementById('ares-chronometer');
+    if (chron && document.body.classList.contains('menu-subsection-open')) {
+      chron.classList.add('squeezed');
+    }
   }
 
   function cacheElements() {
@@ -525,7 +529,14 @@
   function setPanel(open) {
     if (!ARES.el.panel) return;
     ARES.el.panel.classList.toggle('ares-panel-collapsed', !open);
-    if (ARES.el.toggle) ARES.el.toggle.classList.toggle('visible', !open);
+    document.body.classList.toggle('ares-panel-open', !!open);
+    if (ARES.el.toggle) {
+      ARES.el.toggle.classList.toggle('active', open);
+      ARES.el.toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    if (open && typeof window.closeMainMenu === 'function') {
+      window.closeMainMenu();
+    }
   }
 
   function switchTab(name) {
@@ -544,7 +555,18 @@
     });
     var close = $('ares-panel-close');
     if (close) close.addEventListener('click', function () { setPanel(false); });
-    if (ARES.el.toggle) ARES.el.toggle.addEventListener('click', function () { setPanel(true); });
+    if (ARES.el.toggle) ARES.el.toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isCollapsed = ARES.el.panel ? ARES.el.panel.classList.contains('ares-panel-collapsed') : true;
+      if (isCollapsed) {
+        if (typeof window.closeMainMenu === 'function') {
+          window.closeMainMenu();
+        }
+        setPanel(true);
+      } else {
+        setPanel(false);
+      }
+    });
   }
 
   /* ------------------------------------------------------------------------
@@ -2664,6 +2686,7 @@
   }
 
   // Expose a few integration points for the existing console and for debugging.
+  ARES.setPanel = setPanel;
   window.ARES = ARES;
   window.aresMissionControl = {
     flyTo: function (lat, lon) { flyToItem({ lat: lat, lon: lon, lon_east: eastLon(lon) }); },

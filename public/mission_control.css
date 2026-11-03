@@ -24,7 +24,9 @@
   position: fixed;
   top: 76px;
   left: 356px;
-  right: 432px;
+  right: 20px;
+  max-width: 1080px;
+  width: auto;
   z-index: 1050;
   display: flex;
   align-items: stretch;
@@ -36,7 +38,11 @@
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   overflow: hidden;
   font-family: var(--ares-mono);
-  transition: opacity 180ms ease, transform 180ms ease;
+  transition: right 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              max-width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              left 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 180ms ease,
+              transform 180ms ease;
 }
 #ares-chronometer.ares-hidden {
   opacity: 0;
