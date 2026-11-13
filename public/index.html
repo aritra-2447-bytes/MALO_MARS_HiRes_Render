@@ -2622,18 +2622,46 @@
     marsGlobe.receiveShadow = true;
     scene.add(marsGlobe);
 
-    // Progressive Texture: 2K Fast -> 8K Master
+    // Progressive Texture: 2K Fast -> 8K Master & Dynamic Texture Loader
     const textureLoader = new THREE.TextureLoader();
     let molaMasterTexture = null;
     let isGeologyTextureActive = false;
     let geoTexture4k = null;
+    const mainGlobeTextures = {};
+
+    function loadMainGlobeTexture(url, fallbackUrl = null) {
+      if (mainGlobeTextures[url]) {
+        marsMaterial.map = mainGlobeTextures[url];
+        marsMaterial.needsUpdate = true;
+        return;
+      }
+      if (fallbackUrl && !mainGlobeTextures[fallbackUrl]) {
+        textureLoader.load(fallbackUrl, (texFast) => {
+          if (!mainGlobeTextures[url]) {
+            marsMaterial.map = texFast;
+            marsMaterial.needsUpdate = true;
+          }
+        });
+      }
+      textureLoader.load(url, (tex) => {
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        mainGlobeTextures[url] = tex;
+        marsMaterial.map = tex;
+        marsMaterial.needsUpdate = true;
+      });
+    }
+
     textureLoader.load('/textures/mars_mola_base_2k.jpg', (tex2k) => {
+      mainGlobeTextures['/textures/mars_mola_base_2k.jpg'] = tex2k;
       marsMaterial.map = tex2k;
       marsMaterial.needsUpdate = true;
       textureLoader.load('/textures/mars_mola_8k.jpg', (tex8k) => {
         tex8k.generateMipmaps = true;
         tex8k.minFilter = THREE.LinearMipmapLinearFilter;
         tex8k.magFilter = THREE.LinearFilter;
+        mainGlobeTextures['/textures/mars_mola_8k.jpg'] = tex8k;
         molaMasterTexture = tex8k;
         if (!isGeologyTextureActive) {
           marsMaterial.map = tex8k;
@@ -2715,12 +2743,15 @@
     // Groups
     const markersGroup = new THREE.Group();
     scene.add(markersGroup);
+    window.markersGroup = markersGroup;
 
     const routesGroup = new THREE.Group();
     scene.add(routesGroup);
+    window.routesGroup = routesGroup;
 
     const astroPathsGroup = new THREE.Group();
     scene.add(astroPathsGroup);
+    window.astroPathsGroup = astroPathsGroup;
 
     const landingSiteMarkersGroup = new THREE.Group();
     scene.add(landingSiteMarkersGroup);
@@ -2728,6 +2759,7 @@
 
     const corridorHighlightGroup = new THREE.Group();
     scene.add(corridorHighlightGroup);
+    window.corridorHighlightGroup = corridorHighlightGroup;
 
     // Coordinate Math
     function latLonToVector3(lat, lon, radius = MARS_RADIUS) {
@@ -2747,6 +2779,52 @@
       while (lon < -180) lon += 360;
       return { lat, lon };
     }
+
+    // High-Precision 30-Degree Lat/Lon Graticule for Main Globe
+    function createMainLatLonGraticule(radius = MARS_RADIUS * 1.001) {
+      const graticuleGroup = new THREE.Group();
+      const lineMaterial = new THREE.LineBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.35,
+        depthWrite: false
+      });
+      const eqMaterial = new THREE.LineBasicMaterial({
+        color: 0x00f0ff,
+        transparent: true,
+        opacity: 0.65,
+        depthWrite: false
+      });
+
+      // Parallels every 30 deg from -60 to +60
+      for (let lat = -60; lat <= 60; lat += 30) {
+        const points = [];
+        for (let lon = -180; lon <= 180; lon += 5) {
+          points.push(latLonToVector3(lat, lon, radius));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = (lat === 0) ? eqMaterial : lineMaterial;
+        graticuleGroup.add(new THREE.Line(geo, mat));
+      }
+
+      // Meridians every 30 deg
+      for (let lon = -180; lon < 180; lon += 30) {
+        const isPrime = (lon === 0);
+        const points = [];
+        for (let lat = -90; lat <= 90; lat += 2.5) {
+          points.push(latLonToVector3(lat, lon, radius));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = isPrime ? eqMaterial : lineMaterial;
+        graticuleGroup.add(new THREE.Line(geo, mat));
+      }
+
+      return graticuleGroup;
+    }
+
+    window.mainGridMesh = createMainLatLonGraticule(MARS_RADIUS * 1.001);
+    window.mainGridMesh.visible = false;
+    marsGlobe.add(window.mainGridMesh);
 
     // Landmark & Destination Camera Zoom Distances
     const DEFAULT_LANDMARK_CAM_DIST = 1.32; // Regional context zoom for large volcanoes & canyons (~1,085 km altitude)
@@ -2928,11 +3006,7 @@
           <span style="font-size:14px; color:var(--accent-orange); flex-shrink:0;">➔</span>
         `;
         card.onclick = () => {
-          if (isGeologyGlobeActive && typeof flyGeologyGlobeTo === 'function') {
-            flyGeologyGlobeTo(item.lat, item.lon, 440);
-          } else {
-            flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
-          }
+          flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
           currentElevation = item.elevation_m;
           updateStatusHUD();
         };
@@ -3276,11 +3350,7 @@
         // Fly action
         const flyAction = (e) => {
           if (e) e.stopPropagation();
-          if (isGeologyGlobeActive && typeof flyGeologyGlobeTo === 'function') {
-            flyGeologyGlobeTo(item.lat, item.lon, 440);
-          } else {
-            flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
-          }
+          flyToCoordinate(item.lat, item.lon, getLandmarkZoomDist(item));
           if (item.elevation_m !== undefined) currentElevation = item.elevation_m;
           updateStatusHUD();
         };
@@ -4342,6 +4412,8 @@
       solarTerminatorActive = !solarTerminatorActive;
       const btn = document.getElementById('btn-toggle-solar');
       btn.classList.toggle('active', solarTerminatorActive);
+      const btnSun = document.getElementById('btn-toggle-sun');
+      if (btnSun) btnSun.classList.toggle('active', solarTerminatorActive);
 
       if (solarTerminatorActive) {
         // True physical ephemeris mode: Sun positioned directly at subsolar point with dynamic shadows
@@ -5015,62 +5087,50 @@
       requestAnimationFrame(step);
     }
 
-    function setupGeologyGlobeEvents(canvas) {
-      // Texture Switchers in Submenu
+    // =========================================================================
+    // MAIN ENGINE MENU CONTROLS & OVERLAYS CONTROLLER
+    // Maps all menu features directly to the primary Mars globe (three-canvas)
+    // =========================================================================
+    function setupMainMenuEvents() {
+      // 1. Base Textures for the Original Globe (marsGlobe)
       const btnGeo = document.getElementById('btn-tex-geology-4k');
       const btnMola4k = document.getElementById('btn-tex-mola-4k');
       const btnMola8k = document.getElementById('btn-tex-mola-8k');
       const btnZoom5Base = document.getElementById('btn-tex-zoom5-grayscale');
+      const btnAddTexture = document.getElementById('btn-add-texture');
 
       function setActiveTexBtn(btn) {
-        [btnGeo, btnMola4k, btnMola8k, btnZoom5Base].filter(Boolean).forEach(b => b.classList.remove('active'));
+        [btnGeo, btnMola4k, btnMola8k, btnZoom5Base, btnAddTexture].filter(Boolean).forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
       }
 
-      if (btnGeo) {
-        btnGeo.onclick = () => {
-          const isVis = window.geoTopoOverlayMesh ? window.geoTopoOverlayMesh.visible : false;
-          setTopoBlendVisibility(!isVis);
-        };
-      }
       if (btnMola4k) {
         btnMola4k.onclick = () => {
           setActiveTexBtn(btnMola4k);
-          loadGeologyGlobeTexture('/textures/mars_mola_4k.jpg', '/textures/mars_mola_base_2k.jpg', 'MOLA Topo 4K');
+          loadMainGlobeTexture('/textures/mars_mola_4k.jpg', '/textures/mars_mola_base_2k.jpg');
+          if (typeof loadGeologyGlobeTexture === 'function' && isGeologyGlobeActive) {
+            loadGeologyGlobeTexture('/textures/mars_mola_4k.jpg', '/textures/mars_mola_base_2k.jpg', 'MOLA Topo 4K');
+          }
         };
       }
       if (btnMola8k) {
         btnMola8k.onclick = () => {
           setActiveTexBtn(btnMola8k);
-          loadGeologyGlobeTexture('/textures/mars_mola_8k.jpg', '/textures/mars_mola_4k.jpg', 'MOLA Topo 8K');
+          loadMainGlobeTexture('/textures/mars_mola_8k.jpg', '/textures/mars_mola_4k.jpg');
+          if (typeof loadGeologyGlobeTexture === 'function' && isGeologyGlobeActive) {
+            loadGeologyGlobeTexture('/textures/mars_mola_8k.jpg', '/textures/mars_mola_4k.jpg', 'MOLA Topo 8K');
+          }
         };
       }
       if (btnZoom5Base) {
         btnZoom5Base.onclick = () => {
           setActiveTexBtn(btnZoom5Base);
-          loadGeologyGlobeTexture('/textures/mars_zoom5_grayscale_8k.jpg', '/textures/mars_zoom5_grayscale_4k.jpg', 'Zoom 5 Grayscale');
-        };
-      }
-      // Set MOLA Topo 4K as initial active base texture button
-      setActiveTexBtn(btnMola4k);
-
-      // Legend Drawer Toggle
-      const legendDrawer = document.getElementById('globe-legend-drawer');
-      const btnToggleLegend = document.getElementById('btn-geologic-legend');
-      if (btnToggleLegend && legendDrawer) {
-        btnToggleLegend.onclick = () => {
-          const isShown = legendDrawer.style.display === 'flex';
-          if (!isShown) {
-            if (ephPanel) ephPanel.style.display = 'none';
-            closeMainMenu();
+          loadMainGlobeTexture('/textures/mars_zoom5_grayscale_8k.jpg', '/textures/mars_zoom5_grayscale_4k.jpg');
+          if (typeof loadGeologyGlobeTexture === 'function' && isGeologyGlobeActive) {
+            loadGeologyGlobeTexture('/textures/mars_zoom5_grayscale_8k.jpg', '/textures/mars_zoom5_grayscale_4k.jpg', 'Zoom 5 Grayscale');
           }
-          legendDrawer.style.display = isShown ? 'none' : 'flex';
-          btnToggleLegend.classList.toggle('active', !isShown);
         };
       }
-
-      // Add Custom Texture Button
-      const btnAddTexture = document.getElementById('btn-add-texture');
       if (btnAddTexture) {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
@@ -5083,133 +5143,19 @@
         fileInput.onchange = (e) => {
           const file = e.target.files[0];
           if (file) {
+            setActiveTexBtn(btnAddTexture);
             const url = URL.createObjectURL(file);
-            loadGeologyGlobeTexture(url, url, file.name);
+            loadMainGlobeTexture(url, url);
+            if (typeof loadGeologyGlobeTexture === 'function' && isGeologyGlobeActive) {
+              loadGeologyGlobeTexture(url, url, file.name);
+            }
           }
         };
       }
+      // Set MOLA 8K / 4K as initial active base texture button
+      setActiveTexBtn(btnMola4k);
 
-      const btnCloseLegend = document.getElementById('btn-close-legend');
-      if (btnCloseLegend && legendDrawer) {
-        btnCloseLegend.onclick = () => {
-          legendDrawer.style.display = 'none';
-          if (btnToggleLegend) btnToggleLegend.classList.remove('active');
-        };
-      }
-
-      // Legend Item Clicks -> Fly to representative unit location
-      document.querySelectorAll('#globe-legend-drawer .legend-unit-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const lat = parseFloat(item.dataset.flyLat);
-          const lon = parseFloat(item.dataset.flyLon);
-          const dist = parseFloat(item.dataset.flyDist || 440);
-          flyGeologyGlobeTo(lat, lon, dist);
-          const sym = item.querySelector('.u-sym')?.textContent || 'USGS Unit';
-          const unitPill = document.getElementById('lbl-globe-unit');
-          if (unitPill) unitPill.textContent = sym;
-        });
-      });
-
-      // Target HUD Close Button
-      const hudMinClose = document.getElementById('hud-min-close');
-      if (hudMinClose) {
-        hudMinClose.onclick = () => {
-          const hud = document.getElementById('mineral-target-hud');
-          if (hud) hud.style.display = 'none';
-        };
-      }
-
-
-      // Lat/Lon Grid Toggle
-      const btnGrid = document.getElementById('btn-toggle-grid');
-      if (btnGrid) {
-        btnGrid.onclick = () => {
-          isGridVisible = !isGridVisible;
-          if (gridMesh) gridMesh.visible = isGridVisible;
-          btnGrid.classList.toggle('active', isGridVisible);
-        };
-      }
-
-      // Solar Sun Toggle
-      const btnSun = document.getElementById('btn-toggle-sun');
-      if (btnSun) {
-        btnSun.onclick = () => {
-          isSunLight = !isSunLight;
-          if (isSunLight) {
-            geoDirLight.intensity = 1.1;
-            geoAmbientLight.intensity = 0.15;
-            geoFillLight.intensity = 0.05;
-            btnSun.classList.add('active');
-          } else {
-            geoDirLight.intensity = 0.58;
-            geoAmbientLight.intensity = 0.38;
-            geoFillLight.intensity = 0.18;
-            btnSun.classList.remove('active');
-          }
-        };
-      }
-
-      // Overlay Layer Toggles & Sync (Geology 4K Map)
-      const btnLandings = document.getElementById('btn-toggle-landings');
-      const chkLandings = document.getElementById('chk-geo-landings');
-      function setLandingsVisibility(vis) {
-        if (window.geoLandingSitesGroup) window.geoLandingSitesGroup.visible = vis;
-        if (btnLandings) btnLandings.classList.toggle('active', vis);
-        if (chkLandings) chkLandings.checked = vis;
-      }
-      if (btnLandings) {
-        btnLandings.onclick = () => {
-          const vis = !(window.geoLandingSitesGroup && window.geoLandingSitesGroup.visible);
-          setLandingsVisibility(vis);
-        };
-      }
-      if (chkLandings) {
-        chkLandings.onchange = (e) => {
-          setLandingsVisibility(e.target.checked);
-        };
-      }
-
-      // Rover Traverses Toggle
-      const btnTraverses = document.getElementById('btn-toggle-geo-traverses');
-      const chkTraverses = document.getElementById('chk-geo-traverses');
-      function setTraversesVisibility(vis) {
-        if (window.geoAstroPathsGroup) window.geoAstroPathsGroup.visible = vis;
-        if (btnTraverses) btnTraverses.classList.toggle('active', vis);
-        if (chkTraverses) chkTraverses.checked = vis;
-      }
-      if (btnTraverses) {
-        btnTraverses.onclick = () => {
-          const vis = !(window.geoAstroPathsGroup && window.geoAstroPathsGroup.visible);
-          setTraversesVisibility(vis);
-        };
-      }
-      if (chkTraverses) {
-        chkTraverses.onchange = (e) => {
-          setTraversesVisibility(e.target.checked);
-        };
-      }
-
-      // Destinations (IAU) Toggle
-      const btnGeoDest = document.getElementById('btn-toggle-geo-dest');
-      const chkGeoDest = document.getElementById('chk-geo-destinations');
-      function setDestVisibility(vis) {
-        if (window.geoLandmarksGroup) window.geoLandmarksGroup.visible = vis;
-        if (btnGeoDest) btnGeoDest.classList.toggle('active', vis);
-        if (chkGeoDest) chkGeoDest.checked = vis;
-      }
-      if (btnGeoDest) {
-        btnGeoDest.onclick = () => {
-          const vis = !(window.geoLandmarksGroup && window.geoLandmarksGroup.visible);
-          setDestVisibility(vis);
-        };
-      }
-      if (chkGeoDest) {
-        chkGeoDest.onchange = (e) => {
-          setDestVisibility(e.target.checked);
-        };
-      }
-
-      // USGS SIM 3292 Geology 4K Overlay Toggle & Slider (Rendered ON TOP of MOLA Topo 4K Base)
+      // 2. Overlays & Opacity Controls (Geology 4K & Zoom 5 Grayscale on Original Globe)
       const btnGeoTopo = document.getElementById('btn-toggle-geo-topo');
       const chkGeoTopo = document.getElementById('chk-geo-topo-blend');
       const sliderGeoTopo = document.getElementById('slider-geo-blend');
@@ -5219,11 +5165,11 @@
       const lblMenuGeoBlendPct = document.getElementById('lbl-menu-geo-blend-pct');
 
       function updateGeologyOpacity(val) {
-        if (window.geoTopoOverlayMesh && window.geoTopoOverlayMesh.material) {
-          window.geoTopoOverlayMesh.material.opacity = val;
-        }
         if (window.mainGeologyOverlayMesh && window.mainGeologyOverlayMesh.material) {
           window.mainGeologyOverlayMesh.material.opacity = val;
+        }
+        if (window.geoTopoOverlayMesh && window.geoTopoOverlayMesh.material) {
+          window.geoTopoOverlayMesh.material.opacity = val;
         }
         if (sliderGeoTopo) sliderGeoTopo.value = val;
         if (sliderMenuGeo) sliderMenuGeo.value = val;
@@ -5231,10 +5177,11 @@
         if (lblGeoBlendPct) lblGeoBlendPct.textContent = pctStr;
         if (lblMenuGeoBlendPct) lblMenuGeoBlendPct.textContent = pctStr;
       }
+      window.updateGeologyOpacity = updateGeologyOpacity;
 
       function setTopoBlendVisibility(vis) {
-        if (window.geoTopoOverlayMesh) window.geoTopoOverlayMesh.visible = vis;
         if (window.mainGeologyOverlayMesh) window.mainGeologyOverlayMesh.visible = vis;
+        if (window.geoTopoOverlayMesh) window.geoTopoOverlayMesh.visible = vis;
         if (btnGeoTopo) btnGeoTopo.classList.toggle('active', vis);
         if (chkGeoTopo) chkGeoTopo.checked = vis;
         if (btnGeo) btnGeo.classList.toggle('active', vis);
@@ -5242,10 +5189,18 @@
         const menuSliderWrap = document.getElementById('menu-geo-slider-wrap');
         if (menuSliderWrap) menuSliderWrap.style.display = vis ? 'flex' : 'none';
       }
+      window.setTopoBlendVisibility = setTopoBlendVisibility;
+
       if (btnGeoTopo) {
         btnGeoTopo.onclick = () => {
-          const vis = !(window.geoTopoOverlayMesh && window.geoTopoOverlayMesh.visible);
-          setTopoBlendVisibility(vis);
+          const isVis = window.mainGeologyOverlayMesh ? window.mainGeologyOverlayMesh.visible : false;
+          setTopoBlendVisibility(!isVis);
+        };
+      }
+      if (btnGeo) {
+        btnGeo.onclick = () => {
+          const isVis = window.mainGeologyOverlayMesh ? window.mainGeologyOverlayMesh.visible : false;
+          setTopoBlendVisibility(!isVis);
         };
       }
       if (chkGeoTopo) {
@@ -5264,7 +5219,7 @@
         };
       }
 
-      // Zoom 5 Grayscale Overlay Toggle & Slider (Rendered ON TOP of Geology & MOLA Topo)
+      // Zoom 5 Grayscale Overlay Toggle & Slider
       const btnGeoZoom5 = document.getElementById('btn-toggle-geo-zoom5');
       const chkGeoZoom5 = document.getElementById('chk-geo-zoom5-blend');
       const sliderGeoZoom5 = document.getElementById('slider-geo-zoom5');
@@ -5275,17 +5230,17 @@
 
       function updateZoom5Opacity(val) {
         const isFullOpaque = val >= 0.999;
-        if (window.geoZoom5OverlayMesh && window.geoZoom5OverlayMesh.material) {
-          window.geoZoom5OverlayMesh.material.opacity = val;
-          window.geoZoom5OverlayMesh.material.transparent = !isFullOpaque;
-          window.geoZoom5OverlayMesh.material.depthWrite = isFullOpaque;
-          window.geoZoom5OverlayMesh.material.needsUpdate = true;
-        }
         if (window.mainZoom5OverlayMesh && window.mainZoom5OverlayMesh.material) {
           window.mainZoom5OverlayMesh.material.opacity = val;
           window.mainZoom5OverlayMesh.material.transparent = !isFullOpaque;
           window.mainZoom5OverlayMesh.material.depthWrite = isFullOpaque;
           window.mainZoom5OverlayMesh.material.needsUpdate = true;
+        }
+        if (window.geoZoom5OverlayMesh && window.geoZoom5OverlayMesh.material) {
+          window.geoZoom5OverlayMesh.material.opacity = val;
+          window.geoZoom5OverlayMesh.material.transparent = !isFullOpaque;
+          window.geoZoom5OverlayMesh.material.depthWrite = isFullOpaque;
+          window.geoZoom5OverlayMesh.material.needsUpdate = true;
         }
         if (sliderGeoZoom5) sliderGeoZoom5.value = val;
         if (sliderMenuZoom5) sliderMenuZoom5.value = val;
@@ -5293,21 +5248,24 @@
         if (lblGeoZoom5Pct) lblGeoZoom5Pct.textContent = pctStr;
         if (lblMenuZoom5Pct) lblMenuZoom5Pct.textContent = pctStr;
       }
+      window.updateZoom5Opacity = updateZoom5Opacity;
 
       function setZoom5BlendVisibility(vis) {
         window._zoom5Visible = vis;
-        if (window.geoZoom5OverlayMesh) window.geoZoom5OverlayMesh.visible = vis;
         if (window.mainZoom5OverlayMesh) window.mainZoom5OverlayMesh.visible = vis;
+        if (window.geoZoom5OverlayMesh) window.geoZoom5OverlayMesh.visible = vis;
         if (btnGeoZoom5) btnGeoZoom5.classList.toggle('active', vis);
         if (chkGeoZoom5) chkGeoZoom5.checked = vis;
         if (sliderZoom5Wrap) sliderZoom5Wrap.style.display = vis ? 'flex' : 'none';
         const menuZoom5Wrap = document.getElementById('menu-zoom5-slider-wrap');
         if (menuZoom5Wrap) menuZoom5Wrap.style.display = vis ? 'flex' : 'none';
       }
+      window.setZoom5BlendVisibility = setZoom5BlendVisibility;
+
       if (btnGeoZoom5) {
         btnGeoZoom5.onclick = () => {
-          const vis = !(chkGeoZoom5 && chkGeoZoom5.checked);
-          setZoom5BlendVisibility(vis);
+          const isVis = window.mainZoom5OverlayMesh ? window.mainZoom5OverlayMesh.visible : (chkGeoZoom5 ? chkGeoZoom5.checked : false);
+          setZoom5BlendVisibility(!isVis);
         };
       }
       if (chkGeoZoom5) {
@@ -5326,15 +5284,162 @@
         };
       }
 
-      // Reset Camera Center
+      // 3. Planetary Markers & Traverses (on Original Globe)
+      const btnLandings = document.getElementById('btn-toggle-landings');
+      const chkLandings = document.getElementById('chk-geo-landings');
+      function setLandingsVisibility(vis) {
+        if (window.landingSiteMarkersGroup) window.landingSiteMarkersGroup.visible = vis;
+        if (window.geoLandingSitesGroup) window.geoLandingSitesGroup.visible = vis;
+        if (btnLandings) btnLandings.classList.toggle('active', vis);
+        if (chkLandings) chkLandings.checked = vis;
+        if (appMode === '2D' && typeof draw2DFlat === 'function') draw2DFlat();
+      }
+      window.setLandingsVisibility = setLandingsVisibility;
+
+      if (btnLandings) {
+        btnLandings.onclick = () => {
+          const vis = !(window.landingSiteMarkersGroup && window.landingSiteMarkersGroup.visible);
+          setLandingsVisibility(vis);
+        };
+      }
+      if (chkLandings) {
+        chkLandings.onchange = (e) => {
+          setLandingsVisibility(e.target.checked);
+        };
+      }
+
+      const btnTraverses = document.getElementById('btn-toggle-geo-traverses');
+      const chkTraverses = document.getElementById('chk-geo-traverses');
+      function setTraversesVisibility(vis) {
+        if (window.astroPathsGroup) window.astroPathsGroup.visible = vis;
+        if (window.routesGroup) window.routesGroup.visible = vis;
+        if (window.corridorHighlightGroup) window.corridorHighlightGroup.visible = vis;
+        if (window.geoAstroPathsGroup) window.geoAstroPathsGroup.visible = vis;
+        if (btnTraverses) btnTraverses.classList.toggle('active', vis);
+        if (chkTraverses) chkTraverses.checked = vis;
+        if (appMode === '2D' && typeof draw2DFlat === 'function') draw2DFlat();
+      }
+      window.setTraversesVisibility = setTraversesVisibility;
+
+      if (btnTraverses) {
+        btnTraverses.onclick = () => {
+          const vis = !(window.astroPathsGroup && window.astroPathsGroup.visible);
+          setTraversesVisibility(vis);
+        };
+      }
+      if (chkTraverses) {
+        chkTraverses.onchange = (e) => {
+          setTraversesVisibility(e.target.checked);
+        };
+      }
+
+      const btnGeoDest = document.getElementById('btn-toggle-geo-dest');
+      const chkGeoDest = document.getElementById('chk-geo-destinations');
+      function setDestVisibility(vis) {
+        if (window.markersGroup) window.markersGroup.visible = vis;
+        if (window.geoLandmarksGroup) window.geoLandmarksGroup.visible = vis;
+        if (btnGeoDest) btnGeoDest.classList.toggle('active', vis);
+        if (chkGeoDest) chkGeoDest.checked = vis;
+      }
+      window.setDestVisibility = setDestVisibility;
+
+      if (btnGeoDest) {
+        btnGeoDest.onclick = () => {
+          const vis = !(window.markersGroup && window.markersGroup.visible);
+          setDestVisibility(vis);
+        };
+      }
+      if (chkGeoDest) {
+        chkGeoDest.onchange = (e) => {
+          setDestVisibility(e.target.checked);
+        };
+      }
+
+      // 4. Lat/Lon Grid on Original Globe
+      const btnGrid = document.getElementById('btn-toggle-grid');
+      if (btnGrid) {
+        btnGrid.onclick = () => {
+          const isVis = window.mainGridMesh ? !window.mainGridMesh.visible : true;
+          if (window.mainGridMesh) window.mainGridMesh.visible = isVis;
+          if (gridMesh) gridMesh.visible = isVis;
+          btnGrid.classList.toggle('active', isVis);
+        };
+      }
+
+      // 5. Solar Sun on Original Globe
+      const btnSun = document.getElementById('btn-toggle-sun');
+      if (btnSun) {
+        btnSun.classList.toggle('active', solarTerminatorActive);
+        btnSun.onclick = () => {
+          const btnSolar = document.getElementById('btn-toggle-solar');
+          if (btnSolar) {
+            btnSolar.click();
+            btnSun.classList.toggle('active', solarTerminatorActive);
+          }
+        };
+      }
+
+      // 6. Center View on Original Globe
       const btnResetCam = document.getElementById('btn-reset-cam');
       if (btnResetCam) {
         btnResetCam.onclick = () => {
-          flyGeologyGlobeTo(0, 0, 520);
+          flyToCoordinate(0, 0, DEFAULT_LANDMARK_CAM_DIST);
+          controls.target.set(0, 0, 0);
           const hud = document.getElementById('mineral-target-hud');
           if (hud) hud.style.display = 'none';
         };
       }
+
+      // 7. Geologic Legend Drawer & Fly-To on Original Globe
+      const legendDrawer = document.getElementById('globe-legend-drawer');
+      const btnToggleLegend = document.getElementById('btn-geologic-legend');
+      if (btnToggleLegend && legendDrawer) {
+        btnToggleLegend.onclick = () => {
+          const isShown = legendDrawer.style.display === 'flex';
+          if (!isShown) {
+            if (ephPanel) ephPanel.style.display = 'none';
+            closeMainMenu();
+          }
+          legendDrawer.style.display = isShown ? 'none' : 'flex';
+          btnToggleLegend.classList.toggle('active', !isShown);
+        };
+      }
+
+      const btnCloseLegend = document.getElementById('btn-close-legend');
+      if (btnCloseLegend && legendDrawer) {
+        btnCloseLegend.onclick = () => {
+          legendDrawer.style.display = 'none';
+          if (btnToggleLegend) btnToggleLegend.classList.remove('active');
+        };
+      }
+
+      // Legend Item Clicks -> Fly to representative unit location on original globe
+      document.querySelectorAll('#globe-legend-drawer .legend-unit-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const lat = parseFloat(item.dataset.flyLat);
+          const lon = parseFloat(item.dataset.flyLon);
+          flyToCoordinate(lat, lon, LANDING_SITE_CAM_DIST);
+          const sym = item.querySelector('.u-sym')?.textContent || 'USGS Unit';
+          const unitPill = document.getElementById('lbl-globe-unit');
+          if (unitPill) unitPill.textContent = sym;
+          if (window.mainGeologyOverlayMesh && !window.mainGeologyOverlayMesh.visible) {
+            setTopoBlendVisibility(true);
+          }
+        });
+      });
+
+      // Target HUD Close Button
+      const hudMinClose = document.getElementById('hud-min-close');
+      if (hudMinClose) {
+        hudMinClose.onclick = () => {
+          const hud = document.getElementById('mineral-target-hud');
+          if (hud) hud.style.display = 'none';
+        };
+      }
+    }
+
+    function setupGeologyGlobeEvents(canvas) {
+      if (!canvas) return;
 
       // Landmark Waypoint Fly-To Buttons inside geology container
       document.querySelectorAll('#geology-globe-container [data-fly-lat]').forEach(btn => {
@@ -5685,7 +5790,7 @@
       };
     }
 
-    // Toggle Geology 4K Map Item & Submenu Flyout
+    // Toggle Geology 4K Map Item & Submenu Flyout (Maps directly to main globe)
     if (btnToggleGeo) {
       btnToggleGeo.onclick = (e) => {
         e.stopPropagation();
@@ -5694,8 +5799,8 @@
           closeGeologySubmenu();
         } else {
           openGeologySubmenu();
-          if (!isGeologyGlobeActive) {
-            activateGeologyGlobe();
+          if (window.mainGeologyOverlayMesh && !window.mainGeologyOverlayMesh.visible) {
+            setTopoBlendVisibility(true);
           }
         }
       };
@@ -5979,6 +6084,7 @@
     updateLiveMarsEphemeris();
     setInterval(updateLiveMarsEphemeris, 1000); // 1-second live clock update
     loadEVARoute('m20_perseverance', false); // Initialize route metrics without hijacking camera view
+    setupMainMenuEvents();
     syncBottomLayout();
     updateTargetHudPosition();
     updateDynamicScaleBar();
